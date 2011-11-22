@@ -1,0 +1,5 @@
+egout.mps is part of the Cgl test data:
+https://projects.coin-or.org/svn/Cgl/trunk/Cgl/test/CglTestData/egout.mps
+
+brandy.mps is available via
+https://projects.coin-or.org/svn/Data/Sample/releases/1.2.0/brandy.mps

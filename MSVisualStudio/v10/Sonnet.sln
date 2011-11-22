@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonnet", "Sonnet\Sonnet.csproj", "{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetTest", "SonnetTest\SonnetTest.csproj", "{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

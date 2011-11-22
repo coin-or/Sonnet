@@ -1,0 +1,39 @@
+http://sourceforge.net/projects/sonnet-project
+http://www.coin-or.org
+
+As mentioned in the README, SONNET consists of two libraries:
+
+The SonnetWrapper is writen in C++/CLI
+The SonnetWrapper library is built using the COIN libraries BuildTools, Cbc, Clp, Cgl, CoinUtils, Osi and their dependencies.
+
+Note that all these projects are also included as part of the Cbc tarball.
+The SonnetWrapper solution refers to and builds all COIN dependencies and the SonnetWrapper project itself.
+The COIN libraries are statically linked into the SonnetWrapper library.
+
+Within SONNET, the main purpose of the SonnetWrapper library is to be use by the Sonnet library.
+The SonnetWrapper can also be used as a stand-alone library to provide classic COIN functionality in .NET.
+
+In contrast, the Sonnet library is writen in C#. This library uses a reference to the SonnetWrapper library.
+Code is provided to perform various tests on the Sonnet library.
+
+All projects and solutions are provided for Visual Studio 2010 only.
+Since Visual Studio 2010 Express (see "MSVisualStudio\v10e") cannot mix projects of different languages, 
+
+the C++/CLI projects (SonnetWrapper and COIN libraries) are put into one solution, 
+and the C# projects (Sonnet and SonnetTest) are put into another solution.
+Note that both Visual C++ Express and Visual C# Express are required.
+The downside of this split is that the Sonnet library has an outside dependency on the SonnetWrapper library, 
+which must be manually built first.
+
+To build SonnetWrapper with 64-bit support in VS Express, see the Readme.txt there.
+
+For use within (non-Express) Visual Studio 2010 (see "MSVisualStudio\v10"), 
+one single solution is also provided that contains all projects.
+
+See http://www.microsoft.com/visualstudio/en-us/products/2010-editions/express 
+
+To strongly name (sign) the Sonnet.dll and SonnetWrapper.dll there are two options:
+1) Build the source code using your own key, or
+2) Use ILMERGE 
+ilmerge Weak.dll /keyfile:key.snk /out:Strong.dll
+See http://www.microsoft.com/download/en/details.aspx?id=17630
