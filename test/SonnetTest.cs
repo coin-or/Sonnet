@@ -167,6 +167,7 @@ namespace SonnetTest
                     SonnetTest36();
                     SonnetTest37();
                     SonnetTest38();
+                    SonnetTest39();
 
                     // do these two stress tests last..
                     SonnetTest29();
@@ -2218,13 +2219,18 @@ namespace SonnetTest
             {
                 Solver solver = new Solver(model, solverType);
 
-
-                // TODO: Let available memory determine size of problem
-                // otherwise we may run out of memory
+                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
+                int n = Math.Min(3, Environment.ProcessorCount + 1);
+            
+                // N = 3K, M = 30K, Z=100 requires works with about 1.5GB per thread (n).
+                // Let's scale accordingly
+                // Note: Arguably only M and Z matter, but we scall also N
+                double f = (memoryGB / n) / 1.5;
 
                 // the stress test
-                int N = 10000; // number of variables
-                int M = 100000; // number of rangeconstraints
+                int N = (int) (f * 3000); // number of variables
+                int M = (int) (f * 30000); // number of rangeconstraints
                 int Z = 100; // number nonzeros per constraint
 
                 Variable x = new Variable();
@@ -2241,7 +2247,6 @@ namespace SonnetTest
                         int i = (z + m) % N; // always between 0 and N-1
                         expr.Add(vars[i]);
                     }
-
 
                     int available = m;
                     
@@ -2309,6 +2314,7 @@ namespace SonnetTest
                 Console.WriteLine(exception.ToString());
                 if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
                 throw;
+                // could be out-of-memory... Can we examine the SEHException?
             }
         }
 
@@ -2501,38 +2507,30 @@ namespace SonnetTest
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
 
-            //Assert(MathExtension.CompareDouble(model.ObjectiveValue(), 3.45) == 0); // without Constant
             Assert(MathExtension.CompareDouble(model.Objective.Value, 13.45) == 0); // with Constant
             Assert(MathExtension.CompareDouble(model.Objective.Level(), 13.45) == 0); // with Constant
         }
 
         public void SonnetTest36()
         {
+            Console.WriteLine("SonnetTest36 - testing objective values");
+
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
 
             Assert(model.ImportModel("MIP-124725.mps")); // added file to project, "Copy Always"
 
-            model.ObjectiveSense = ObjectiveSense.Minimise;
-
-            if (solver.OsiSolver is OsiCbcSolverInterface)
-            {
-                solver.Minimise();
-                Assert(MathExtension.CompareDouble(model.Objective.Value, 124725) == 0);
-            }
-            else
-            {
-                solver.Minimise(true);
-                Assert(MathExtension.CompareDouble(model.Objective.Value, 104713.12807881772) == 0);
-            }
+            solver.Minimise();
+            Assert(MathExtension.CompareDouble(model.Objective.Value, 124725) == 0);
         }
 
         public void SonnetTest37()
         {
+            if (solverType != SolverType.CbcSolver) return;
+            Console.WriteLine("SonnetTest37 - Cbc test set CbcStrategyNull and addCutGenerator");
+
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
-
-            if (solverType != SolverType.CbcSolver) return;
 
             Assert(model.ImportModel("MIP-124725.mps")); // added file to project, "Copy Always"
 
@@ -2542,8 +2540,8 @@ namespace SonnetTest
             CbcModel cbcModel = osisolver.getModelPtr();
             cbcModel.setStrategy(new CbcStrategyNull());
             cbcModel.addCutGenerator(new CglProbing());
-            cbcModel.numberCutGenerators();
-            cbcModel.cutGenerators();
+            Assert(cbcModel.numberCutGenerators() == 1);
+            //cbcModel.cutGenerators();
 
             solver.Minimise();
 
@@ -2554,6 +2552,8 @@ namespace SonnetTest
         public void SonnetTest38()
         {
             if (solverType != SolverType.CbcSolver) return;
+
+            Console.WriteLine("SonnetTest38 - Cbc set CbcStrategyDefault");
 
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
@@ -2568,7 +2568,7 @@ namespace SonnetTest
             cbcModel.setStrategy(new CbcStrategyDefault(1, 5, 5));
             //cbcModel.strategy().setupCutGenerators(cbcModel);
 
-            solver.AutoResetAfterMIPSolve = true;
+            solver.AutoResetMIPSolve = true;
             solver.Minimise();
 
             string message = "Used cut generators: " + string.Join(", ", cbcModel.cutGenerators().Select(generator => generator.generator().GetType().Name));
@@ -2580,6 +2580,53 @@ namespace SonnetTest
             solver.Solve(true);
             Assert(MathExtension.CompareDouble(model.Objective.Value, 104713.12807881772) == 0);
         }
+
+        public void SonnetTest39()
+        {
+            Console.WriteLine("SonnetTest39 - Test MIP solve followed by solving lp-relaxation");
+
+            Model m = new Model();
+            Variable x = new Variable(VariableType.Integer);
+            Variable y = new Variable(VariableType.Integer);
+
+            m.Add(0 <= 1.3 * x + 3 * y <= 10, "con1");
+            m.Objective = x + 2 * y;
+
+            Solver s = new Solver(m, solverType);
+            s.Maximise();
+
+            Console.WriteLine("Status: Optimal? " + s.IsProvenOptimal);
+            Console.WriteLine("Status: x = " + x.Value);
+            Console.WriteLine("Status: y = " + y.Value);
+            Console.WriteLine("Status: obj = " + m.Objective.Value);
+
+            Assert(MathExtension.CompareDouble(m.Objective.Value, 7) == 0);
+
+
+            s.Maximise(true);
+            Console.WriteLine("Status: Optimal? " + s.IsProvenOptimal);
+            Console.WriteLine("Status: x = " + x.Value);
+            Console.WriteLine("Status: y = " + y.Value);
+            Console.WriteLine("Status: obj = " + m.Objective.Value);
+            Assert(MathExtension.CompareDouble(m.Objective.Value, 7.6923076923076907) == 0);
+
+            m.GetConstraint("con1").Lower = 4;
+
+            s.Minimise();
+            Console.WriteLine("Status: Optimal? " + s.IsProvenOptimal);
+            Console.WriteLine("Status: x = " + x.Value);
+            Console.WriteLine("Status: y = " + y.Value);
+            Console.WriteLine("Status: obj = " + m.Objective.Value);
+            Assert(MathExtension.CompareDouble(m.Objective.Value, 3.0) == 0);
+
+            s.Minimise(true);
+            Console.WriteLine("Status: Optimal? " + s.IsProvenOptimal);
+            Console.WriteLine("Status: x = " + x.Value);
+            Console.WriteLine("Status: y = " + y.Value);
+            Console.WriteLine("Status: obj = " + m.Objective.Value);
+            Assert(MathExtension.CompareDouble(m.Objective.Value, 2.66666666666) == 0);
+        }
+        
 
         public static bool EqualsString(string string1, string string2)
         {

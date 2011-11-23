@@ -76,10 +76,15 @@ namespace Sonnet
             set { SonnetLog.Default.LogLevel = value; }
         }
         
-        public bool AutoResetAfterMIPSolve
+        /// <summary>
+        /// When true, automatically reset the solver after a MIP has been solved (= Default)
+        /// When false, you have to manually Save before and Reset after a MIP solve.
+        /// Note, this only affects MIP.
+        /// </summary>
+        public bool AutoResetMIPSolve
         {
-            get { return this.autoResetAfterMIPSolve; }
-            set { this.autoResetAfterMIPSolve = value; }
+            get { return this.autoResetMIPSolve; }
+            set { this.autoResetMIPSolve = value; }
         }
         
         #region OsiSolver Properties and Parameters
@@ -291,12 +296,12 @@ namespace Sonnet
                 if (forceRelaxation == false && IsMIP)
                 {
                     isSolving = true;
-                    SaveBeforeMIPSolve();
+                    if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
 
                     solver.branchAndBound();
 
                     AssignSolution();
-                    if (AutoResetAfterMIPSolve) ResetAfterMIPSolve(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
+                    if (AutoResetMIPSolve) ResetAfterMIPSolveInternal(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
                 }
                 else
                 {
@@ -409,6 +414,15 @@ namespace Sonnet
         #region Reset / Save for MIP Solver methods
         public void ResetAfterMIPSolve()
         {
+            if (AutoResetMIPSolve)
+            {
+                throw new NotSupportedException("ResetAfterMIPSolve is automatically called");
+            }
+
+            SaveBeforeMIPSolveInternal();
+        }
+        private void ResetAfterMIPSolveInternal()
+        {
             //TODO: this needs some work: ResetAfterMIPSolve also clears the solution, so afterwards any AssignSolution yields all zero values!
             // so, either we always AssignSolution, and discourage the user from calling it (in MIP),
             // or we (force) manual ResetAfterMIPSolve from the user in MIP.
@@ -417,8 +431,6 @@ namespace Sonnet
             // the user needs to be able to switch the solutions in the variables by calling AssignSolution on 
             // the prefered model.
             // But the problem with ResetAfterMIPSolve is bigger: also the solver.get.. functions (getObjValue etc) no longer work
-            // Therefore, it was decided NOT to automatically ResetAfterMIPSolve
-            // Then force automatic ResetAfterMIPSolve
             if (solver is OsiCbcSolverInterface)
             {
                 // Since the model was already generated before, we can safely Reset to the reference solver instance 
@@ -429,12 +441,24 @@ namespace Sonnet
             else
             {
                 solver.restoreBaseModel(solver.getNumRows());
-                solver.setDblParam(OsiDblParam.OsiDualObjectiveLimit, double.MaxValue);
+                // Restore bounds and dual limit
+                solver.setColLower(saveColLower);
+                solver.setColUpper(saveColUpper);
+                solver.setDblParam(OsiDblParam.OsiDualObjectiveLimit, saveOsiDualObjectiveLimit);
             }
         }
 
-        private void SaveBeforeMIPSolve()
+        public void SaveBeforeMIPSolve()
         {
+            if (AutoResetMIPSolve)
+            {
+                throw new NotSupportedException("SaveBeforeMIPSolve is automatically called");
+            }
+
+            SaveBeforeMIPSolveInternal();
+        }
+        private void SaveBeforeMIPSolveInternal()
+            {
             if (solver is OsiCbcSolverInterface)
             {
                 // save the new reference solver including the new constraints.
@@ -442,6 +466,9 @@ namespace Sonnet
             }
             else
             {
+                saveColLower = solver.getColLower(); // a copy!
+                saveColUpper = solver.getColUpper(); // a copy!
+                solver.getDblParam(OsiDblParam.OsiDualObjectiveLimit, out saveOsiDualObjectiveLimit);
                 solver.saveBaseModel();
             }
         }
@@ -1740,7 +1767,10 @@ namespace Sonnet
         private List<Constraint> rawconstraints;
 
         private bool generated;
-        private bool autoResetAfterMIPSolve = true;
+        private bool autoResetMIPSolve = true;
+        private double saveOsiDualObjectiveLimit;
+        private double[] saveColLower;
+        private double[] saveColUpper;
 
         // solution status
         private bool isAbandoned;

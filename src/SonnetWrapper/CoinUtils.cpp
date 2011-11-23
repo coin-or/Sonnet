@@ -3,6 +3,7 @@
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 #include "CoinUtils.h"
+#include "Helpers.h"
 
 namespace COIN
 {
@@ -54,5 +55,4 @@ namespace COIN
 	{
 		return ::CoinCpuTime();
 	}
-
 }

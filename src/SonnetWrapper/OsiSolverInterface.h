@@ -7,6 +7,7 @@
 #include "CoinMessageHandler.h"
 #include "CoinWarmStart.h"
 #include "OsiSolverParameters.h"
+#include "CoinError.h"
 
 #include <CoinTime.hpp>
 #include <CoinMessage.hpp>
@@ -120,6 +121,71 @@ namespace COIN
 		double getObjValue();
 	    /// Get objective function sense (1 for min (default), -1 for max)
 		double getObjSense();
+	
+		const double *getColLowerUnsafe()
+		{
+			return Base->getColLower();
+		}
+
+		array<double> ^ getColLower()
+		{
+			int n = Base->getNumCols();
+			double *input = (double *) Base->getColLower();
+			array<double> ^result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+
+		void setColLowerUnsafe(const double *input)
+		{
+			try
+			{
+				Base->setColLower(input);
+			}
+			catch (::CoinError err)
+			{
+				throw gcnew CoinError(err);
+			}
+		}
+
+		void setColLower(array<double> ^input)
+		{
+			pin_ptr<double> inputPinned = GetPinablePtr(input);
+			setColLowerUnsafe(inputPinned);
+		}
+
+		const double *getColUpperUnsafe()
+		{
+			return Base->getColUpper();
+		}
+
+		array<double> ^ getColUpper()
+		{
+			int n = Base->getNumCols();
+			double *input = (double *) Base->getColUpper();
+			array<double> ^result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+
+		void setColUpperUnsafe(const double *input)
+		{
+			try
+			{
+				Base->setColUpper(input);
+			}
+			catch (::CoinError err)
+			{
+				throw gcnew CoinError(err);
+			}
+		}
+
+		void setColUpper(array<double> ^input)
+		{
+			pin_ptr<double> inputPinned = GetPinablePtr(input);
+			setColUpperUnsafe(inputPinned);
+		}
+
 		const double *getColSolutionUnsafe();
 		array<double> ^ getColSolution();
 		void setColSolutionUnsafe(const double *colsol);

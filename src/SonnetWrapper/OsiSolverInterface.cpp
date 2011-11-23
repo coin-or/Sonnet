@@ -39,7 +39,6 @@ namespace COIN
 		{
 			throw gcnew CoinError(err);
 		}
-
 	}
 
 	void OsiSolverInterface::resolve()
@@ -531,6 +530,7 @@ namespace COIN
 		System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
 		return result;
 	}
+
 	void OsiSolverInterface::setColSolutionUnsafe(const double *colsol)
 	{
 		try
@@ -546,7 +546,7 @@ namespace COIN
 	void OsiSolverInterface::setColSolution(array<double> ^colsol)
 	{
 		pin_ptr<double> colsolPinned = GetPinablePtr(colsol);
-		Base->setColSolution(colsolPinned);
+		setColSolutionUnsafe(colsolPinned);
 	}
 
 	const double *OsiSolverInterface::getReducedCostUnsafe()
@@ -588,7 +588,7 @@ namespace COIN
 	void OsiSolverInterface::setRowPrice(array<double> ^rowprice)
 	{
 		pin_ptr<double> rowpricePinned = GetPinablePtr(rowprice);
-		Base->setRowPrice(rowpricePinned);
+		setRowPriceUnsafe(rowpricePinned);
 	}
 
 	const double *OsiSolverInterface::getRowActivityUnsafe()

@@ -106,4 +106,10 @@ namespace COIN
 		{
 		}
 	};
+
+	template<typename T>
+	inline cli::interior_ptr<T> GetPinablePtr(array<T> ^t)
+	{
+		return (t == nullptr || t->LongLength == 0)?nullptr:&t[0];
+	}
 }

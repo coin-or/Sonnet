@@ -53,6 +53,7 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="SonnetWrapper, Version=1.0.4340.31281, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SonnetWrapper\SonnetWrapper.dll</HintPath>
