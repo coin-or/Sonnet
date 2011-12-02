@@ -8,10 +8,35 @@ using System.Text;
 
 namespace Sonnet
 {
-    public enum ConstraintType { LE, GE, EQ };
+    /// <summary>
+    /// Specifies the types of constraints: less-or-equal (LE), greater-or-equal (GE) or equal (EQ)
+    /// </summary>
+    public enum ConstraintType { 
+        /// <summary>
+        /// Less-or-equal
+        /// </summary>
+        LE, 
+        /// <summary>
+        /// Greater-or-equal
+        /// </summary>
+        GE, 
+        /// <summary>
+        /// Equal
+        /// </summary>
+        EQ 
+    };
 
+    /// <summary>
+    /// Class Constraints that can be added to one or more models.
+    /// By definition, a constraint has a left-hand side, a type and a right-hand side.
+    /// </summary>
     public class Constraint : ModelEntity, IDisposable
     {
+        /// <summary>
+        /// Constructor returns a new constraints with the given name and based on a copy of the given constaint
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="con"></param>
         public Constraint(string name, Constraint con)
             : base()
         {
@@ -20,6 +45,14 @@ namespace Sonnet
             GutsOfConstructor(name, con.expr, con.type, con.rhs);
         }
 
+        /// <summary>
+        /// Constructor that copies the given expressions. 
+        /// The given expressions can be disposed after this constructor is called.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="expr"></param>
+        /// <param name="type"></param>
+        /// <param name="rhs"></param>
         public Constraint(string name, Expression expr, ConstraintType type, Expression rhs)
         {
             Ensure.NotNull(expr, "expression");

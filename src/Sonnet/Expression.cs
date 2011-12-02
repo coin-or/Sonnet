@@ -46,7 +46,7 @@ namespace Sonnet
     }
     public class Utils
     {
-        public static void Erase<T>(List<T> list, int index)
+        public static void Remove<T>(List<T> list, int index)
         {
             // This should be much faster, but without maintaining the (sorted?) order.
             // swap the last for i!!
@@ -173,9 +173,9 @@ namespace Sonnet
 
     internal class CoefVector : List<Coef>
     {
-        public void Erase(int index)
+        public void Remove(int index)
         {
-            Utils.Erase<Coef>(this, index);
+            Utils.Remove<Coef>(this, index);
         }
 
         //public override bool Equals(object obj)
@@ -230,17 +230,28 @@ namespace Sonnet
 
     public class Expression : IDisposable
     {
+        /// <summary>
+        /// Constructor of empty expression (constant = 0)
+        /// </summary>
         public Expression()
             : this(0.0)
         {
         }
 
-        public Expression(double coef)
+        /// <summary>
+        /// Constructor of new expression with only the given constrant
+        /// </summary>
+        /// <param name="constant">Constant to use</param>
+        public Expression(double constant)
         {
-            constant = coef;
+            this.constant = constant;
             coefs = new CoefVector();
         }
 
+        /// <summary>
+        /// Constructor of new expression with one term: 1 * variable
+        /// </summary>
+        /// <param name="variable">Variable to use</param>
         public Expression(Variable variable)
             : this(0.0)
         {
@@ -249,6 +260,11 @@ namespace Sonnet
             coefs.Add(new Coef(variable, 1.0));
         }
 
+        /// <summary>
+        /// Constructor of new expression with one term: coef * variable
+        /// </summary>
+        /// <param name="coef">Multiplication coefficient</param>
+        /// <param name="variable">Variable to use</param>
         public Expression(double coef, Variable variable)
             : this(0.0)
         {
@@ -260,6 +276,11 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Constructor copies the given expression and multiplies all coefficients and constant with the given multiplier.
+        /// </summary>
+        /// <param name="multiplier">Multiplier to use</param>
+        /// <param name="expr">Expression to copy and multiply</param>
         public Expression(double multiplier, Expression expr)
             : this()
         {
@@ -278,6 +299,10 @@ namespace Sonnet
             constant = multiplier * expr.constant;
         }
 
+        /// <summary>
+        /// Constructor that copies the given expression.
+        /// </summary>
+        /// <param name="expr">Expression to copy</param>
         public Expression(Expression expr)
             : this()
         {
@@ -300,11 +325,14 @@ namespace Sonnet
         //    return this;
         //}
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
+        /// <summary>
+        /// Determines whether the specified Expression is equal to the current Expression.
+        /// Note, this expression and the given expression are not necessarily assembled.
+        /// Therefore, for example, the expression (x + x) not "Equals" (2 * x).
+        /// This has nothing to do with equality (EQ) constraints.
+        /// </summary>
+        /// <param name="expr">The Expression to compare with the current Expression.</param>
+        /// <returns>true iff the given expression has the same constant and all coefficients and variables as the current Expression.</returns>
         public bool Equals(Expression expr)
         {
             EnsureNotDisposedOrFinalized();
@@ -324,23 +352,30 @@ namespace Sonnet
 
             return this.coefs.Equals(expr.coefs);
         }
+
+        /// <summary>
+        //  Determines whether the specified object is equal to the current Expression.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current Expression.</param>
+        /// <returns>True iff the given object is an Expression and is equal to the current Expression.</returns>
         public override bool Equals(object obj)
         {
             return base.Equals(obj as Expression);
         }
 
-        //public override int GetHashCode()
-        //{
-        //    EnsureNotDisposedOrFinalized();
-        //    // coefs is a pointer to a CoefVector. CoefVector is derived from list, and list implements the "==" operator
-        //    // However, the CoefVector's elements are Coefs, which implement "==" only by comparing the id of the variables of two coefs.
-        //    if (this.constant != expr.constant) return false;
+        /// <summary>
+        /// Serves as a hash function for the current Expression, base on the constant, coefficients and variables.
+        /// </summary>
+        /// <returns>A hash code for the current Expression.</returns>
+        public override int GetHashCode()
+        {
+            return this.constant.GetHashCode() ^ this.coefs.GetHashCode();
+        }
 
-        //    if (this.coefs.Count != expr.coefs.Count) return false;
-
-        //    return this.coefs.Equals(expr.coefs);
-        //}
-
+        /// <summary>
+        /// Returns a System.String that represents the current Expression.
+        /// </summary>
+        /// <returns>A System.String that represents the current Expression.</returns>
         public override string ToString()
         {
             EnsureNotDisposedOrFinalized();
@@ -362,28 +397,44 @@ namespace Sonnet
             }
 
             return tmp.ToString();
-
         }
-        public Expression Add(double aCoef, Variable variable)
+
+        /// <summary>
+        /// Adds the variable with the given coefficient to the current Expression.
+        /// </summary>
+        /// <param name="coef">The coefficient to be added.</param>
+        /// <param name="variable">The Variable to be added with the coefficient.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Add(double coef, Variable variable)
         {
             EnsureNotDisposedOrFinalized();
             Ensure.NotNull(variable, "variable");
 
-            if (aCoef != 0.0)
+            if (coef != 0.0)
             {
-                coefs.Add(new Coef(variable, aCoef));
+                coefs.Add(new Coef(variable, coef));
             }
 
             return this;
         }
 
-        public Expression Add(double coef)
+        /// <summary>
+        /// Adds the given constant to the constant of the current Expression.
+        /// </summary>
+        /// <param name="constant">The constant value to be added.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Add(double constant)
         {
             EnsureNotDisposedOrFinalized();
-            constant += coef;
+            this.constant += constant;
             return this;
         }
 
+        /// <summary>
+        /// Adds the given variable with coefficient 1.0 to the current Expression.
+        /// </summary>
+        /// <param name="variable">The Variable to be added.</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Add(Variable variable)
         {
             EnsureNotDisposedOrFinalized();
@@ -393,6 +444,12 @@ namespace Sonnet
             return this;
         }
 
+        /// <summary>
+        /// Adds the constant and a copy of the coefficients and variables of the given Expression to the current Expression.
+        /// Cannot be used recursively.
+        /// </summary>
+        /// <param name="expr">The expression to be added.</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Add(Expression expr)
         {
             EnsureNotDisposedOrFinalized();
@@ -405,53 +462,92 @@ namespace Sonnet
             return this;
         }
 
-        public Expression Add(double coef, Expression expr)
+        /// <summary>
+        /// Adds the constant and a copy of the coefficients and variables of the given Expression, multiplied by the given factor
+        /// to the current Expression.
+        /// </summary>
+        /// <param name="factor">The multiplication factor for the given Expression.</param>
+        /// <param name="expr">The expression to be added.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Add(double factor, Expression expr)
         {
             EnsureNotDisposedOrFinalized();
             Ensure.NotNull(expr, "expr");
 
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
 
-            if (coef != 0.0)
+            if (factor != 0.0)
             {
                 int n = expr.coefs.Count;
                 for (int i = 0; i < n; i++)
                 {
                     Coef c = expr.coefs[i]; // consider ref
-                    coefs.Add(new Coef(c.var, coef * c.coef));
+                    coefs.Add(new Coef(c.var, factor * c.coef));
                 }
-                constant += coef * expr.constant;
+                constant += factor * expr.constant;
             }
             return this;
         }
 
+        /// <summary>
+        /// Subtracts the given variable with the given coefficient from the current Expression.
+        /// </summary>
+        /// <param name="coef">The coefficient of the variable to be subtracted.</param>
+        /// <param name="variable">The variable to be subtracted with the coefficient</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Subtract(double coef, Variable variable)
         {
             return this.Add(-coef, variable);
         }
 
-        public Expression Subtract(double coef, Expression expr)
+        /// <summary>
+        /// Subtracts the given expression multiplied by the given factor from the current Expression.
+        /// </summary>
+        /// <param name="factor">The multiplication factor for the given expression.</param>
+        /// <param name="expr">The expression to be subtracted.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Subtract(double factor, Expression expr)
         {
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive subtractions not allowed.");
 
-            return this.Add(-coef, expr);
+            return this.Add(-factor, expr);
         }
 
-        public Expression Subtract(double coef)
+        /// <summary>
+        /// Subtracts the given constant from the constant of the current Expression.
+        /// </summary>
+        /// <param name="constant">The value to subtract.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Subtract(double constant)
         {
-            return this.Add(-coef);
+            return this.Add(-constant);
         }
 
-        public Expression Subtract(Variable aVar)
+        /// <summary>
+        /// Subtracts the given variable (with coefficient 1.0) from the current Expression.
+        /// </summary>
+        /// <param name="var">The variable to subtract.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Subtract(Variable var)
         {
-            return this.Add(-1.0, aVar);
+            return this.Add(-1.0, var);
         }
 
+        /// <summary>
+        /// Subtracts the given expression from the current Expression
+        /// </summary>
+        /// <param name="expr">The expression to subtract.</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Subtract(Expression expr)
         {
             return this.Subtract(1.0, expr);
         }
 
+        /// <summary>
+        /// Multiplies the constant and all coefficients of the current Expression by the given multiplier.
+        /// </summary>
+        /// <param name="multiplier">The multiplier to be used.</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Multiply(double multiplier)
         {
             if (multiplier == 0.0) Clear();
@@ -468,6 +564,11 @@ namespace Sonnet
             return this;
         }
 
+        /// <summary>
+        /// Divides the constant and all coefficients of the current Expression by the given divider.
+        /// </summary>
+        /// <param name="divider">The divider to be used.</param>
+        /// <returns>The updated current Expression.</returns>
         public Expression Divide(double divider)
         {
             if (divider == 0.0) throw new DivideByZeroException();
@@ -482,7 +583,13 @@ namespace Sonnet
             constant = 0.0;
         }
 
-        protected double Erase(Variable var)
+        /// <summary>
+        /// Removes the given variable from the current Expression.
+        /// This disrupts the order of coefficients.
+        /// </summary>
+        /// <param name="var">The variable to be removed.</param>
+        /// <returns>The sum of all coefficients of the given variable before removing.</returns>
+        protected double Remove(Variable var)
         {
             EnsureNotDisposedOrFinalized();
             Ensure.NotNull(var, "var");
@@ -497,7 +604,7 @@ namespace Sonnet
                 if (aID == c.id)
                 {
                     coef += c.coef;
-                    coefs.Erase(i);
+                    coefs.Remove(i);
                     n = coefs.Count; // needs to be updated!
                 }
                 else
@@ -509,18 +616,35 @@ namespace Sonnet
             return coef;
         }
 
+        /// <summary>
+        /// Determines the sum of all coefficients of the given variable.
+        /// Same as Assemble(var);
+        /// </summary>
+        /// <param name="var">The variable involved.</param>
+        /// <returns>The sum of all coefficients of the given variable.</returns>
         public double GetCoefficient(Variable var)
         {
             return Assemble(var);
         }
 
+        /// <summary>
+        /// Sets the overall coefficient of the given variable to the given value.
+        /// </summary>
+        /// <param name="var">The variable to be used.</param>
+        /// <param name="value">The new coefficient for the given variable.</param>
+        /// <returns>The sum of all *old* coefficients of the given variable.</returns>
         public double SetCoefficient(Variable var, double value)
         {
-            double oldValue = Erase(var);
+            double oldValue = Remove(var);
             this.Add(value, var);
             return oldValue;
         }
 
+        /// <summary>
+        /// Determines the sum of all coefficients of the given variable.
+        /// </summary>
+        /// <param name="var">The variable to be used.</param>
+        /// <returns>The sum of all coefficients of the given variable.</returns>
         public double Assemble(Variable var)
         {
             EnsureNotDisposedOrFinalized();
@@ -537,6 +661,10 @@ namespace Sonnet
             return coef;
         }
 
+        /// <summary>
+        /// Assemble the current Expression.
+        /// After Assembling, all variables will appear only once in the list of coefficients.
+        /// </summary>
         public void Assemble()
         {
             EnsureNotDisposedOrFinalized();
@@ -565,20 +693,32 @@ namespace Sonnet
             coefs.AddRange(assembled);
         }
 
+        /// <summary>
+        /// Clears the current Expression and then adds the given expression.
+        /// </summary>
+        /// <param name="expr">The expression to be assigned.</param>
+        /// <returns>The updated current Expression, equal to the given Expression.</returns>
         public Expression Assign(Expression expr)
         {
             // the assign erases any existing elements first, and then copies the aExp
-            // couldnt this be just coefs.clear(); this.Add(aExp);
             Clear();
             return this.Add(expr);
         }
 
-        public Expression Assign(double coef)
+        /// <summary>
+        /// Clears the current Expression and sets the given constant.
+        /// </summary>
+        /// <param name="constant">The constant to be assigned.</param>
+        /// <returns>The updated current Expression, equal to the given constant.</returns>
+        public Expression Assign(double constant)
         {
             Clear();
-            return this.Add(coef);
+            return this.Add(constant);
         }
 
+        /// <summary>
+        /// Gets the vector of coefficients and variables of the current Expression.
+        /// </summary>
         internal CoefVector Coefficients
         {
             get
@@ -589,6 +729,9 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Gets the constant of the current Expression.
+        /// </summary>
         public double Constant
         {
             get
@@ -599,6 +742,9 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Returns the number of coefficients of the current Expression.
+        /// </summary>
         public int NumberOfCoefficients
         {
             get
@@ -609,6 +755,10 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Calculates constant plus the product of all coefficients and the Value in the current solution of their variables.
+        /// </summary>
+        /// <returns>The constant plus the product of all coefficients and the Value in the current solution of their variables.</returns>
         public double Level()
         {
             EnsureNotDisposedOrFinalized();
@@ -623,32 +773,44 @@ namespace Sonnet
             return level;
         }
         #region Overloaded Operators
-        /// Overloaded operators for defining constraints
-        /// Note that these overloaded operators use implicit conversion from variable and double to expression!
-        /// The <= operator
-
+        // (?) Note that these overloaded operators use implicit conversion from variable and double to expression!
+        
+        /// <summary>
+        /// Returns a new Constraint "lhs &lt;= rhs".
+        /// The expressions are copied.
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="rhs">The rigt-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
         public static Constraint operator <=(Expression lhs, Expression rhs)
         {
             return new Constraint(lhs, ConstraintType.LE, rhs);
         }
+
+        /// <summary>
+        /// Returns a new Constraint "lhs &lt;= val".
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static Constraint operator <=(Expression lhs, double val)
         {
-            return lhs <= new Expression(val); // removed gcnew: this is put into a new constraint, which copies the exprs.
+            return lhs <= new Expression(val);
         }
 
         public static Constraint operator <=(double val, Expression rhs)
         {
-            return (new Expression(val) <= rhs); // removed gcnew: this is put into a new constraint, which copies the exprs. 
+            return (new Expression(val) <= rhs); 
         }
 
         public static Constraint operator <=(Variable var, Expression rhs)
         {
-            return (new Expression(var) <= rhs); // removed gcnew: this is put into a new constraint, which copies the exprs.
+            return (new Expression(var) <= rhs); 
         }
 
         public static Constraint operator <=(Expression lhs, Variable var)
         {
-            return (lhs <= new Expression(var)); // removed gcnew: this is put into a new constraint, which copies the exprs.
+            return (lhs <= new Expression(var));
         }
 
 

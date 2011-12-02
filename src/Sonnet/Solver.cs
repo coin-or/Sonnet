@@ -673,7 +673,7 @@ namespace Sonnet
                             throw new SonnetException(message, e);
                         }
 
-                        Utils.Erase<Constraint>(rawconstraints, i);
+                        Utils.Remove<Constraint>(rawconstraints, i);
 
                         //static_cast<ModelEntity *>(constraint)->Unassign();	// Assign was done in Generate(con)
                     }
@@ -726,7 +726,7 @@ namespace Sonnet
                 CoefVector coefs = con.Coefficients;
 
                 nz += coefs.Count;
-                Utils.Erase<Constraint>(rawconstraints, i);
+                Utils.Remove<Constraint>(rawconstraints, i);
             }
 
 #if (SONNET_USE_SEMICONTVAR)

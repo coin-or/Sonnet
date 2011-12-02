@@ -73,9 +73,9 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName).proxy</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName).proxy</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -112,7 +112,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;SONNET_NO_CPLEX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -125,25 +125,19 @@
       </AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
-      <ForceSymbolReferences>_DllMainCRTStartup</ForceSymbolReferences>
+      <ForceSymbolReferences> __DllMainCRTStartup@12</ForceSymbolReferences>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
     <PreBuildEvent>
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent />
     <PostBuildEvent>
-      <Command>SET ORIGTARGET=$(TargetName)
-SET NEWTARGET=%ORIGTARGET:proxy=$(PlatformName)%
-
-IF  "%ORIGTARGET%"=="%NEWTARGET%" (
- ECHO Error: 'proxy' must be used in target name
- GOTO End
-)
-
-ERASE /Q $(OutDir)%NEWTARGET%.*
-COPY /Y $(OutDir)%ORIGTARGET%.* $(OutDir)%NEWTARGET%.*
-
-:End</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy target to project directory</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -173,7 +167,7 @@ COPY /Y $(OutDir)%ORIGTARGET%.* $(OutDir)%NEWTARGET%.*
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\osi\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\osi\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -185,20 +179,14 @@ COPY /Y $(OutDir)%ORIGTARGET%.* $(OutDir)%NEWTARGET%.*
       <AdditionalDependencies>
       </AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
+    <PostBuildEvent />
     <PostBuildEvent>
-      <Command>SET ORIGTARGET=$(TargetName)
-SET NEWTARGET=%ORIGTARGET:proxy=$(PlatformName)%
-
-IF  "%ORIGTARGET%"=="%NEWTARGET%" (
- ECHO Error: 'proxy' must be used in target name
- GOTO End
-)
-
-ERASE /Q $(OutDir)%NEWTARGET%.*
-COPY /Y $(OutDir)%ORIGTARGET%.* $(OutDir)%NEWTARGET%.*
-
-:End</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy target to project directory</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
