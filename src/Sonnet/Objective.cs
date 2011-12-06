@@ -8,72 +8,141 @@ using System.Text;
 
 namespace Sonnet
 {
+    /// <summary>
+    /// Specifies the types of objective sense: Maximise or Minimise.
+    /// </summary>
     public enum ObjectiveSense
     {
+        /// <summary>
+        /// Maximise the value of the given objective function.
+        /// </summary>
         Maximise = -1,
+        /// <summary>
+        /// Minimise the value of the given objective function.
+        /// </summary>
         Minimise = 1
     }
 
-    public class Objective : ModelEntity, IDisposable
+    /// <summary>
+    /// The Objective class is an expression that can be assigned to one or more 
+    /// models. 
+    /// The expression is copied, and can not be modified, except by modifying individual coefficients.
+    /// The Objective itself does not specify whether its value will be maximise or minimised.
+    /// The direction of the optimisation is set at the Model.
+    /// The constant in the given expression is taken into account.
+    /// </summary>
+    public class Objective : ModelEntity
     {
+        /// <summary>
+        /// Initializes a new instance of the Objective class with an 
+        /// empty expression.
+        /// </summary>
         public Objective()
-            :base()
+            : base()
         {
             GutsOfConstructor(null, null);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the Objective class with the given 
+        /// name and an empty expression. 
+        /// </summary>
+        /// <param name="name">The given name.</param>
         public Objective(string name)
-            :base()
+            : base()
         {
             GutsOfConstructor(name, null);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the Objective class
+        /// that contains elements copied from the specified expression.
+        /// </summary>
+        /// <param name="expr">The expression whose elements are copied to the new objective.</param>
         public Objective(Expression expr)
-            :base()
+            : base()
         {
             Ensure.NotNull(expr, "expression");
 
             GutsOfConstructor(name, expr);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the Objective class with the given name
+        /// that contains elements copied from the specified expression.
+        /// </summary>
+        /// <param name="name">The name for the new objective.</param>
+        /// <param name="expr">The expression whose elements are copied to the new objective.</param>
         public Objective(string name, Expression expr)
-            :base()
+            : base()
         {
             Ensure.NotNull(expr, "expression");
-            
+
             GutsOfConstructor(name, expr);
         }
 
+        /// <summary>
+        /// Implicitly initializes a new instance of the Objective class
+        /// that contains elements copied from the specified expression.
+        /// For example: 
+        /// Variable x = new Variable();
+        /// Expression expression = 2 * x;
+        /// Objective obj = expression;
+        /// Objective obj2 = 3 * x;
+        /// </summary>
+        /// <param name="expr">The expression whose elements are copied to the new objective.</param>
+        /// <returns>The new objective.</returns>
         public static implicit operator Objective(Expression expr)
         {
             return new Objective(expr);
         }
 
-        public override string ToString()
+        /// <summary>
+        /// Removes all elements from the Objective.
+        /// </summary>
+        public void Clear()
         {
-            EnsureNotDisposedOrFinalized();
-
-            return string.Format("Objective {0} : {1}", Name, expression.ToString());
-        }
-
-        public virtual string ToLevelString()
-        {
-            EnsureNotDisposedOrFinalized();
-
-            return string.Format("Objective {0} : {1}", Name, expression.Level());
-        }
-
-        public double Value
-        {
-            get
+            if (!object.ReferenceEquals(expression, null))
             {
-                EnsureNotDisposedOrFinalized();
-
-                return value;
+                expression.Clear();
             }
         }
 
+        /// <summary>
+        /// Converts the value of this instance to a System.String.
+        /// </summary>
+        /// <returns>A string representation of this instance.</returns>
+        public override string ToString()
+        {
+            return string.Format("Objective {0} : {1}", Name, expression.ToString());
+        }
+
+        /// <summary>
+        /// Converts the value of this instance to a System.String using the Level of the expression
+        /// of this objective.
+        /// </summary>
+        /// <returns>A string representation of this instance using the Level.</returns>
+        public virtual string ToLevelString()
+        {
+            return string.Format("Objective {0} : {1}", Name, expression.Level());
+        }
+
+        /// <summary>
+        /// Gets the current Value of this objective.
+        /// This value is set (AssignSolution) after the optimisation.
+        /// </summary>
+        public double Value
+        {
+            get { return value; }
+        }
+
+        /// <summary>
+        /// Gets the level of this objective. This should be equal to the Value.
+        /// See Level of the Expression class.
+        /// </summary>
+        /// <returns>The level.</returns>
         public double Level()
         {
-            EnsureNotDisposedOrFinalized();
-
 #if (DEBUG)
             if (!Assigned)
             {
@@ -83,54 +152,70 @@ namespace Sonnet
             return expression.Level();
         }
 
+        /// <summary>
+        /// Returns the coefficient of the given variable in this objective.
+        /// </summary>
+        /// <param name="var">The variable whose coefficient to return.</param>
+        /// <returns>The coefficient of the given variable.</returns>
         public double GetCoefficient(Variable var)
         {
-            EnsureNotDisposedOrFinalized();
             return expression.GetCoefficient(var);
         }
 
-        public double SetCoefficient(Variable var, double value)
+        /// <summary>
+        /// Sets the coefficients of the given variable in this objective.
+        /// All solvers that use this objective are updated.
+        /// </summary>
+        /// <param name="var">The variable whose coefficient is to be set.</param>
+        /// <param name="coef">The new coefficient.</param>
+        /// <returns>The previous coefficients of the given variable in this objective.</returns>
+        public double SetCoefficient(Variable var, double coef)
         {
-            EnsureNotDisposedOrFinalized();
-
-            double oldValue = expression.SetCoefficient(var, value);
-            foreach(Solver solver in solvers) solver.SetObjectiveCoefficient(var, value);
+            double oldValue = expression.SetCoefficient(var, coef);
+            foreach (Solver solver in solvers) solver.SetObjectiveCoefficient(var, coef);
             return oldValue;
         }
 
+        /// <summary>
+        /// Assemble this objective by assembling its expression.
+        /// </summary>
         internal void Assemble()
         {
-            EnsureNotDisposedOrFinalized();
-
             expression.Assemble();
         }
-
+        
+        /// <summary>
+        /// Assigns the given solver, and set the Value of this objective.
+        /// </summary>
+        /// <param name="solver">The solver to be assigned.</param>
+        /// <param name="value">The new Value of this objective.</param>
         internal void Assign(Solver solver, double value)
         {
-            EnsureNotDisposedOrFinalized();
-
             base.Assign(solver, -1);
             this.value = value;
         }
 
+        /// <summary>
+        /// Returns the coefficients of (the expression of) this objective.
+        /// </summary>
         internal CoefVector Coefficients
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-                return expression.Coefficients;
-            }
+            get { return expression.Coefficients; }
         }
 
+        /// <summary>
+        /// Returns the constant of (the expression of) this objective.
+        /// </summary>
         internal double Constant
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-                return expression.Constant;
-            }
+            get { return expression.Constant; }
         }
 
+        /// <summary>
+        /// Initializes this objective.
+        /// </summary>
+        /// <param name="name">The name to be used for this objective.</param>
+        /// <param name="expr">The expression to be used for this objective.</param>
         private void GutsOfConstructor(string name, Expression expr)
         {
             this.id = numberOfObjectives++;
@@ -148,33 +233,5 @@ namespace Sonnet
         private static int numberOfObjectives = 0;
         private Expression expression;
         private double value;
-
-        private void EnsureNotDisposedOrFinalized()
-        {
-            if (disposed > 0)// || finalized > 0)
-            {
-                string message = string.Format("Cannot use Objective after it was disposed {0} times.", disposed);
-                throw new ObjectDisposedException("Objective", message);
-            }
-        }
-
-        private int disposed;
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            if (disposed > 0) return;
-
-            if (!object.ReferenceEquals(expression, null))
-            {
-                expression.Dispose();
-                expression = null;
-            }
-
-            disposed++;
-        }
-
-        #endregion
     }
 }

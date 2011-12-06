@@ -29,6 +29,7 @@ namespace Sonnet
                 this.name = value;
             }
         }
+
         public int ID
         {
             get { return id; }
@@ -38,6 +39,7 @@ namespace Sonnet
         {
             return Equals(obj as Named);
         }
+
         public override int GetHashCode()
         {
             return id;
@@ -153,7 +155,6 @@ namespace Sonnet
         }
 
 		protected List<Solver> solvers = new List<Solver>();		// should be set in derived class'  Load(Model ^model,....)
-
         protected Solver solver = null;
 		protected int offset = -1;
 	}

@@ -30,15 +30,15 @@ namespace Sonnet
     /// Class Constraints that can be added to one or more models.
     /// By definition, a constraint has a left-hand side, a type and a right-hand side.
     /// </summary>
-    public class Constraint : ModelEntity, IDisposable
+    public class Constraint : ModelEntity
     {
         /// <summary>
-        /// Constructor returns a new constraints with the given name and based on a copy of the given constaint
+        /// Initializes a new instance of the Constraint class based on a copy of the given constraint,
+        /// but with the given name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="con"></param>
+        /// <param name="name">The name for the new constraint.</param>
+        /// <param name="con">The constraint to be copied.</param>
         public Constraint(string name, Constraint con)
-            : base()
         {
             Ensure.NotNull(con, "constraint");
 
@@ -46,53 +46,68 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Constructor that copies the given expressions. 
-        /// The given expressions can be disposed after this constructor is called.
+        /// Initializes a new instance of the Constraint class based on a copy of the given constraint,
+        /// but with a new default name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="expr"></param>
-        /// <param name="type"></param>
-        /// <param name="rhs"></param>
-        public Constraint(string name, Expression expr, ConstraintType type, Expression rhs)
-        {
-            Ensure.NotNull(expr, "expression");
-            Ensure.NotNull(rhs, "rhs expression");
-
-            GutsOfConstructor(name, expr, type, rhs);
-        }
-
-        public Constraint(Expression expr, ConstraintType type, Expression rhs)
-            : this(null, expr, type, rhs)
-        {
-        }
-
+        /// <param name="con">The constraint to be copied.</param>
         public Constraint(Constraint con)
             : this(null, con)
         {
         }
 
-        public static char GetOsiConstraintType(ConstraintType constraintType)
+        /// <summary>
+        /// Initializes a new instance of the Constraint class with the given name, 
+        /// of the given type with the given left and right-hand side expressions.
+        /// The given expressions are copied, and therefore are no longer needed after this constructor is called.
+        /// </summary>
+        /// <param name="name">The name for the new constraint.</param>
+        /// <param name="lhs">The left-hand side expression of the constraint.</param>
+        /// <param name="type">The type of the constraint.</param>
+        /// <param name="rhs">The right-hand side expression of the consrtaint.</param>
+        public Constraint(string name, Expression lhs, ConstraintType type, Expression rhs)
         {
-            switch (constraintType)
+            Ensure.NotNull(lhs, "expression");
+            Ensure.NotNull(rhs, "rhs expression");
+
+            GutsOfConstructor(name, lhs, type, rhs);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the Constraint class with a default name, 
+        /// of the given type with the given left and right-hand side expressions.
+        /// The given expressions are copied, and therefore are no longer needed after this constructor is called.
+        /// </summary>
+        /// <param name="lhs">The left-hand side expression of the constraint.</param>
+        /// <param name="type">The type of the constraint.</param>
+        /// <param name="rhs">The right-hand side expression of the consrtaint.</param>
+        public Constraint(Expression lhs, ConstraintType type, Expression rhs)
+            : this(null, lhs, type, rhs)
+        {
+        }
+
+        /// <summary>
+        /// Clear this constraint by clearing its expressions.
+        /// </summary>
+        public void Clear()
+        {
+            if (!object.ReferenceEquals(expr, null))
             {
-                case ConstraintType.EQ: return 'E';
-                case ConstraintType.LE: return 'L';
-                case ConstraintType.GE: return 'G';
-                default: throw new SonnetException("Unknown constraint type " + constraintType);
+                expr.Clear();
+            }
+
+            if (!object.ReferenceEquals(rhs, null))
+            {
+                rhs.Clear();
             }
         }
 
-        public bool IsFeasible()
-        {
-            EnsureNotDisposedOrFinalized();
-
-            return MathExtension.CompareDouble(Slack(), 0.0) >= 0;
-        }
-
+        #region ToString() methods
+        /// <summary>
+        /// Returns a System.String that represents the current Constraint.
+        /// </summary>
+        /// <returns>A System.String that represents the current Constraint.</returns>
         public override string ToString()
         {
-            EnsureNotDisposedOrFinalized();
-
             StringBuilder tmp = new StringBuilder();
             string typeString = "";
 
@@ -121,10 +136,12 @@ namespace Sonnet
             return tmp.ToString();
         }
 
+        /// <summary>
+        /// Returns a string that represents the value of this instance using the Level of the expressions.
+        /// </summary>
+        /// <returns>A string representation of this instance using the Level.</returns>
         public virtual string ToLevelString()
         {
-            EnsureNotDisposedOrFinalized();
-
             StringBuilder tmp = new StringBuilder();
             string typeString;
             switch (type)
@@ -156,14 +173,26 @@ namespace Sonnet
             return tmp.ToString();
 
         }
+        #endregion
 
+        #region Overloaded operators
         //   a <= b <= c    
         // is    Constraint(a <= b) <= c, 
         // where c = upper, and a = con->expr, and b = con->rhs
+
+        /// <summary>
+        /// Creates a new RangeConstraint "l &lt;= expr &lt;= u"
+        /// where l is the left-hand side constant of the given constraint,
+        /// expr is the right-hand side of the constraint and u is the given upper bound.
+        /// Note that this can be used as
+        ///   RangeConstraint rcon = 2 &lt;= x + y &lt;= 10;
+        /// because (2 &lt;= x + y) is first made into a constraint.
+        /// </summary>
+        /// <param name="con">The &lt;= constraint that will be used for its right-hand side expression. The left-hand side expressin must not contain any variables.</param>
+        /// <param name="upper">The upper bound of the new range constraint.</param>
+        /// <returns>The new range constraint.</returns>
         public static RangeConstraint operator <=(Constraint con, double upper)
         {
-            con.EnsureNotDisposedOrFinalized();
-
             if (con.expr.NumberOfCoefficients > 0) // not constant!
             {
                 throw new SonnetException("Range constraints must have constant lower and upper bounds!");
@@ -176,26 +205,34 @@ namespace Sonnet
             return new RangeConstraint(con.expr.Constant, con.rhs, upper);
         }
 
+        /// <summary>
+        /// Throws an exception: Range constraints can only be &lt;= constraints.
+        /// </summary>
+        /// <param name="con">The constraint.</param>
+        /// <param name="rhs">The bound.</param>
+        /// <returns>A SonnetException</returns>
         public static RangeConstraint operator >=(Constraint con, double rhs)
         {
             throw new SonnetException("Range constraints can only be <= constraints");
         }
+        #endregion
 
+        #region Public properties
+        /// <summary>
+        /// Gets the type of this constraint.
+        /// </summary>
         public virtual ConstraintType Type
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-
-                return type;
-            }
+            get { return type; }
         }
+
+        /// <summary>
+        /// Gets or sets the name of this constraint.
+        /// </summary>
         public override string Name
         {
             set
             {
-                EnsureNotDisposedOrFinalized();
-
                 if (!name.Equals(value))
                 {
                     name = value;
@@ -204,34 +241,30 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Gets the price of this constraint in the current solution.
+        /// </summary>
         public double Price
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-                return price;
-            }
+            get { return price; }
         }
 
+        /// <summary>
+        /// Gets the value of this constraint in the current solution.
+        /// </summary>
         public double Value
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-                return value;
-            }
+            get { return value; }
         }
 
+        /// <summary>
+        /// Gets or sets whether this constraint is enabled (enforced).
+        /// </summary>
         public bool Enabled
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-                return enabled;
-            }
+            get { return enabled; }
             set
             {
-                EnsureNotDisposedOrFinalized();
                 if (value != enabled)
                 {
                     enabled = value;
@@ -239,55 +272,16 @@ namespace Sonnet
                 }
             }
         }
-
-        public double Level()
-        {
-            EnsureNotDisposedOrFinalized();
-            return expr.Level();
-        }
-
-        public virtual double Slack()
-        {
-            EnsureNotDisposedOrFinalized();
-
-            //the slack values returned consist of the right-hand side minus the row activity level
-            switch (type)
-            {
-                case ConstraintType.EQ:
-                case ConstraintType.LE:
-                    return rhs.Level() - Level();
-                case ConstraintType.GE:
-                    return Level() - rhs.Level();
-            }
-
-            throw new SonnetException("Unknown constraint type");
-        }
-
-        internal virtual void Assemble()
-        {
-            EnsureNotDisposedOrFinalized();
-
-            expr.Subtract(rhs);
-            rhs.Clear();
-
-            double constant = expr.Constant;
-            if (constant != 0.0)
-            {
-                expr.Subtract(constant);
-                rhs.Subtract(constant);
-            }
-            expr.Assemble();
-
-        }
-
-        internal CoefVector Coefficients { get { EnsureNotDisposedOrFinalized(); return expr.Coefficients; } }
-        internal CoefVector RhsCoefficients { get { EnsureNotDisposedOrFinalized(); return rhs.Coefficients; } }
-        internal double RhsConstant { get { EnsureNotDisposedOrFinalized(); return rhs.Constant; } }
+        
+        /// <summary>
+        /// Gets the lower bound of this constraint. For EQ and GE constraint, this is the right-hand side constant.
+        /// For LE constraints, this is -inf.
+        /// Only RangeConstraints can Set the lower bound.
+        /// </summary>
         public virtual double Lower
         {
             get
             {
-                EnsureNotDisposedOrFinalized();
                 switch (this.type)
                 {
                     case ConstraintType.EQ: return RhsConstant;
@@ -301,11 +295,16 @@ namespace Sonnet
                 throw new NotSupportedException();
             }
         }
+
+        /// <summary>
+        /// Gets the upper bound of this constraint. For EQ and LE constraint, this is the right-hand side constant.
+        /// For GE constraints, this is +inf.
+        /// Only RangeConstraints can Set the upper bound.
+        /// </summary>
         public virtual double Upper
         {
             get
             {
-                EnsureNotDisposedOrFinalized();
                 switch (this.type)
                 {
                     case ConstraintType.EQ: return RhsConstant;
@@ -313,7 +312,6 @@ namespace Sonnet
                     case ConstraintType.GE: return double.MaxValue;
                     default: throw new SonnetException("Unknown constraint type");
                 }
-
             }
             set
             {
@@ -321,18 +319,69 @@ namespace Sonnet
             }
         }
 
+        #endregion
+        /// <summary>
+        /// Determines the level of the left-hand side expression of this constraint in the current solution.
+        /// </summary>
+        /// <returns>The level of the left-hand side expression of this constraint in the current solution.</returns>
+        public double Level()
+        {
+            return expr.Level();
+        }
+
+        /// <summary>
+        /// Determines whether the current solution is feasible wrt this constraint by checking whether the slack is non-negative.
+        /// </summary>
+        /// <returns>True if this constraint is satisfied; false otherwise.</returns>
+        public bool IsFeasible()
+        {
+            return !Slack().IsNegative();
+        }
+
+        /// <summary>
+        /// Determines the slack of this constraint in the current solution. Regardless of the type of constraint, the slack should 
+        /// be non-negative in a feasible solution.
+        /// </summary>
+        /// <returns>The slack of this constraint in the current solution</returns>
+        public virtual double Slack()
+        {
+            //the slack values returned consist of the right-hand side minus the row activity level
+            switch (type)
+            {
+                case ConstraintType.EQ:
+                case ConstraintType.LE:
+                    return rhs.Level() - Level();
+                case ConstraintType.GE:
+                    return Level() - rhs.Level();
+            }
+
+            throw new SonnetException("Unknown constraint type");
+        }
+
+        internal CoefVector Coefficients { get { return expr.Coefficients; } }
+        internal CoefVector RhsCoefficients { get { return rhs.Coefficients; } }
+        internal double RhsConstant { get { return rhs.Constant; } }
+
+        internal virtual void Assemble()
+        {
+            expr.Subtract(rhs);
+            rhs.Clear();
+
+            double constant = expr.Constant;
+            if (constant != 0.0)
+            {
+                expr.Subtract(constant);
+                rhs.Subtract(constant);
+            }
+            expr.Assemble();
+        }
+
         internal void Assign(Solver solver, int offset, double price, double value)
         {
-            EnsureNotDisposedOrFinalized();
-
             base.Assign(solver, offset);
             this.price = price;
             this.value = value;
         }
-
-        protected static int numberOfConstraints = 0;
-        protected Expression expr;
-        protected Expression rhs;
 
         private void GutsOfConstructor(string name, Expression expr, ConstraintType type, Expression rhs)
         {
@@ -347,145 +396,24 @@ namespace Sonnet
             else Name = string.Format("Con[{0}]", id);
         }
 
+        /// <summary>
+        /// Counts the global number of constraints. Mainly used for id.
+        /// </summary>
+        protected static int numberOfConstraints = 0;
+
         private ConstraintType type;
         private double price;
         private double value;
-        private int disposed;
         private bool enabled;
 
-        private void EnsureNotDisposedOrFinalized()
-        {
-            if (disposed > 0)// || finalized > 0)
-            {
-                string message = string.Format("Cannot use Constraint after it was disposed {0} times.", disposed);
-                throw new ObjectDisposedException("Constraint", message);
-            }
-        }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            if (disposed > 0) return;
-
-            if (!object.ReferenceEquals(expr, null))
-            {
-                expr.Dispose();
-                expr = null;
-            }
-
-            if (!object.ReferenceEquals(rhs, null))
-            {
-                rhs.Dispose();
-                rhs = null;
-            }
-
-            disposed++;
-        }
-
-        #endregion
-    }
-
-    public class RangeConstraint : Constraint
-    {
-        public RangeConstraint(double lower, Expression expr, double upper)
-            : base(expr, ConstraintType.LE, new Expression(upper))
-        {
-            this.lower = lower;
-            Name = string.Format("RangeCon[{0}]", id);
-        }
-
-        public RangeConstraint(string name, RangeConstraint rangeConstraint)
-            : base(name, rangeConstraint)
-        {
-            this.lower = rangeConstraint.lower;
-        }
-
-        public RangeConstraint(string name, double lhs, Expression expr, double rhs)
-            : base(name, expr, ConstraintType.LE, new Expression(rhs))
-        {
-            this.lower = lhs;
-        }
-
-        public override string ToString()
-        {
-            if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
-
-            return string.Format("{0} : {1} <= {2} <= {3}", Name, Lower, expr.ToString(), Upper);
-        }
-
-        public override string ToLevelString()
-        {
-            if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
-
-            return string.Format("{0} : {1} <= {2} <= {3}  ( {4} )", Name, Lower, expr.Level(), Upper, Price);
-        }
-
-        public override double Lower
-        {
-            get { return this.lower; }
-            set
-            {
-                this.lower = value;
-                foreach (Solver solver in solvers) solver.SetConstraintLower(this, value);
-            }
-        }
-
-        public override double Upper
-        {
-            get { return rhs.Constant; }
-            set
-            {
-                rhs.Assign(value);
-                foreach (Solver solver in solvers) solver.SetConstraintUpper(this, value);
-            }
-        }
-
-        public void SetBounds(double lower, double upper)
-        {
-            rhs.Assign(upper);
-            this.lower = lower;
-
-            foreach (Solver solver in solvers) solver.SetConstraintBounds(this, lower, upper);
-        }
-
-        public double GetCoefficient(Variable var)
-        {
-            return expr.GetCoefficient(var);
-        }
-
-#if (CONSTRAINT_SET_COEF)
-        // Change the coefficient of variable var to value. Returns the old coefficient of this variable.
-        public double SetCoefficient(Variable var, double value)
-        {
-            Ensure.NotNull(var, "variable");
-
-            double oldValue = expr.SetCoefficient(var, value);
-            foreach (Solver solver in solvers) solver.SetCoefficient(this, var, value);
-
-            return oldValue;
-        }
-#endif
-        public override double Slack() // for a feasible solution, the Slack is non-negative!
-        {
-            return rhs.Level() - Level();
-        }
-
-        internal override void Assemble()
-        {
-            // for RangeConstraints, the rhs (upper) and lhs (lower) are always constant.
-            double constant = expr.Constant;
-            if (constant != 0.0)
-            {
-                expr.Subtract(constant);
-                // if the rhs->Constant is not already Infinity, then subtract the constant
-                if (rhs.Constant < MathExtension.Infinity) rhs.Subtract(constant);
-                // if the lower (lhs) is not already minus Infinity, then subtract the constant
-                if (lower > -MathExtension.Infinity) lower -= constant;
-            }
-            expr.Assemble();
-        }
-
-        private double lower;
+        /// <summary>
+        /// The (left-hand side) expression of this constraint.
+        /// </summary>
+        
+        protected Expression expr;
+        /// <summary>
+        /// The right-hand side expression of this constraint.
+        /// </summary>
+        protected Expression rhs;
     }
 }

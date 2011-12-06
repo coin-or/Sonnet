@@ -15,7 +15,7 @@ using COIN;
 
 namespace Sonnet
 {
-    public class Model : Named, IDisposable
+    public class Model : Named
     {
 #if (DYNAMIC_LOADING)
         static Model()
@@ -43,8 +43,6 @@ namespace Sonnet
             };
         }
 #endif
-        private static SonnetLog log = SonnetLog.Default;
-
         #region Constructors
         public Model()
             : this(string.Empty)
@@ -54,20 +52,60 @@ namespace Sonnet
         public Model(string name)
             : base(name)
         {
-            LoadConfiguration(true);
             GutsOfConstructor();
         }
         #endregion
 
-        internal void Register(Solver solver)
+        public void Clear()
         {
-            solvers.Add(solver);
+            if (!object.ReferenceEquals(objective, null)) objective.Clear();
+            objective = new Objective("obj");
+
+            if (!object.ReferenceEquals(constraints, null)) constraints.Clear();
         }
 
-        internal void Unregister(Solver solver)
+        #region ToString() methods
+        public override string ToString()
         {
-            solvers.Remove(solver);
+            StringBuilder tmp = new StringBuilder();
+
+            IEnumerable<Variable> variables = GetVariables();
+            foreach (Variable variable in variables)
+            {
+                tmp.Append(variable.ToString());
+                tmp.Append("\n");
+            }
+
+            tmp.Append("Objective: ");
+            if (object.ReferenceEquals(null, objective))
+            {
+                tmp.Append("No objective defined");
+                tmp.Append("\n");
+            }
+            else
+            {
+                tmp.Append(objective.ToString());
+                tmp.Append("\n");
+            }
+
+            if (constraints.Count > 0)
+            {
+                tmp.Append("Constraints:\n");
+                foreach (Constraint constraint in Constraints)
+                {
+                    tmp.Append(constraint.ToString());
+                    tmp.Append("\n");
+                }
+            }
+
+            if (constraints.Count == 0)
+            {
+                tmp.Append("Model does not contain any constraints!");
+            }
+
+            return tmp.ToString();
         }
+        #endregion
 
         #region Objective Property
         public Objective Objective
@@ -101,21 +139,18 @@ namespace Sonnet
 
         #endregion
 
-        #region Get Model propeties
+        #region Public propeties
 
         /// <summary>
-        /// Get the Infinity of the current solver
+        /// Get the Infinity value
         /// </summary>
         public double Infinity
         {
-            get
-            {
-                return MathExtension.Infinity;
-            }
+            get { return MathUtils.Infinity; }
         }
 
         /// <summary>
-        /// Gets the (generated) constraints
+        /// Gets the constraints
         /// </summary>
         public IEnumerable<Constraint> Constraints
         {
@@ -123,25 +158,23 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the number of generated constraints.
+        /// Gets the number of constraints.
         /// </summary>
         public int NumberOfConstraints
         {
-            get
-            {
-                return constraints.Count;
-            }
+            get { return constraints.Count; }
         }
         
         #endregion
 
+        #region Add constraints methods
         /// <summary>
-        /// Adds (a reference) the given constraint to the mode with the given name
+        /// Adds a reference to the given constraint with the given name to this model.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="con"></param>
-        /// <returns></returns>
-        public Constraint Add(Constraint con, string name = "")// overrides any given name. Adds a reference!
+        /// <param name="con">The constraint to be added.</param>
+        /// <param name="name">The name of the constraint within this model.</param>
+        /// <returns>The given constraint.</returns>
+        public Constraint Add(Constraint con, string name = "")
         {
             Ensure.NotNull(con, "con");
             if (!string.IsNullOrEmpty(name)) con.Name = name;
@@ -152,9 +185,9 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Adds (references to) the given constraints to the model
+        /// Adds references to the given constraints to this model.
         /// </summary>
-        /// <param name="constraints"></param>
+        /// <param name="constraints">The constraints to be added.</param>
         public void Add(System.Collections.IEnumerable constraints)
         {
             Ensure.NotNull(constraints, "constraints");
@@ -162,14 +195,46 @@ namespace Sonnet
             foreach (Constraint constraint in constraints) Add(constraint);
         }
 
+        /// <summary>
+        /// Determine whether this constraint was added to this model.
+        /// </summary>
+        /// <param name="c">The constraint to look for.</param>
+        /// <returns>True iff this constraint is part of this model.</returns>
+        public bool Contains(Constraint c)
+        {
+            // otherwise, check the constraints still to be added.
+            foreach (Constraint constraint in constraints)
+            {
+                if (object.ReferenceEquals(constraint, c)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// return the constraint, given its element index in this model
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Constraint GetConstraint(string name)
+        {
+            return constraints.Find(con => con.Name.Equals(name));
+        }
+        #endregion
+
         #region Static Properties
-        public static double GenericInfinity { get { return MathExtension.Infinity; } }
         /// <summary>
         /// Gets the Version number of this assembly
         /// </summary>
         public static Version Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version; } }
         #endregion
 
+        #region Import and Export methods
+        /// <summary>
+        /// Imports the model in the given file into this model.
+        /// Only MPS files are supported.
+        /// </summary>
+        /// <param name="fileName">The mps file to be imported.</param>
+        /// <returns>True if the file was successfully imported.</returns>
         public bool ImportModel(string fileName)
         {
             string directoryName = System.IO.Path.GetDirectoryName(fileName);
@@ -265,7 +330,7 @@ namespace Sonnet
                                 ConstraintType type = ConstraintType.LE;
                                 Expression upperExpr = new Expression(upper);
                                 Constraint con = new Constraint(conName, expr, type, upperExpr);
-                                upperExpr.Dispose();
+                                upperExpr.Clear();
                                 this.Add(con);
                                 break;
                             }
@@ -274,7 +339,7 @@ namespace Sonnet
                                 ConstraintType type = ConstraintType.EQ;
                                 Expression upperExpr = new Expression(upper);
                                 Constraint con = new Constraint(conName, expr, type, upperExpr);
-                                upperExpr.Dispose();
+                                upperExpr.Clear();
                                 this.Add(con);
                                 break;
                             }
@@ -283,7 +348,7 @@ namespace Sonnet
                                 ConstraintType type = ConstraintType.GE;
                                 Expression lowerExpr = new Expression(lower);
                                 Constraint con = new Constraint(conName, expr, type, lowerExpr);
-                                lowerExpr.Dispose();
+                                lowerExpr.Clear();
                                 this.Add(con);
                                 break;
                             }
@@ -314,11 +379,10 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Exports the model in either MPS, LP or SONNET format, depending on the extension of the given filename
-        /// Note, after solving a model, the Bounds etc are left at non-original values!
-        /// If you want to export the original bounds etc, then call Generate() before Exporting.
+        /// Exports the model in SONNET format.
+        /// To export to different formats, use the Solver.
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename">The sonnet file to be exported to.</param>
         public void ExportModel(string filename)
         {
             string directoryName = System.IO.Path.GetDirectoryName(filename);
@@ -338,11 +402,26 @@ namespace Sonnet
                 throw new SonnetException(string.Concat("Cannot export file ", filename, " : unknown extension '", extension, "'."));
             }
         }
+        #endregion
+
+        #region Helper methods
+        internal void Register(Solver solver)
+        {
+            solvers.Add(solver);
+        }
+
+        internal void Unregister(Solver solver)
+        {
+            solvers.Remove(solver);
+        }
+
+        //bool Contains(Variable v);		// IsRegistered OR in the (to-be) added list -> NOT do this, since we'd have to check all the new constraints 
 
         /// <summary>
         /// Generate a full list of all used variable from the objective and constraints.
+        /// This is very expensive to call.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list of variables used in the objective and constraints.</returns>
         private IEnumerable<Variable> GetVariables()
         {
             Dictionary<int, Variable> variables = new Dictionary<int, Variable>();
@@ -353,8 +432,6 @@ namespace Sonnet
 
             foreach (Constraint constraint in Constraints)
             {
-                // Con.coefficients only refers to lhs coefs, but we cannot access rhs coefs.
-                // So, just assemble..
                 foreach (Coef c in constraint.Coefficients) variables[c.var.id] = c.var;
                 foreach (Coef c in constraint.RhsCoefficients) variables[c.var.id] = c.var;
             }
@@ -362,151 +439,25 @@ namespace Sonnet
             return variables.Values;
         }
 
-        public override string ToString()
-        {
-            StringBuilder tmp = new StringBuilder();
-
-            IEnumerable<Variable> variables = GetVariables();
-            foreach (Variable variable in variables)
-            {
-                tmp.Append(variable.ToString());
-                tmp.Append("\n");
-            }
-
-            tmp.Append("Objective: ");
-            if (object.ReferenceEquals(null, objective))
-            {
-                tmp.Append("No objective defined");
-                tmp.Append("\n");
-            }
-            else
-            {
-                tmp.Append(objective.ToString());
-                tmp.Append("\n");
-            }
-
-            if (constraints.Count > 0)
-            {
-                tmp.Append("Constraints:\n");
-                foreach (Constraint constraint in Constraints)
-                {
-                    tmp.Append(constraint.ToString());
-                    tmp.Append("\n");
-                }
-            }
-
-            if (constraints.Count == 0)
-            {
-                tmp.Append("Model does not contain any constraints!");
-            }
-
-            return tmp.ToString();
-        }
-
-        private void Clear()
-        {
-            this.objective = new Objective("obj");
-            this.constraints.Clear();
-        }
-
-        //bool Contains(Variable v);		// IsRegistered OR in the (to-be) added list -> NOT do this, since we'd have to check all the new constraints 
-
-        /// <summary>
-        /// IsRegistered OR in the (to-be) added list
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public bool Contains(Constraint c)
-        {
-            // otherwise, check the constraints still to be added.
-            foreach (Constraint constraint in constraints)
-            {
-                if (Equals(constraint, c)) return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// return the constraint, given its element index in this model
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public Constraint GetConstraint(string name)
-        {
-            return constraints.Find(con => con.Name.Equals(name));
-        }
-
-        protected void LoadConfiguration(bool onlyDefaultSolverType)
-        {
-        }
 
         private void GutsOfConstructor()
         {
-            DumpAssemblyInfo();
+            Utils.DumpAssemblyInfo();
 
             id = numberOfModels++;
 
             objective = new Objective("obj");
             objectiveSense = ObjectiveSense.Minimise;
             constraints = new List<Constraint>();
-
-            LoadConfiguration(false);
         }
+        #endregion
 
-        private static void DumpAssemblyInfo()
-        {
-            Trace.WriteLine("Initialising SONNET Model.\nAssembly information:");
-            Trace.WriteLine(String.Concat("File path: ", System.Reflection.Assembly.GetExecutingAssembly().Location));
-            Trace.WriteLine(String.Concat("File date: ", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString()));
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
-            Trace.WriteLine(String.Concat("Framework: ", Environment.Version.ToString()));
-            Trace.WriteLine(String.Concat("Assembly runtime version: ", System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion));
-
-            System.Reflection.PortableExecutableKinds portableExecutableKinds;
-            System.Reflection.ImageFileMachine imageFileMachine;
-            System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out portableExecutableKinds, out imageFileMachine);
-            Trace.WriteLine("Portable executable kinds: " + portableExecutableKinds.ToString());
-            Trace.WriteLine("Image file machine: " + imageFileMachine.ToString());
-            Trace.WriteLine("----------------------------------------------------------");
-        }
-
+        private static SonnetLog log = SonnetLog.Default;
         private static int numberOfModels = 0;
 
         private Objective objective;
         private ObjectiveSense objectiveSense;
         private List<Constraint> constraints;
-
         private List<Solver> solvers = new List<Solver>();
-
-        #region IDisposable Members
-
-        //Implement IDisposable.
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Free other state (managed objects).
-                Clear();
-            }
-
-            // Free your own state (unmanaged objects).
-            // Set large fields to null.
-        }
-
-        // Use C# destructor syntax for finalization code.
-        ~Model()
-        {
-            // Simply call Dispose(false).
-            Dispose(false);
-        }
-
-        #endregion
-
     }
 }

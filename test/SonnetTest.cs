@@ -179,7 +179,7 @@ namespace SonnetTest
                     System.Diagnostics.Debugger.Break();
                 }
             }
-            model.Dispose();
+            model.Clear();
             model = null;
             System.GC.Collect();
 
@@ -2215,59 +2215,58 @@ namespace SonnetTest
         private void SonnetTest29Worker()
         {
             string threadid = System.Threading.Thread.CurrentThread.Name;
-            using (Model model = new Model())
+            Model model = new Model();
+            Solver solver = new Solver(model, solverType);
+
+            var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+            double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
+            int n = Math.Min(3, Environment.ProcessorCount + 1);
+
+            // N = 3K, M = 30K, Z=100 requires works with about 1.5GB per thread (n).
+            // Let's scale accordingly
+            // Note: Arguably only M and Z matter, but we scall also N
+            double f = (memoryGB / n) / 1.5;
+
+            // the stress test
+            int N = (int)(f * 3000); // number of variables
+            int M = (int)(f * 30000); // number of rangeconstraints
+            int Z = 100; // number nonzeros per constraint
+
+            Variable x = new Variable();
+            Variable[] vars = Variable.NewVariables(N);
+
+            for (int m = 0; m < M; m++)
             {
-                Solver solver = new Solver(model, solverType);
+                if (m % 10000 == 0) Console.WriteLine(string.Format("Thread {0}: {1}", threadid, (1.0 * m / M).ToString("p")));
+                Expression expr = new Expression();
+                expr.Add(x);
 
-                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
-                double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
-                int n = Math.Min(3, Environment.ProcessorCount + 1);
-            
-                // N = 3K, M = 30K, Z=100 requires works with about 1.5GB per thread (n).
-                // Let's scale accordingly
-                // Note: Arguably only M and Z matter, but we scall also N
-                double f = (memoryGB / n) / 1.5;
-
-                // the stress test
-                int N = (int) (f * 3000); // number of variables
-                int M = (int) (f * 30000); // number of rangeconstraints
-                int Z = 100; // number nonzeros per constraint
-
-                Variable x = new Variable();
-                Variable[] vars = Variable.NewVariables(N);
-
-                for (int m = 0; m < M; m++)
+                for (int z = 0; z < Z; z++)
                 {
-                    if (m % 10000 == 0) Console.WriteLine(string.Format("Thread {0}: {1}", threadid, (1.0 * m / M).ToString("p")));
-                    Expression expr = new Expression();
-                    expr.Add(x);
-
-                    for (int z = 0; z < Z; z++)
-                    {
-                        int i = (z + m) % N; // always between 0 and N-1
-                        expr.Add(vars[i]);
-                    }
-
-                    int available = m;
-                    
-                    string rowName = "MyConstraint(" + m + ")";
-                    RangeConstraint con = (RangeConstraint)model.Add(
-                        -model.Infinity <= expr <= available, rowName);
-
-                    expr.Assemble();
-                    Assert(expr.NumberOfCoefficients == Z + 1);
-
-                    expr.Dispose();
+                    int i = (z + m) % N; // always between 0 and N-1
+                    expr.Add(vars[i]);
                 }
 
-                solver.Generate();
+                int available = m;
 
-                Assert(solver.NumberOfConstraints == model.NumberOfConstraints);
-                Assert(solver.NumberOfConstraints == M);
-                Assert(solver.NumberOfElements == M * (Z + 1));
+                string rowName = "MyConstraint(" + m + ")";
+                RangeConstraint con = (RangeConstraint)model.Add(
+                    -model.Infinity <= expr <= available, rowName);
 
-                Console.WriteLine(string.Format("Thread {0}: finished", threadid));
+                expr.Assemble();
+                Assert(expr.NumberOfCoefficients == Z + 1);
+
+                expr.Clear();
             }
+
+            solver.Generate();
+
+            Assert(solver.NumberOfConstraints == model.NumberOfConstraints);
+            Assert(solver.NumberOfConstraints == M);
+            Assert(solver.NumberOfElements == M * (Z + 1));
+
+            Console.WriteLine(string.Format("Thread {0}: finished", threadid));
+            model.Clear();
             Console.WriteLine(string.Format("Thread {0}: closed", threadid));
         }
 

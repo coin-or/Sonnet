@@ -68,6 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\src\Sonnet\CoefVector.cs">
+      <Link>CoefVector.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\src\Sonnet\Constraint.cs" />
     <Compile Include="..\..\..\src\Sonnet\Exceptions.cs" />
     <Compile Include="..\..\..\src\Sonnet\Expression.cs" />
@@ -77,7 +80,13 @@
     <Compile Include="..\..\..\src\Sonnet\ModelEntity.cs" />
     <Compile Include="..\..\..\src\Sonnet\Objective.cs" />
     <Compile Include="..\..\..\src\Sonnet\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\src\Sonnet\RangeConstraint.cs">
+      <Link>RangeConstraint.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\src\Sonnet\Solver.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Utils.cs">
+      <Link>Utils.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\src\Sonnet\Variable.cs" />
     <Compile Include="..\..\..\src\Sonnet\WarmStart.cs" />
   </ItemGroup>

@@ -11,6 +11,14 @@ using COIN;
 
 namespace Sonnet
 {
+    /// <summary>
+    /// The class WarmStart can be used to warm-start another optimization.
+    /// The WarmStart object should be taken from the solver (GetWarmStart) just after a Solve(),
+    /// and applied to the solver (SetWarmStart) before another solve.
+    /// Use via solver.GetWarmStart() and solver.SetWarmStart().
+    /// The model at the solver that called GetWarmStart should not be significantly different from 
+    /// the model at the solver of the subsequent SetWarmStart.
+    /// </summary>
     public class WarmStart : IDisposable
     {
         internal static WarmStart NewWarmStart(OsiSolverInterface solver)
@@ -24,6 +32,7 @@ namespace Sonnet
 #endif
             }
         }
+        
         internal static WarmStart NewEmptyWarmStart(OsiSolverInterface solver)
         {
             unsafe
@@ -31,6 +40,7 @@ namespace Sonnet
                 return new WarmStart(solver.getEmptyWarmStart(), 0, null, 0, null);
             }
         }
+        
         internal void ApplyWarmStart(OsiSolverInterface solver)
         {
             Ensure.NotNull(solver, "solver");
@@ -44,7 +54,7 @@ namespace Sonnet
                 if (numberColumns > 0)
                 {
                     // if the new solver has *fewer* columns, then no problem.
-                    // if the new solver her MORE columns, then make sure we dont copy wrong memory..
+                    // if the new solver has MORE columns, then make sure we dont copy wrong memory..
                     if (solver.getNumCols() > numberColumns)
                     {
                         int n = solver.getNumCols();
@@ -67,8 +77,8 @@ namespace Sonnet
                     // set the dual solution
                     if (numberRows > 0)
                     {
-                        // if the new solver has *fewer* columns, then no problem.
-                        // if the new solver her MORE columns, then make sure we dont copy wrong memory..
+                        // if the new solver has *fewer* rows, then no problem.
+                        // if the new solver has MORE rows, then make sure we dont copy wrong memory..
                         if (solver.getNumRows() > numberRows)
                         {
                             int m = solver.getNumRows();
@@ -76,7 +86,7 @@ namespace Sonnet
                             double[] newRowPrice = new double[m];
                             fixed (double* newRowPricePinned = newRowPrice)
                             {
-                                // copy the first NumberOfColumns into the new array
+                                // copy the first NumberOfRows into the new array
                                 CoinUtils.CoinDisjointCopyN(rowPrice, numberRows, newRowPricePinned);
                                 // then fill it up with zeros
                                 CoinUtils.CoinZeroN(&newRowPricePinned[numberRows], (m - numberRows));
@@ -122,41 +132,57 @@ namespace Sonnet
         private int numberRows;
 
         #region IDisposable Members
+        // See also http://msdn.microsoft.com/en-us/library/system.idisposable.aspx
 
-        //Implement IDisposable.
+        /// <summary>
+        /// Releases all resources used by the WarmStart.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the WarmStart
+        /// and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!this.disposed)
             {
-                // Free other state (managed objects).
-                coinWarmStart.Dispose();
-            }
+                if (disposing)
+                {
+                    // Free other state (managed objects).
+                    coinWarmStart.Dispose();
+                }
 
-            // Free your own state (unmanaged objects).
-            // Set large fields to null.
-            unsafe
-            {
-                CoinUtils.DeleteArray(this.colSolution);
-                this.colSolution = null;
+                // Free your own state (unmanaged objects).
+                // Set large fields to null.
+                unsafe
+                {
+                    CoinUtils.DeleteArray(this.colSolution);
+                    this.colSolution = null;
 
-                CoinUtils.DeleteArray(this.rowPrice);
-                this.rowPrice = null;
+                    CoinUtils.DeleteArray(this.rowPrice);
+                    this.rowPrice = null;
+                }
+
+                this.disposed = true;
             }
         }
 
-        // Use C# destructor syntax for finalization code.
+        /// <summary>
+        /// Use C# destructor syntax for finalization code.
+        /// </summary>
         ~WarmStart()
         {
             // Simply call Dispose(false).
             Dispose(false);
         }
 
+        private bool disposed = false;
         #endregion
     }
 }

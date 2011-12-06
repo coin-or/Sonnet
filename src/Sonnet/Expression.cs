@@ -8,227 +8,24 @@ using System.Text;
 
 namespace Sonnet
 {
-    internal class MathExtension
-    {
-        public static bool IsInteger(double a)
-        {
-            return CompareDouble(System.Math.Round(a) - a, 0.0) == 0;
-        }
-
-        public static string DoubleToString(double a)
-        {
-            if (a <= -Infinity) return "-Inf";
-            if (a >= Infinity) return "Inf";
-
-            return a.ToString();
-        }
-
-        // return 0 if a and b are equal (relative to epsilon), or -1 if a < b - eps, or 1 if a > b + eps
-        public static int CompareDouble(double a, double b)
-        {
-            double eps = MathExtension.Epsilon;
-            // if either a or b is close to zero, then do absolute difference
-            // otherwise (the 'if' here) do a relative comparison (relative to the absolute value of the highest of a and b)
-            if (!UseAbsoluteComparisonOnly &&
-                System.Math.Abs(a) >= Epsilon && System.Math.Abs(b) >= Epsilon)
-                eps *= System.Math.Abs(System.Math.Max(a, b));
-
-            if (a < b - eps)
-                return -1;
-            if (a > b + eps)
-                return 1;
-            return 0;
-        }
-
-        public const double Infinity = double.MaxValue;
-        public const double Epsilon = 1e-5;
-        public static bool UseAbsoluteComparisonOnly = false;
-    }
-    public class Utils
-    {
-        public static void Remove<T>(List<T> list, int index)
-        {
-            // This should be much faster, but without maintaining the (sorted?) order.
-            // swap the last for i!!
-            int n = list.Count;
-            if (index < n - 1)
-            {
-                // somewhere in the middle of the list, then copy the last element into this position
-                list[index] = list[n - 1];
-                // and remove the last (copy)
-                list.RemoveAt(n - 1);
-            }
-            else
-            {
-                //index == n - 1
-                // if the last: then simply remove this one. Note that this does NOT copy elements.
-                list.RemoveAt(index);
-            }
-        }
-    }
-
-    public class Ensure
-    {
-        public static void IsTrue(bool b)
-        {
-            if (!b) throw new ArgumentException();
-        }
-        public static void IsFalse(bool b)
-        {
-            if (b) throw new ArgumentException();
-        }
-        public static void Equals<T>(IEquatable<T> a, IEquatable<T> b)
-        {
-            if (!a.Equals(b)) throw new ArgumentException();
-        }
-        public static void NotNull(object obj)
-        {
-            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException();
-        }
-
-        public static void NotNull(object obj, string paramName)
-        {
-            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException(paramName);
-        }
-
-        //public static void NotNull(void obj, string paramName)
-        //{
-        //    if (void
-        //}
-    }
-
-    internal struct Coef : IComparable<Coef>
-    {
-        public Coef(Variable aVar, double aCoef)
-        {
-            Ensure.NotNull(aVar, "variable of coef");
-
-            var = aVar;
-            id = var.id;
-            coef = aCoef;
-
-#if (DEBUG)
-            if (double.IsNaN(coef)) throw new SonnetException("The value of the coefficient of variable " + var.Name + " is not a number! (NaN)");
-#endif
-        }
-
-        public override string ToString()
-        {
-            StringBuilder tmp = new StringBuilder();
-            string varName = var.name;
-
-            if (coef == 1.0) tmp.AppendFormat("{0}", varName);
-            else if (coef == -1.0) tmp.AppendFormat("- {0}", varName);
-            else if (coef < 0.0) tmp.AppendFormat("- {0} {1}", -coef, varName);
-            else tmp.AppendFormat("{0} {1}", coef, varName);
-
-            // note that a coef of -2.5 for x2 results in     "-2.5 x2", whereas in an expression
-            // we might prefer ".... - 2.5 x2 ..." 
-
-            return tmp.ToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Coef) return Equals((Coef)obj);
-            return false;
-        }
-
-        public bool Equals(Coef rhs)
-        {
-            return id == rhs.id && coef == rhs.coef;
-        }
-
-        public override int GetHashCode()
-        {
-            return id;
-        }
-
-        public int CompareTo(Coef coef)
-        {
-            return id.CompareTo(coef.id);
-        }
-
-        public double Level()
-        {
-            return coef * (var.Value);
-        }
-
-        public Coef Multiply(double multiplier)
-        {
-            coef *= multiplier;
-            return this;
-        }
-        public Coef Divide(double divider)
-        {
-            coef /= divider;
-            return this;
-        }
-
-        public Variable var;
-        public int id;
-        public double coef;
-
-    }
-
-    internal class CoefVector : List<Coef>
-    {
-        public void Remove(int index)
-        {
-            Utils.Remove<Coef>(this, index);
-        }
-
-        //public override bool Equals(object obj)
-        //{
-        //    return base.Equals(obj as CoefVector);
-        //}
-        //public bool Equals(CoefVector obj)
-        //{
-        //    if (object.ReferenceEquals(null, obj)) return false;
-
-        //    if (coefs.Count != expr.coefs.Count) return false;
-
-        //    int n = coefs.Count;
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        if (!this[i].Equals(obj[i])) return false;
-        //    }
-        //    return true;
-        //}
-
-        //public override int GetHashCode()
-        //{
-        //    int hashCode = -int.MinValue;
-        //    foreach (Coef coef in this)
-        //    {
-        //        hashCode += coef.GetHashCode();
-        //    }
-        //    return hashCode;
-        //}
-        public override string ToString()
-        {
-            StringBuilder tmp = new StringBuilder();
-            int cap = this.Capacity;
-            int n = this.Count;
-            for (int i = 0; i < n; i++)
-            {
-                Coef c = this[i];
-                if (c.coef != 0.0)
-                {
-                    if (tmp.Length > 0)
-                    {
-                        tmp.Append(" ");
-                        if (c.coef > 0.0) tmp.Append("+ ");
-                    }
-
-                    tmp.Append(c.ToString());
-                }
-            }
-            return tmp.ToString();
-        }
-    }
-
-    public class Expression : IDisposable
+    /// <summary>
+    /// The class Expression is an important building block in the building of a Model.
+    /// An Expression consists of a constant (double) and an array of variables with their coefficients.
+    /// Many overloaded operators exists for expressions. In principle, these operators 
+    /// return *new* objects (Expressions or Constraints), with all coefficients copied.
+    /// On the other hand, methods exist for manipulating the current expression.
+    /// For example, the overloaded + operator returns copy of lhs + rhs:
+    ///   tmp = exp1 + exp2 + exp3;
+    /// performs  
+    ///		((copy exp1, add exp2), copy result (exp1 and exp2), add exp3)
+    /// thus performing n1 + n2 + n1 + n2 + n3 operations in total.
+    /// More efficient is
+    ///   tmp.Add(exp1); tmp.Add(exp2); tmp.Add(exp3);
+    /// or equivalently 
+    ///   tmp.Add(exp1).Add(exp2).Add(exp3);
+    /// which performs only n1 + n2 + n3 operations.
+    /// </summary>
+    public class Expression
     {
         /// <summary>
         /// Constructor of empty expression (constant = 0)
@@ -285,7 +82,6 @@ namespace Sonnet
             : this()
         {
             Ensure.NotNull(expr, "expr");
-            expr.EnsureNotDisposedOrFinalized();
 
             if (multiplier == 0.0) return;
 
@@ -307,10 +103,19 @@ namespace Sonnet
             : this()
         {
             Ensure.NotNull(expr, "expr");
-            expr.EnsureNotDisposedOrFinalized();
 
             constant = expr.constant;
             coefs.AddRange(expr.coefs);
+        }
+
+        public void Clear()
+        {
+            if (!object.ReferenceEquals(coefs, null))
+            {
+                coefs.Clear();
+                coefs.TrimExcess();
+            }
+            constant = 0.0;
         }
 
         // Assignment operator cannot be overloaded in c#
@@ -335,11 +140,8 @@ namespace Sonnet
         /// <returns>true iff the given expression has the same constant and all coefficients and variables as the current Expression.</returns>
         public bool Equals(Expression expr)
         {
-            EnsureNotDisposedOrFinalized();
             if (object.ReferenceEquals(expr, null)) return false;
             if (object.ReferenceEquals(expr, this)) return true;
-
-            expr.EnsureNotDisposedOrFinalized();
 
             //this.Assemble();
             //expression.Assemble();
@@ -354,7 +156,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        //  Determines whether the specified object is equal to the current Expression.
+        ///  Determines whether the specified object is equal to the current Expression.
         /// </summary>
         /// <param name="obj">The object to compare with the current Expression.</param>
         /// <returns>True iff the given object is an Expression and is equal to the current Expression.</returns>
@@ -378,7 +180,6 @@ namespace Sonnet
         /// <returns>A System.String that represents the current Expression.</returns>
         public override string ToString()
         {
-            EnsureNotDisposedOrFinalized();
             StringBuilder tmp = new StringBuilder();
 
             tmp.Append(coefs.ToString());
@@ -407,7 +208,6 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(double coef, Variable variable)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(variable, "variable");
 
             if (coef != 0.0)
@@ -425,7 +225,6 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(double constant)
         {
-            EnsureNotDisposedOrFinalized();
             this.constant += constant;
             return this;
         }
@@ -437,7 +236,6 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(Variable variable)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(variable, "variable");
 
             coefs.Add(new Coef(variable, 1.0));
@@ -452,7 +250,6 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(Expression expr)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(expr, "expr");
 
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
@@ -471,7 +268,6 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(double factor, Expression expr)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(expr, "expr");
 
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
@@ -567,7 +363,7 @@ namespace Sonnet
         /// <summary>
         /// Divides the constant and all coefficients of the current Expression by the given divider.
         /// </summary>
-        /// <param name="divider">The divider to be used.</param>
+        /// <param name="divider">The divider to be used. Must be non-zero.</param>
         /// <returns>The updated current Expression.</returns>
         public Expression Divide(double divider)
         {
@@ -576,22 +372,14 @@ namespace Sonnet
             return this.Multiply(1.0 / divider);
         }
 
-        internal void Clear()
-        {
-            EnsureNotDisposedOrFinalized();
-            coefs.Clear();
-            constant = 0.0;
-        }
-
         /// <summary>
         /// Removes the given variable from the current Expression.
-        /// This disrupts the order of coefficients.
+        /// Note: This method reorders the coefficients.
         /// </summary>
         /// <param name="var">The variable to be removed.</param>
         /// <returns>The sum of all coefficients of the given variable before removing.</returns>
         protected double Remove(Variable var)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(var, "var");
 
             int aID = var.id;
@@ -647,7 +435,6 @@ namespace Sonnet
         /// <returns>The sum of all coefficients of the given variable.</returns>
         public double Assemble(Variable var)
         {
-            EnsureNotDisposedOrFinalized();
             Ensure.NotNull(var, "var");
 
             int aID = var.id;
@@ -667,7 +454,6 @@ namespace Sonnet
         /// </summary>
         public void Assemble()
         {
-            EnsureNotDisposedOrFinalized();
             CoefVector assembled = new CoefVector();
             coefs.Sort();
 
@@ -721,12 +507,7 @@ namespace Sonnet
         /// </summary>
         internal CoefVector Coefficients
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-
-                return coefs;
-            }
+            get { return coefs; }
         }
 
         /// <summary>
@@ -734,12 +515,7 @@ namespace Sonnet
         /// </summary>
         public double Constant
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-
-                return constant;
-            }
+            get { return constant; }
         }
 
         /// <summary>
@@ -747,12 +523,7 @@ namespace Sonnet
         /// </summary>
         public int NumberOfCoefficients
         {
-            get
-            {
-                EnsureNotDisposedOrFinalized();
-
-                return coefs.Count;
-            }
+            get { return coefs.Count; }
         }
 
         /// <summary>
@@ -761,8 +532,6 @@ namespace Sonnet
         /// <returns>The constant plus the product of all coefficients and the Value in the current solution of their variables.</returns>
         public double Level()
         {
-            EnsureNotDisposedOrFinalized();
-
             int n = coefs.Count;
             double level = constant;
             foreach (Coef coef in coefs)
@@ -772,12 +541,12 @@ namespace Sonnet
 
             return level;
         }
-        #region Overloaded Operators
+        #region Overloaded operators
         // (?) Note that these overloaded operators use implicit conversion from variable and double to expression!
-        
+
+        #region Operator <=
         /// <summary>
-        /// Returns a new Constraint "lhs &lt;= rhs".
-        /// The expressions are copied.
+        /// Creates a new Constraint "lhs &lt;= rhs".
         /// </summary>
         /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
         /// <param name="rhs">The rigt-hand-side expression of the new constraint.</param>
@@ -788,188 +557,378 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Returns a new Constraint "lhs &lt;= val".
+        /// Creates a new Constraint "lhs &lt;= c".
         /// </summary>
-        /// <param name="lhs"></param>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static Constraint operator <=(Expression lhs, double val)
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="c">The constant.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator <=(Expression lhs, double c)
         {
-            return lhs <= new Expression(val);
+            return lhs <= new Expression(c);
         }
 
-        public static Constraint operator <=(double val, Expression rhs)
+        /// <summary>
+        /// Creates a new Constraint "c &lt;= rhs".
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator <=(double c, Expression rhs)
         {
-            return (new Expression(val) <= rhs); 
+            return (new Expression(c) <= rhs);
         }
 
-        public static Constraint operator <=(Variable var, Expression rhs)
+        /// <summary>
+        /// Creates a new Constraint "x &lt;= rhs".
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator <=(Variable x, Expression rhs)
         {
-            return (new Expression(var) <= rhs); 
+            return (new Expression(x) <= rhs);
         }
 
-        public static Constraint operator <=(Expression lhs, Variable var)
+        /// <summary>
+        /// Creates a new Constraint "lhs &lt;= x".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="x">The variable.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator <=(Expression lhs, Variable x)
         {
-            return (lhs <= new Expression(var));
+            return (lhs <= new Expression(x));
         }
+        #endregion
 
-
-        /// The >= operator
+        /// <summary>
+        /// Creates a new Constraint "lhs &gt;= rhs".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
         public static Constraint operator >=(Expression lhs, Expression rhs)
         {
             return new Constraint(lhs, ConstraintType.GE, rhs);
         }
 
-        public static Constraint operator >=(Expression lhs, double val)
+        /// <summary>
+        /// Creates a new Constraint "lhs &gt;= c".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="c">The constant.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator >=(Expression lhs, double c)
         {
-            return (lhs >= new Expression(val));
+            return (lhs >= new Expression(c));
         }
 
-        public static Constraint operator >=(double val, Expression rhs)
+        /// <summary>
+        /// Creates a new Constraint "c &gt;= rhs".
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator >=(double c, Expression rhs)
         {
-            return (new Expression(val) >= rhs);
+            return (new Expression(c) >= rhs);
         }
 
-        public static Constraint operator >=(Variable var, Expression rhs)
+        /// <summary>
+        /// Creates a new Constraint "x &gt;= rhs".
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator >=(Variable x, Expression rhs)
         {
-            return (new Expression(var) >= rhs);
+            return (new Expression(x) >= rhs);
         }
 
-        public static Constraint operator >=(Expression lhs, Variable var)
+        /// <summary>
+        /// Creates a new Constraint "lhs &gt;= x".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="x">The variable.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator >=(Expression lhs, Variable x)
         {
-            return (lhs >= new Expression(var));
+            return (lhs >= new Expression(x));
         }
 
-        /// The == operator, eg  lhs == rhs
+        #region Operator ==
+        /// <summary>
+        /// Creates a new Constraint "lhs == rhs".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
         public static Constraint operator ==(Expression lhs, Expression rhs)
         {
             return new Constraint(lhs, ConstraintType.EQ, rhs);
         }
 
+        /// <summary>
+        /// Creates a new Constraint "lhs == c".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="c">The constant.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator ==(Expression lhs, double c)
+        {
+            return (lhs == new Expression(c));
+        }
+
+        /// <summary>
+        /// Creates a new Constraint "c == rhs".
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator ==(double c, Expression rhs)
+        {
+            return (new Expression(c) == rhs);
+        }
+
+        /// <summary>
+        /// Creates a new Constraint "x == rhs".
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="rhs">The right-hand-side expression of the new constraint.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator ==(Variable x, Expression rhs)
+        {
+            return (new Expression(x) == rhs);
+        }
+
+        /// <summary>
+        /// Creates a new Constraint "lhs == x".
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="x">The variable.</param>
+        /// <returns>The new constraint.</returns>
+        public static Constraint operator ==(Expression lhs, Variable x)
+        {
+            return (lhs == new Expression(x));
+        }
+        #endregion
+
+        #region Operator !=
+        /// <summary>
+        /// Not supported. Added to prevent error CS0216.
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression.</param>
+        /// <param name="rhs">The right-hand-side expression.</param>
+        /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, Expression rhs)
         {
-            throw new SonnetException("Cannot use != operator");
+            throw new NotSupportedException();
         }
 
-        public static Constraint operator ==(Expression lhs, double val)
+        /// <summary>
+        /// Not supported. Added to prevent error CS0216.
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression.</param>
+        /// <param name="c">The constant.</param>
+        /// <returns>NotSupportedException</returns>
+        public static Constraint operator !=(Expression lhs, double c)
         {
-            return (lhs == new Expression(val));
+            throw new NotSupportedException();
         }
 
-        public static Constraint operator !=(Expression lhs, double val)
+        /// <summary>
+        /// Not supported. Added to prevent error CS0216.
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <param name="rhs">The right-hand-side expression.</param>
+        /// <returns>NotSupportedException</returns>
+        public static Constraint operator !=(double c, Expression rhs)
         {
-            throw new SonnetException("Cannot use != operator");
+            throw new NotSupportedException();
         }
 
-        public static Constraint operator ==(double val, Expression rhs)
+        /// <summary>
+        /// Not supported. Added to prevent error CS0216.
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="rhs">The right-hand-side expression.</param>
+        /// <returns>NotSupportedException</returns>
+        public static Constraint operator !=(Variable x, Expression rhs)
         {
-            return (new Expression(val) == rhs);
+            throw new NotSupportedException();
         }
 
-        public static Constraint operator !=(double val, Expression rhs)
+        /// <summary>
+        /// Not supported. Added to prevent error CS0216.
+        /// </summary>
+        /// <param name="lhs">The left-hand-side expression of the new constraint.</param>
+        /// <param name="x">The variable.</param>
+        /// <returns>NotSupportedException</returns>
+        public static Constraint operator !=(Expression lhs, Variable x)
         {
-            throw new SonnetException("Cannot use != operator");
+            throw new NotSupportedException();
+        }
+        #endregion
+
+        #region Operator +
+        /// <summary>
+        /// Creates a new Expression set to "c + expr"
+        /// </summary>
+        /// <param name="c">The constant.</param>
+        /// <param name="expr">The expression</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator +(double c, Expression expr)
+        {
+            return new Expression(c).Add(expr);
         }
 
-        public static Constraint operator ==(Variable var, Expression rhs)
+        /// <summary>
+        /// Creates a new Expression set to "x + expr"
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator +(Variable x, Expression expr)
         {
-            return (new Expression(var) == rhs);
+            return (new Expression(x)).Add(expr);
         }
 
-        public static Constraint operator !=(Variable var, Expression rhs)
+        /// <summary>
+        /// Creates a new Expression set to "expr + c"
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="c">The constant to be added.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator +(Expression expr, double c)
         {
-            throw new SonnetException("Cannot use != operator");
+            return (new Expression(expr)).Add(c);
         }
 
-        public static Constraint operator ==(Expression lhs, Variable var)
+        /// <summary>
+        /// Creates a new Expression set to "expr + x"
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="x">The variable to be added.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator +(Expression expr, Variable x)
         {
-            return (lhs == new Expression(var));
+            return (new Expression(expr)).Add(x);
         }
 
-        public static Constraint operator !=(Expression lhs, Variable var)
-        {
-            throw new SonnetException("Cannot use != operator");
-        }
-        // Overloaded mathematical operators
-        // The + operator
-        public static Expression operator +(double val, Expression expr)
-        {
-            return new Expression(val).Add(expr);
-        }
-
-        public static Expression operator +(Variable var, Expression expr)
-        {
-            return (new Expression(var)).Add(expr);
-        }
-
-        public static Expression operator +(Expression expr, double coef)
-        {
-            return (new Expression(expr)).Add(coef);
-        }
-
-        public static Expression operator +(Expression expr, Variable var)
-        {
-            return (new Expression(expr)).Add(var);
-        }
-
-        //   returns copy of lhs + rhs  
-        // so,   tmp = exp1 + exp2 + exp3   performs  
-        //		((copy exp1, add exp2), copy result (exp1 and exp2), add exp3): n1 + n2 + n1 + n2 + n3!!
-        // better: tmp.Add(exp1), tmp.Add(exp2), tmp.Add(exp3) : n1 + n2 + n3 !
-        // which is equivalent to tmp.Add(exp1).Add(exp2).Add(exp3)
+        /// <summary>
+        /// Creates a new Expression set to "expr1 + expr2"
+        /// </summary>
+        /// <param name="expr1">The left expression</param>
+        /// <param name="expr2">The right expression</param>
+        /// <returns>The new expression.</returns>
         public static Expression operator +(Expression expr1, Expression expr2)
         {
             return (new Expression(expr1)).Add(expr2);
         }
+        #endregion
 
-        // overloaded mathematical operators
-        // the - operator
-        public static Expression operator -(double coef, Expression expr)
+        #region Operator -
+        /// <summary>
+        /// Creates a new Expression set to "c - expr"
+        /// </summary>
+        /// <param name="c">The constant to be used.</param>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(double c, Expression expr)
         {
-            return (new Expression(coef)).Subtract(expr);
+            return (new Expression(c)).Subtract(expr);
         }
 
-        public static Expression operator -(Variable var, Expression expr)
+        /// <summary>
+        /// Creates a new Expression set to "x - expr"
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(Variable x, Expression expr)
         {
-            return (new Expression(var)).Subtract(expr);
+            return (new Expression(x)).Subtract(expr);
         }
 
-        public static Expression operator -(Expression expr, double coef)
+        /// <summary>
+        /// Creates a new Expression set to "expr - c"
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="c">The constant to be subtracted.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(Expression expr, double c)
         {
-            return (new Expression(expr)).Subtract(coef);
+            return (new Expression(expr)).Subtract(c);
         }
 
-        public static Expression operator -(Expression expr, Variable var)
+        /// <summary>
+        /// Creates a new Expression set to "expr - x"
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="x">The variable to be subtracted.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(Expression expr, Variable x)
         {
-            return (new Expression(expr)).Subtract(var);
+            return (new Expression(expr)).Subtract(x);
         }
 
+        /// <summary>
+        /// Creates a new Expression set to "expr1 - expr2"
+        /// </summary>
+        /// <param name="expr1">The left expression.</param>
+        /// <param name="expr2">The right expression.</param>
+        /// <returns>The new expression.</returns>
         public static Expression operator -(Expression expr1, Expression expr2)
         {
             return (new Expression(expr1)).Subtract(expr2);
         }
+        #endregion
 
-        // overloaded mathematical operators
-        // the * operator
-        public static Expression operator *(double coef, Expression expr)
+        #region Operator * for constants
+        /// <summary>
+        /// Creates a new expression set to "f * expr".
+        /// The multiplication factor f is applied to the constant and coefficients in the expression.
+        /// </summary>
+        /// <param name="f">The multiplication factor.</param>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(double f, Expression expr)
         {
-            return new Expression(coef, expr);
+            return new Expression(f, expr);
         }
 
-        public static Expression operator *(Expression expr, double coef)
+        /// <summary>
+        /// Creates a new expression set to "expr * f" ( = "f * expr").
+        /// The multiplication factor f is applied to the constant and coefficients in the expression.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="f">The multiplication factor.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(Expression expr, double f)
         {
-            return new Expression(coef, expr);
+            return new Expression(f, expr);
         }
+        #endregion
 
-        // overloaded mathematical operators
-        // the / operator
-        public static Expression operator /(Expression expr, double coef)
+        #region Operator / for constant
+        /// <summary>
+        /// Creates a new expression set to "expr / d".,
+        /// The constant and coefficients of the given expression are all divided by d.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="d">The divider to be used. Must be non-zero.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator /(Expression expr, double d)
         {
-            return (new Expression(expr)).Divide(coef);
+            return (new Expression(expr)).Divide(d);
         }
+        #endregion
 
-        // Some mathematical functions
-        // returns a new expression that is the sum of the given expressions
+        /// <summary>
+        /// Returns a new expression that is the sum of the given expressions
+        /// </summary>
+        /// <param name="expressions">The expressions to be summed up.</param>
+        /// <returns>A new expression that is the sum of the given expressions.</returns>
         public static Expression Sum(IEnumerable<Expression> expressions)
         {
             Expression sum = new Expression();
@@ -980,7 +939,12 @@ namespace Sonnet
             return sum;
         }
 
-        // returns a new expression that is the sum of the given *expressions*
+        /// <summary>
+        /// Returns a new expression that is the sum of the given expressions or variables.
+        /// An exception is thrown if an element is neither an expression nor a variable.
+        /// </summary>
+        /// <param name="expressions">The expressions or variables to be summed up.</param>
+        /// <returns>A new expression that is the sum of the given expressions.</returns>
         public static Expression Sum(System.Collections.IEnumerable expressions)
         {
             Expression sum = new Expression();
@@ -1001,8 +965,11 @@ namespace Sonnet
             return sum;
         }
 
-
-        // returns a new expression that is the sum of the given variables
+        /// <summary>
+        /// Returns a new expression that is the sum of the given variables.
+        /// </summary>
+        /// <param name="variables">The variables to be summed up.</param>
+        /// <returns>A new expression that is the sum of the given variables.</returns>
         public static Expression Sum(IEnumerable<Variable> variables)
         {
             Expression sum = new Expression();
@@ -1016,10 +983,16 @@ namespace Sonnet
         //public static Expression ScalarProduct(double[] coefs, System.Collections.Generic.IList<Variable> variables)
         //{
         //            public static Expression ScalarProduct(double[] coefs, System.Collections.IList variables)
+        //}
 
-        //    }
-
-
+        /// <summary>
+        /// Returns an expression that is the scalar product of the array of coefficients and list of variables: 
+        ///   sum_i { coefs_i * variables_i }
+        /// Note that the number of coefficients and variables must be equal.
+        /// </summary>
+        /// <param name="coefs">The coefficients to be used.</param>
+        /// <param name="variables">The variables to be used.</param>
+        /// <returns>The new expression.</returns>
         public static Expression ScalarProduct(double[] coefs, System.Collections.IList variables)
         {
             if (coefs.Length != variables.Count)
@@ -1037,6 +1010,15 @@ namespace Sonnet
             return sum;
         }
 
+
+        /// <summary>
+        /// Returns an expression that is the scalar product of the array of coefficients and array of variables: 
+        ///   sum_i { coefs_i * variables_i }
+        /// Note that the number of coefficients and variables must be equal.
+        /// </summary>
+        /// <param name="coefs">The coefficients to be used.</param>
+        /// <param name="variables">The variables to be used.</param>
+        /// <returns>The new expression.</returns>
         public static Expression ScalarProduct(double[] coefs, Variable[] variables)
         {
             if (coefs.Length != variables.Length)
@@ -1053,10 +1035,18 @@ namespace Sonnet
             return sum;
         }
 
-        public static Expression ScalarProduct(IEnumerable<double> coefs, IEnumerable<Variable> vars)
+        /// <summary>
+        /// Returns an expression that is the scalar product of the coefficients and variables: 
+        ///   sum_i { coefs_i * variables_i }
+        /// Note that the number of coefficients and variables must be equal.
+        /// </summary>
+        /// <param name="coefs">The coefficients to be used.</param>
+        /// <param name="variables">The variables to be used.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression ScalarProduct(IEnumerable<double> coefs, IEnumerable<Variable> variables)
         {
             Expression sum = new Expression();
-            IEnumerator<Variable> varEnumerator = vars.GetEnumerator();
+            IEnumerator<Variable> varEnumerator = variables.GetEnumerator();
             IEnumerator<double> coefEnumerator = coefs.GetEnumerator();
             while (varEnumerator.MoveNext())
             {
@@ -1071,37 +1061,9 @@ namespace Sonnet
             if (coefEnumerator.MoveNext()) throw new SonnetException("For scalar product, the number of coefficients and variables must be the same.");
             return sum;
         }
-
         #endregion
 
         private CoefVector coefs;
         private double constant;
-        #region IDisposable Members
-
-        private void EnsureNotDisposedOrFinalized()
-        {
-            if (isDisposed) // || finalized > 0)
-            {
-                string message = "Cannot use Expression after it was disposed.";
-                throw new ObjectDisposedException("Expression", message);
-            }
-        }
-
-        private bool isDisposed;
-
-        public void Dispose()
-        {
-            if (isDisposed) return;
-
-            isDisposed = true;
-            if (!object.ReferenceEquals(coefs, null))
-            {
-                coefs.Clear();
-                coefs.TrimExcess();
-                coefs = null;
-            }
-        }
-
-        #endregion
     }
 }

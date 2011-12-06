@@ -1,0 +1,227 @@
+// Copyright (C) 2011, Jan-Willem Goossens 
+// All Rights Reserved.
+// This code is licensed under the terms of the Eclipse Public License (EPL).
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Diagnostics;
+
+namespace Sonnet
+{
+    /// <summary>
+    /// This class implements various static methods
+    /// </summary>
+    internal static class MathUtils
+    {
+        public const double Infinity = double.MaxValue;
+        public const double Epsilon = 1e-5;
+        public static bool UseAbsoluteComparisonOnly = false;
+        /// <summary>
+        /// Compares this double to the given value.
+        /// Returns -1 if b is larger, 1 if b is smaller, and 0 otherwise.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <param name="b">The given double.</param>
+        /// <returns>-1 if this double is smaller than b - eps,
+        /// 1 if a is larget than b + eps, and 0 otherwise.
+        /// </returns>
+        public static int CompareToEps(this double a, double b)
+        {
+            double eps = Epsilon;
+            // if either a or b is close to zero, then do absolute difference
+            // otherwise (the 'if' here) do a relative comparison (relative to the absolute value of the highest of a and b)
+            if (!UseAbsoluteComparisonOnly &&
+                System.Math.Abs(a) >= Epsilon && System.Math.Abs(b) >= Epsilon)
+                eps *= System.Math.Abs(System.Math.Max(a, b));
+
+            if (a < b - eps)
+                return -1;
+            if (a > b + eps)
+                return 1;
+            return 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is positive.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>True iff this double is larger than zero.</returns>
+        public static bool IsPositive(this double a)
+        {
+            return a.CompareToEps(0.0) > 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is negative.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>True iff this double is smaller than zero.</returns>
+        public static bool IsNegative(this double a)
+        {
+            return a.CompareToEps(0.0) < 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is equal to or between the given two bounds.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="x">This double.</param>
+        /// <param name="l">the lowwer bound.</param>
+        /// <param name="u">The upper bound.</param>
+        /// <returns>True iff this double is equal to or between the two bounds.</returns>
+        public static bool IsBetween(this double x, double l, double u)
+        {
+            if (x.CompareToEps(l) >= 0 && x.CompareToEps(u) <= 0) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether this double is equal to zero.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <returns>True iff this double is equal to zero.</returns>
+        public static bool IsZero(this double a)
+        {
+            return a.CompareToEps(0.0) == 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is integer.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>true if this double is integer, and false otherwise.</returns>
+        public static bool IsInteger(this double a)
+        {
+            return (System.Math.Round(a) - a).IsZero();
+        }
+
+        /// <summary>
+        /// Creates a string representation of this double.
+        /// Uses "-Inf" and "Inf" whenever applicatable.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <returns>"-Inf" if a is less than or equal to Utils.Infinity, "Inf" is larger or equal, and 
+        /// regular a.ToString() otherwise.</returns>
+        public static string ToDoubleString(this double a)
+        {
+            if (a <= -Infinity) return "-Inf";
+            if (a >= Infinity) return "Inf";
+
+            return a.ToString();
+        }
+    }
+
+    internal static class Utils
+    {
+        public static void DumpAssemblyInfo()
+        {
+            Trace.WriteLine("Initialising SONNET Model.\nAssembly information:");
+            Trace.WriteLine(String.Concat("File path: ", System.Reflection.Assembly.GetExecutingAssembly().Location));
+            Trace.WriteLine(String.Concat("File date: ", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString()));
+            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
+            Trace.WriteLine(String.Concat("Framework: ", Environment.Version.ToString()));
+            Trace.WriteLine(String.Concat("Assembly runtime version: ", System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion));
+
+            System.Reflection.PortableExecutableKinds portableExecutableKinds;
+            System.Reflection.ImageFileMachine imageFileMachine;
+            System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out portableExecutableKinds, out imageFileMachine);
+            Trace.WriteLine("Portable executable kinds: " + portableExecutableKinds.ToString());
+            Trace.WriteLine("Image file machine: " + imageFileMachine.ToString());
+            Trace.WriteLine("----------------------------------------------------------");
+        }
+
+
+        public static char GetOsiConstraintType(this ConstraintType constraintType)
+        {
+            switch (constraintType)
+            {
+                case ConstraintType.EQ: return 'E';
+                case ConstraintType.LE: return 'L';
+                case ConstraintType.GE: return 'G';
+                default: throw new SonnetException("Unknown constraint type " + constraintType);
+            }
+        }
+
+        public static void Remove<T>(this List<T> list, int index)
+        {
+            // This should be much faster, but without maintaining the (sorted?) order.
+            // swap the last for i!!
+            int n = list.Count;
+            if (index < n - 1)
+            {
+                // somewhere in the middle of the list, then copy the last element into this position
+                list[index] = list[n - 1];
+                // and remove the last (copy)
+                list.RemoveAt(n - 1);
+            }
+            else
+            {
+                //index == n - 1
+                // if the last: then simply remove this one. Note that this does NOT copy elements.
+                list.RemoveAt(index);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The Ensure class contains various tests that will throw an exception if a condition is not met.
+    /// For example:
+    ///     Ensure.IsTrue(a == 5);
+    /// </summary>
+    public class Ensure
+    {
+        /// <summary>
+        /// Throws an ArgumentException if b is not true.
+        /// </summary>
+        /// <param name="b">The boolean value to be tested.</param>
+        public static void IsTrue(bool b)
+        {
+            if (!b) throw new ArgumentException();
+        }
+
+        /// <summary>
+        /// Throws an ArgumentException if b is not false.
+        /// </summary>
+        /// <param name="b">The boolean value to be tested.</param>
+        public static void IsFalse(bool b)
+        {
+            if (b) throw new ArgumentException();
+        }
+
+        /// <summary>
+        /// Throws an ArgumentException if a and b are not equal.
+        /// </summary>
+        /// <typeparam name="T">The type of objects.</typeparam>
+        /// <param name="a">The object to compare.</param>
+        /// <param name="b">The object to compare to.</param>
+        public static void Equals<T>(IEquatable<T> a, IEquatable<T> b)
+        {
+            if (!a.Equals(b)) throw new ArgumentException();
+        }
+
+        /// <summary>
+        /// Throws an ArgumentNullException if the object is null.
+        /// </summary>
+        /// <param name="obj">The given object.</param>
+        public static void NotNull(object obj)
+        {
+            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException();
+        }
+
+        /// <summary>
+        /// Throws an ArgumentNullException for the given parameter name if the object is null.
+        /// </summary>
+        /// <param name="obj">The given object.</param>
+        /// <param name="paramName">The given parameter name to be reported.</param>
+        public static void NotNull(object obj, string paramName)
+        {
+            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException(paramName);
+        }
+    }
+}

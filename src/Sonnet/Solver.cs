@@ -12,13 +12,33 @@ using COIN;
 
 namespace Sonnet
 {
+    /// <summary>
+    /// Specifies the types of solvers.
+    /// At runtime the actual Osi solver instance is attempted to be created using reflection.
+    /// The solvers must be available through the SonnetWrapper.
+    /// </summary>
     public enum SolverType
     {
+        /// <summary>
+        /// No solver type set
+        /// </summary>
         Undefined,
-        ClpSolver,			// the COIN LP solver
-        CbcSolver,			// the COIN Branch-and-Cut solver
-        VolSolver,			// the COIN Volume algorithm solver
-        CpxSolver			// the CPLEX solver		( the availability is checked at runtime )
+        /// <summary>
+        /// Represents the COIN LP solver Clp via OsiClpSolverInterface
+        /// </summary>
+        ClpSolver,
+        /// <summary>
+        /// Represents the CON Branch-and-Cut solver Cbc via OsiCbcSolverInterface
+        /// </summary>
+        CbcSolver,
+        /// <summary>
+        /// Represents the COIN Volume algorithm via OsiVolSolverInterface (availability is checked at runtime)
+        /// </summary>
+        VolSolver,
+        /// <summary>
+        /// Represents the CPLEX solver	via OsiCpxSolverInterface (availability is checked at runtime )
+        /// </summary>
+        CpxSolver
     }
 
     public class Solver : Named, IDisposable
@@ -148,7 +168,6 @@ namespace Sonnet
         #endregion
 
         #region Static Properties
-        public static double GenericInfinity { get { return MathExtension.Infinity; } }
         /// <summary>
         /// Gets the Version number of this assembly
         /// </summary>
@@ -220,7 +239,6 @@ namespace Sonnet
         /// <summary>
         /// Adds (a reference) the given constraint to the mode with the given name
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="con"></param>
         /// <returns></returns>
         internal void Add(Constraint con)// overrides any given name. Adds a reference!
@@ -944,12 +962,10 @@ namespace Sonnet
                 // where the sense of the constraint has been translated into correct bl and bu (see above)
                 // If we use loadProblem with constraints based on rowsense info, then the passed Ranges are only used for Range (R) rows!
 
-                /** Just like the other loadProblem() methods except that the matrix is
+                /* Just like the other loadProblem() methods except that the matrix is
                 given in a standard column major ordered format (without gaps). */
                 //solver.loadProblem(n, m, Cst, Rnr, Elm, l, u, c, rowsen, rowrhs, rowrng);
 
-                /** Just like the other loadProblem() methods except that the matrix is
-                given in a standard column major ordered format (without gaps). */
 #if (LEANLOADPROBLEM)
                 if (solver is OsiClpSolverInterface)
                 {
@@ -1076,7 +1092,7 @@ namespace Sonnet
 
         /// <summary>
         /// Exports the model in either MPS, LP or SONNET format, depending on the extension of the given filename
-        /// Note, after solving a model, the Bounds etc are left at non-original values!
+        /// Note, after solving a model, the Bounds etc could be left at non-original values!
         /// If you want to export the original bounds etc, then call Generate() before Exporting.
         /// </summary>
         /// <param name="filename"></param>
@@ -1255,7 +1271,7 @@ namespace Sonnet
         /// <summary>
         /// Get the element index (offset) of the constraint in this model. An exception is thrown if no offset found.
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="con"></param>
         /// <returns></returns>
         private int Offset(Constraint con)
         {
@@ -1297,7 +1313,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the (generated) constraints
+        /// Gets the generated constraints
         /// </summary>
         public IEnumerable<Constraint> Constraints
         {
@@ -1305,7 +1321,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the variables (currenlty generated)
+        /// Gets the variables currenlty generated
         /// </summary>
         public IEnumerable<Variable> Variables
         {
@@ -1330,7 +1346,7 @@ namespace Sonnet
         /// <summary>
         /// Return the variable, given its element index in this model
         /// </summary>
-        /// <param name="offset"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
         private Variable GetVariable(int index)
         {
@@ -1486,10 +1502,9 @@ namespace Sonnet
 #if (DEBUG)
                     if (IsProvenOptimal)
                     {
-                        if (values[col] < var.Lower - MathExtension.Epsilon ||
-                            values[col] > var.Upper + MathExtension.Epsilon)
+                        if (!values[col].IsBetween(var.Lower, var.Upper))
                         {
-                            Trace.WriteLine(string.Format("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper));
+                            Debug.WriteLine(string.Format("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper));
                         }
                     }
 #endif
@@ -1501,7 +1516,7 @@ namespace Sonnet
 #if (DEBUG)
             if (IsProvenOptimal)
             {
-                if (MathExtension.CompareDouble(objective.Level(), objective.Value) != 0)
+                if (objective.Level().CompareToEps(objective.Value) != 0)
                 {
                     Trace.WriteLine(string.Format("Solution is optimal, but objective value {0} is not corrected for constant term (offset) {1}", objective.Value, objective.Level()));
                 }
@@ -1700,7 +1715,7 @@ namespace Sonnet
                 }
                 else
                 {
-                    char sense = Constraint.GetOsiConstraintType(con.Type);
+                    char sense = con.Type.GetOsiConstraintType();
                     solver.setRowType(offset, (sbyte)sense, con.RhsConstant, range);
                 }
             }
