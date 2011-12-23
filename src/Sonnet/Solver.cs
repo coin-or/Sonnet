@@ -7,88 +7,78 @@ using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Linq;
 
 using COIN;
 
 namespace Sonnet
 {
     /// <summary>
-    /// Specifies the types of solvers.
-    /// At runtime the actual Osi solver instance is attempted to be created using reflection.
-    /// The solvers must be available through the SonnetWrapper.
+    /// The Solver class is responsible of optimizing the problems represented by a Model.
+    /// This class is the main link back to the COIN Osi solvers (OsiSolverInterface) through the SonnetWrapper.
+    /// The Solver can only be constructed for a given type of OsiSolverInterface, or for 
+    /// a specific instance derived from OsiSolverInterface. 
+    /// The OsiSolver can be retrieved using the OsiSolver proporty.
+    /// The available classes in SonnetWrapper that derive from OsiSolverInterface can be retrieved using Solver.GetSolverTypes().
+    /// Ideally, the model is built before creating the Solver. Changes after the construction of the solver involve more overhead.
+    /// Before the model is given to the OsiSolver, it will be Generated automatically (or explicitly). At this point, the
+    /// constraints of the model are transformed into the constraint matrix that is loaded into the OsiSolver.
     /// </summary>
-    public enum SolverType
-    {
-        /// <summary>
-        /// No solver type set
-        /// </summary>
-        Undefined,
-        /// <summary>
-        /// Represents the COIN LP solver Clp via OsiClpSolverInterface
-        /// </summary>
-        ClpSolver,
-        /// <summary>
-        /// Represents the CON Branch-and-Cut solver Cbc via OsiCbcSolverInterface
-        /// </summary>
-        CbcSolver,
-        /// <summary>
-        /// Represents the COIN Volume algorithm via OsiVolSolverInterface (availability is checked at runtime)
-        /// </summary>
-        VolSolver,
-        /// <summary>
-        /// Represents the CPLEX solver	via OsiCpxSolverInterface (availability is checked at runtime )
-        /// </summary>
-        CpxSolver
-    }
-
     public class Solver : Named, IDisposable
     {
         private static SonnetLog log = SonnetLog.Default;
 
         #region Constructors
-        public Solver(Model model, SolverType solverType, string name = "")
-            : this(model, CreateSolver(solverType), name)
-        {
-        }
-
-        public Solver(Model model, OsiSolverInterface solver, string name = "")
+        /// <summary>
+        /// Initializes a new instance of the Solver class with the given name and model, 
+        /// and using the given instance derived from OsiSolverInterface.
+        /// </summary>
+        /// <param name="model">The model used in this solver.</param>
+        /// <param name="solver">The instance of an OsiSolver, eg, OsiClpSolverInterface to be used.</param>
+        /// <param name="name">The name for this solver.</param>
+        public Solver(Model model, OsiSolverInterface solver, string name = null)
         {
             Ensure.NotNull(model, "model");
             Ensure.NotNull(solver, "solver");
 
-            GutsOfConstructor(model, solver);
-        }
-        #endregion
-
-        public static bool CanCreateSolver(SolverType value)
-        {
-            return CreateSolver(value) != null;
-        }
-
-        public static OsiSolverInterface CreateSolver(SolverType value)
-        {
-            OsiSolverInterface result = null;
-            switch (value)
-            {
-                case SolverType.ClpSolver:
-                    result = new OsiClpSolverInterface();
-                    break;
-                case SolverType.CbcSolver:
-                    result = new OsiCbcSolverInterface();
-                    break;
-                case SolverType.VolSolver:
-                    result = (OsiSolverInterface)System.Reflection.Assembly.GetAssembly(typeof(COIN.OsiSolverInterface)).CreateInstance("COIN.OsiVolSolverInterface");
-                    break;
-                case SolverType.CpxSolver:
-                    result = (OsiSolverInterface)System.Reflection.Assembly.GetAssembly(typeof(COIN.OsiSolverInterface)).CreateInstance("COIN.OsiCpxSolverInterface");
-                    break;
-            }
-
-            return result;
+            GutsOfConstructor(model, solver, name);
         }
 
         /// <summary>
-        /// Get or set the amount of logging for the current solver
+        /// Initializes a new instance of the Solver class with the given name and model,
+        /// and using a to be constructed instance of the given type derived from OsiSolverInterface.
+        /// </summary>
+        /// <param name="model">The model used in this solver.</param>
+        /// <param name="osiSolverInterfaceType">The type derived from OsiSolverInterface to be used.</param>
+        /// <param name="name">The name for this solver.</param>
+        public Solver(Model model, Type osiSolverInterfaceType, string name = null)
+        {
+            Ensure.NotNull(model, "model");
+            Ensure.Is<COIN.OsiSolverInterface>(osiSolverInterfaceType, "osiSolverInterfaceType");
+
+            OsiSolverInterface solver = (OsiSolverInterface)osiSolverInterfaceType.GetConstructor(System.Type.EmptyTypes).Invoke(null);
+            GutsOfConstructor(model, solver, name);
+        }
+        
+        /// <summary>
+        /// Initializes a new instance of the Solver class with the given name and model,
+        /// for using a to be constructed instance of the given type derived from OsiSolverInterface.
+        /// </summary>
+        /// <typeparam name="T">The type of OsiSolver to be used, derived from OsiSolverInterface.</typeparam>
+        /// <param name="model">The model used in this solver.</param>
+        /// <param name="name">The name for this solver.</param>
+        /// <returns>The new instance of the Solver class.</returns>
+        public static Solver New<T>(Model model, string name = null)
+            where T : OsiSolverInterface
+        {
+            Ensure.NotNull(model, "model");
+
+            return new Solver(model, typeof(T), name);
+        }
+        #endregion
+
+        /// <summary>
+        /// Gets or sets the amount of logging for the current solver
         /// </summary>
         public int LogLevel
         {
@@ -144,26 +134,20 @@ namespace Sonnet
         public double Infinity { get { return solver.getInfinity(); } }
 
         /// <summary>
-        /// Gets the number of generated constraints.
-        /// </summary>
-        public int NumberOfConstraints { get { return solver.getNumRows(); } }
-        /// <summary>
-        /// Gets the number of generated variables.
-        /// </summary>
-        public int NumberOfVariables { get { return solver.getNumCols(); } }
-        /// <summary>
-        /// Gets the number of elements in the constraint matrix
-        /// </summary>
-        public int NumberOfElements { get { return solver.getNumElements(); } }
-        /// <summary>
-        /// Gets the number of integer variables
-        /// </summary>
-        public int NumberOfIntegerVariables { get { return solver.getNumIntegers(); } }
-
-        /// <summary>
         /// Returns true iff there is at least one integer variable
         /// </summary>
-        public bool IsMIP { get { return NumberOfIntegerVariables > 0; } }
+        public bool IsMIP 
+        { 
+            get 
+            {
+                Generate();
+                foreach (Variable var in variables)
+                {
+                    if (var.Type == VariableType.Integer) return true;
+                }
+                return false;
+            } 
+        }
 
         #endregion
 
@@ -172,20 +156,51 @@ namespace Sonnet
         /// Gets the Version number of this assembly
         /// </summary>
         public static Version Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version; } }
+
         /// <summary>
-        /// Gets the default solver type (CbcSolver). Any new Model without an explicit solver type will use this solver.
+        /// Return all types that are derived from OsiSolverInterface in the SonnetWrapper.
         /// </summary>
-        public static SolverType DefaultSolverType { get { return SolverType.ClpSolver; } }
+        /// <returns></returns>
+        public static Type[] GetOsiSolverTypes()
+        {
+            Type[] types = System.Reflection.Assembly.GetAssembly(typeof(COIN.OsiSolverInterface)).GetTypes();
+            List<Type> osiTypes = new List<Type>();
+            foreach (Type type in types)
+            {
+                
+                if (type.IsSubclassOf(typeof(COIN.OsiSolverInterface)) &&
+                    !type.IsAbstract)
+                {
+                    osiTypes.Add(type);
+                }
+            }
+            return osiTypes.ToArray();
+        }
         #endregion
 
+        /// <summary>
+        /// Get the model of the current solver
+        /// </summary>
         public Model Model
         {
             get { return this.model; }
         }
 
+        /// <summary>
+        /// Get the used OsiSolver
+        /// </summary>
         public OsiSolverInterface OsiSolver
         {
             get { return this.solver; }
+        }
+
+        /// <summary>
+        /// Get the full name of the type of OsiSolver.
+        /// For example, "COIN.OsiClpSolverInterface"
+        /// </summary>
+        public string OsiSolverFullName
+        {
+            get { return this.solver.GetType().FullName; }
         }
 
         #region Get Model propeties
@@ -220,8 +235,6 @@ namespace Sonnet
 
         internal void ApplyObjectiveSense(ObjectiveSense sense)
         {
-
-
             // (1 for min (default), -1 for max)
             switch (sense)
             {
@@ -248,15 +261,13 @@ namespace Sonnet
             rawconstraints.Add(con);
         }
 
-
-
         #region Solve, Resolve, Maximise and Minimise Methods
         ///<summary>
-        /// Maximises the model
-        /// This implicitly sets the objective sense to Maximise
-        /// Uses branch and bound if model is MIP and LP otherwise
+        /// Maximises the model.
+        /// This implicitly sets the objective sense to Maximise.
+        /// The method uses branch and bound if model is MIP and LP otherwise.
         /// </summary>
-        /// <param name="forceRelaxation">Force solving LP relaxation</param>
+        /// <param name="forceRelaxation">Force solving of the LP relaxation</param>
         public void Maximise(bool forceRelaxation = false)
         {
             ApplyObjectiveSense(ObjectiveSense.Maximise);
@@ -265,11 +276,11 @@ namespace Sonnet
         }
 
         ///<summary>
-        /// Minimises the model
-        /// This implicitly sets the objective sense to Minimise
-        /// Uses branch and bound if model is MIP and LP otherwise
+        /// Minimises the model.
+        /// This implicitly sets the objective sense to Minimise.
+        /// The method uses branch and bound if model is MIP and LP otherwise.
         /// </summary>
-        /// <param name="forceRelaxation">Force solving LP relaxation</param>
+        /// <param name="forceRelaxation">Force solving of the LP relaxation.</param>
         public void Minimise(bool forceRelaxation = false)
         {
             ApplyObjectiveSense(ObjectiveSense.Minimise);
@@ -278,20 +289,20 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Solve the model according to the ObjectiveSense settings
-        /// Uses branch and bound if model is MIP and LP otherwise
+        /// Solve the model according to the ObjectiveSense settings.
+        /// The method uses branch and bound if model is MIP and LP otherwise.
         /// </summary>
-        /// <param name="forceRelaxation">Force solving LP relaxation</param>
+        /// <param name="forceRelaxation">Force solving of the LP relaxation.</param>
         public void Solve(bool forceRelaxation = false)
         {
             Solve(false, forceRelaxation);
         }
 
         /// <summary>
-        /// Resolve the model according to the ObjectiveSense settings
-        /// Uses branch and bound if model is MIP and LP otherwise
+        /// Resolve the model according to the ObjectiveSense settings.
+        /// The method uses branch and bound if model is MIP and LP otherwise.
         /// </summary>
-        /// <param name="forceRelaxation">Force solving LP relaxation</param>
+        /// <param name="forceRelaxation">Force solving of the LP relaxation.</param>
         public void Resolve(bool forceRelaxation = false)
         {
             Solve(true, forceRelaxation);
@@ -351,8 +362,14 @@ namespace Sonnet
 
         #endregion
 
+        /// <summary>
+        /// Determine whether the current solution satisfies all constraints and variables bounds and types.
+        /// </summary>
+        /// <returns></returns>
         public bool IsFeasible()
         {
+            Generate();
+
             bool feasible = true;
             StringBuilder tmp = new StringBuilder();
 
@@ -396,7 +413,7 @@ namespace Sonnet
             }
 
             tmp.Append("End");
-            Debug.WriteLine(tmp.ToString());
+            log.Debug(tmp.ToString());
 
             return feasible;
         }
@@ -407,6 +424,7 @@ namespace Sonnet
         ///</summary>
         public WarmStart GetWarmStart()
         {
+            Generate();
             return WarmStart.NewWarmStart(solver);
         }
 
@@ -415,6 +433,7 @@ namespace Sonnet
         ///</summary>
         public WarmStart GetEmptyWarmStart()
         {
+            Generate();
             return WarmStart.NewEmptyWarmStart(solver);
         }
 
@@ -425,11 +444,17 @@ namespace Sonnet
         {
             Ensure.NotNull(warmStart, "WarmStart");
 
+            Generate();
             warmStart.ApplyWarmStart(solver);
         }
         #endregion;
 
         #region Reset / Save for MIP Solver methods
+        /// <summary>
+        /// Reset the bounds etc after a MIP solve (branch and bound).
+        /// This is done automatically according to the AutoResetMIPSolve property.
+        /// Note that this also reselt the results of solver.get.. functions.
+        /// </summary>
         public void ResetAfterMIPSolve()
         {
             if (AutoResetMIPSolve)
@@ -437,8 +462,10 @@ namespace Sonnet
                 throw new NotSupportedException("ResetAfterMIPSolve is automatically called");
             }
 
-            SaveBeforeMIPSolveInternal();
+            Generate();
+            ResetAfterMIPSolveInternal();
         }
+        
         private void ResetAfterMIPSolveInternal()
         {
             //TODO: this needs some work: ResetAfterMIPSolve also clears the solution, so afterwards any AssignSolution yields all zero values!
@@ -466,6 +493,10 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Save the bounds etc before a MIP solve (branch and bound)
+        /// This is done automatically according to the AutoResetMIPSolve property.
+        /// </summary>
         public void SaveBeforeMIPSolve()
         {
             if (AutoResetMIPSolve)
@@ -473,10 +504,13 @@ namespace Sonnet
                 throw new NotSupportedException("SaveBeforeMIPSolve is automatically called");
             }
 
+            Generate();
+
             SaveBeforeMIPSolveInternal();
         }
+
         private void SaveBeforeMIPSolveInternal()
-            {
+        {
             if (solver is OsiCbcSolverInterface)
             {
                 // save the new reference solver including the new constraints.
@@ -531,16 +565,12 @@ namespace Sonnet
                 {
                     Coef c = coefs[j];
                     int voffset = Offset(c.var);
-#if (DEBUG)
-                    if (voffset == -1)
-                        throw new SonnetException("Trying to use variable that is not part of this model!");
-#endif
+                    if (voffset == -1) throw new SonnetException("Trying to use variable that is not part of this model!");
+
                     columns[numberElements] = voffset;
                     element[numberElements] = c.coef;
                 }
 
-                //virtual void addRow(int numberElements, const int * columns, const double * element,
-                // const double rowlb, const double rowub) ;
                 solver.addRow(numberElements, columns, element, rowlb, rowub);
 
                 if (!con.Enabled)
@@ -566,7 +596,7 @@ namespace Sonnet
         {
             Ensure.NotNull(obj, "objective");
 
-            //this->objective->Unregister(this); // this should have already been done!
+            //this.objective.Unregister(this); // this should have already been done!
 
             // Registering the objective is important for changing coefficients: If we change coefs of an objective,
             // these changes have to be passed on to all registered models.
@@ -579,7 +609,7 @@ namespace Sonnet
             if (Generated)
             {
                 // now load the objective into the solver
-                int n = NumberOfVariables;	// the NEW number of variables
+                int n = variables.Count;	// the NEW number of variables
                 double[] c = new double[n];
                 // initialise all the coefficient at 0.0
                 for (int j = 0; j < n; j++)
@@ -595,21 +625,12 @@ namespace Sonnet
                     c[j] = kc.coef;	// without objective->Assemble() (in Generate(obj), we could do +=
                 }
 
-                // which ever works faster..
-
-                /*	// change coefficients individually
-                for (int j = 0; j < n; j++)
-                {
-                solver->setObjCoeff(j, c[j]);
-                }
-                */
-
                 // change all coefficients at the same time
                 solver.setObjective(c);
 
-                // skip this: doesnt work as expected with max/min problems
-                // the constant part goes in via the ObjOffset
-                // solver->setDblParam(OsiObjOffset, obj->Constant);
+                // Skip this: doesnt work as expected with max/min problems
+                // The constant part goes in via the ObjOffset
+                // solver.setDblParam(OsiObjOffset, obj->Constant);
             }
         }
 
@@ -661,7 +682,8 @@ namespace Sonnet
         }
 
         ///<summary>
-        /// Generates (builds) the model to be solved. This can be called explicitly, but is done automatically within a solve.
+        /// Generates (builds) the model to be solved. 
+        /// This can be called explicitly, but is done automatically within a solve.
         ///</summary>
         public void Generate()
         {
@@ -678,9 +700,8 @@ namespace Sonnet
 
                 if (rawconstraints.Count > 0)
                 {
-                    for (int i = 0; i < rawconstraints.Count; )
+                    foreach (Constraint con in rawconstraints)
                     {
-                        Constraint con = rawconstraints[i];
                         try
                         {
                             Generate(con);
@@ -690,16 +711,15 @@ namespace Sonnet
                             string message = string.Format("Error generating constraint {0}.", con.Name);
                             throw new SonnetException(message, e);
                         }
-
-                        Utils.Remove<Constraint>(rawconstraints, i);
-
-                        //static_cast<ModelEntity *>(constraint)->Unassign();	// Assign was done in Generate(con)
                     }
+
+                    rawconstraints.Clear();
                 }
                 return;
             }
             #endregion
 
+            #region Not yet generated
             System.GC.Collect();
 
             if (variables.Count > 0)
@@ -728,9 +748,8 @@ namespace Sonnet
 
             log.DebugFormat("Done generating objective after {0}.", (CoinUtils.CoinCpuTime() - genStart));
 
-            for (int i = 0; i < rawconstraints.Count; )
+            foreach (Constraint con in rawconstraints)
             {
-                Constraint con = rawconstraints[i];
                 try
                 {
                     Generate(con);
@@ -744,47 +763,45 @@ namespace Sonnet
                 CoefVector coefs = con.Coefficients;
 
                 nz += coefs.Count;
-                Utils.Remove<Constraint>(rawconstraints, i);
             }
+            rawconstraints.Clear();
 
 #if (SONNET_USE_SEMICONTVAR)
-		// now that all the regular constraints and variables are registered,
-		// register the additional constraints and helper variables for any semi-continuous variables
-		for (int j = 0; j < variables->Count; j++)
-		{
-			Variable ^var = variables[j];
-			if (var->GetType()->Equals(__typeof(SemiContinuousVariable)))
-			{
-				SemiContinuousVariable *scvar = static_cast<SemiContinuousVariable *>(var);
-				double sclower = scvar->SemiContinuousLower;
-				double upper = scvar->Upper;
-				String ^name = String::Concat(scvar->Name, "SCHelper");
+		    // now that all the regular constraints and variables are registered,
+		    // register the additional constraints and helper variables for any semi-continuous variables
+            foreach (Variable var in variables.Where(v => v is SemiContiniuousVariable))
+            {
+                SemiContinuousVariable scvar = (SemiContinuousVariable)var;
+                double sclower = scvar.SemiContinuousLower;
+                double upper = scvar.Upper;
+                string name = scvar.Name + "SCHelper";
 
-				Variable ^scvarHelper = gcnew Variable(name, 0.0, 1.0, VariableType::Integer);
+                Variable scvarHelper = new Variable(name, 0.0, 1.0, VariableType.Integer);
 
-				Constraint ^con = gcnew Constraint(String::Concat(name, "Con1"), gcnew Expression(scvar), ConstraintType::LE, gcnew Expression(upper, scvarHelper));
-				try
-				{
-					Generate(con);
-				}
-				catch (System::Exception^ e)
-				{
-					String ^message = String::Concat("Error generating constraint ", con->Name, ".");
-					throw new SonnetException(message, e);
-				}
+                Constraint con1 = new Constraint(name + "Con1", 1.0 * scvar, ConstraintType.LE, upper * scvarHelper);
+                try
+                {
+                    Generate(con1);
+                }
+                catch (Exception ex)
+                {
+                    string message = string.Format("Error generating constraint {0}.", con1.Name);
+                    throw new SonnetException(message, ex);
+                }
+                nz += con1.Coefficients.Count;
 
-				CoefVector *coefs = con->Coefficients;
-
-				nz += coefs->size();
-
-				con = gcnew Constraint(String::Concat(name, "Con2"), gcnew Expression(sclower, scvarHelper), ConstraintType::LE, gcnew Expression(scvar));
-
-				Generate(con)
-				coefs = con->Coefficients;
-
-				nz += coefs->size();
-			}
-		}
+                Constraint con2 = new Constraint(name + "Con2", sclower * scvarHelper, ConstraintType.LE, 1.0 * scvar);
+                try
+                {
+                    Generate(con2);
+                }
+                catch (Exception ex)
+                {
+                    string message = string.Format("Error generating constraint {0}.", con2.Name);
+                    throw new SonnetException(message, ex);
+                }
+                nz += con2.Coefficients.Count;
+            }
 #endif
 
             log.DebugFormat("Done generating matrix after ", (CoinUtils.CoinCpuTime() - genStart));
@@ -838,7 +855,7 @@ namespace Sonnet
                 }
 
                 // calculate the number of nonzeros per variable
-                foreach (Constraint con in Constraints)
+                foreach (Constraint con in constraints)
                 {
                     CoefVector coefs = con.Coefficients;
                     //double rhs = con.RhsConstant;
@@ -846,11 +863,10 @@ namespace Sonnet
                     foreach (Coef coef in coefs)
                     {
                         int col = Offset(coef.var);
-#if (DEBUG)
+                        
                         if (coef.var.AssignedSolver != this) throw new SonnetException("Trying to use variable that is not part of this model!");
-
                         if (col < 0 || col >= n) throw new SonnetException("Variable offset has error value.");
-#endif
+
                         Clg[col]++;
                     }
                 }
@@ -863,7 +879,7 @@ namespace Sonnet
                 }
 
                 // now start the real seting of the nonzero elements
-                foreach (Constraint con in Constraints)
+                foreach (Constraint con in constraints)
                 {
                     CoefVector coefs = con.Coefficients;
                     //double rhs = con.RhsConstant;
@@ -873,9 +889,8 @@ namespace Sonnet
                     foreach (Coef coef in coefs)
                     {
                         int col = Offset(coef.var);
-#if (DEBUG)
+
                         if (col < 0 || col >= n) throw new SonnetException("Variable offset has error value.");
-#endif
 
                         Elm[Cst[col] + Clg[col]] = coef.coef;
                         Rnr[Cst[col] + Clg[col]] = row;
@@ -886,38 +901,13 @@ namespace Sonnet
                 }
 
                 // Row bounds
-                //Type *rangeConstraintType = __typeof(SONNET.RangeConstraint);
-                foreach (Constraint con in Constraints)
+                foreach (Constraint con in constraints)
                 {
                     int row = Offset(con);
                     bu[row] = con.Upper;
                     bl[row] = con.Lower;
 
                     //double rhs = con.RhsConstant;
-                    //if (con.GetType().Equals(rangeConstraintType))
-                    //{
-                    //	RangeConstraint ^ rangeCon = static_cast<RangeConstraint ^>(con);
-                    //	bu[row] = rangeCon.Upper;
-                    //	bl[row] = rangeCon.Lower;
-                    //}
-                    //else
-                    //{
-                    //	switch (con.Type) 
-                    //	{
-                    //	case LE:
-                    //		bu[row] = rhs;
-                    //		bl[row] = - inf;
-                    //		break;
-                    //	case GE:
-                    //		bu[row] = inf;
-                    //		bl[row] = rhs;
-                    //		break;
-                    //	case EQ:
-                    //		bu[row] = rhs;
-                    //		bl[row] = rhs;
-                    //		break;		
-                    //	}
-                    //}
                 }
 
                 // generate the objective function coefficients :
@@ -955,7 +945,7 @@ namespace Sonnet
                     u[col] = var.Upper;
                 }
 
-                Trace.WriteLine(string.Concat("Ready to load the problem after ", (CoinUtils.CoinCpuTime() - genStart)));
+                log.DebugFormat("Ready to load the problem after {0}", (CoinUtils.CoinCpuTime() - genStart));
 
                 // note that the model is loaded in standard form:
                 // all constraints are of type   bl <= expression <= bu !
@@ -970,7 +960,7 @@ namespace Sonnet
                 if (solver is OsiClpSolverInterface)
                 {
                     // special for Clp
-                    Trace.WriteLine("Using new CLP-specific matrix loading!");
+                    log.Debug("Using new CLP-specific matrix loading!");
 
                     OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
                     osiClp.LeanLoadProblem(n, m, nz, &Cst, &Clg, &Rnr, &Elm, &l, &u, &c, &bl, &bu);
@@ -981,60 +971,59 @@ namespace Sonnet
                     solver.loadProblemUnsafe(n, m, Cst, Rnr, Elm, l, u, c, bl, bu);
                 }
 
-                // skip this: doesnt work as expected with max/min problems
+                // Skip this: doesnt work as expected with max/min problems
                 // the constant part goes in via the ObjOffset
-                //solver.setDblParam(OsiObjOffset, cOffset);
+                // solver.setDblParam(OsiObjOffset, cOffset);
             } // end unsafe
 
-            Trace.WriteLine("Problem fully loaded after " + (CoinUtils.CoinCpuTime() - genStart));
+            log.DebugFormat("Problem fully loaded after {0}", (CoinUtils.CoinCpuTime() - genStart));
 
             foreach (Variable var in variables)
             {
-                int col = Offset(var); //j.second;
-
                 if (var.Type == VariableType.Integer)
                 {
+                    int col = Offset(var); //j.second;
                     solver.setInteger(col);
                 }
             }
 
-            foreach (Constraint con in Constraints)
+            foreach (Constraint con in constraints)
             {
-                int row = Offset(con);
-
                 if (!con.Enabled)
                 {
                     this.SetConstraintEnabled(con, false);
                 }
             }
 
-            Trace.WriteLine("  number of variables  : " + (NumberOfVariables));
-            Trace.WriteLine("  number of constraints: " + (NumberOfConstraints));
-            Trace.WriteLine("  number of elements   : " + (NumberOfElements));
+            StringBuilder tmp = new StringBuilder();
+            tmp.AppendLine("Number of variables  : " + this.variables.Count);
+            tmp.AppendLine("Number of constraints: " + this.constraints.Count);
+            tmp.AppendLine("Number of elements   : " + solver.getNumElements());
+            log.Debug(tmp.ToString()); // dont use ToStatisticsString() because that calls Generate..
 
             //static_cast<ModelEntity *>(objective).Unassign();
 
             // Full Names
             if (NameDiscipline > 0)
             {
-                foreach (Constraint con in Constraints)
+                foreach (Constraint con in constraints)
                 {
                     int offset = Offset(con);
                     solver.setRowName(offset, con.Name);
                 }
-                Trace.WriteLine(string.Concat("done naming constraints after ", (CoinUtils.CoinCpuTime() - genStart)));
+                log.DebugFormat("Done naming constraints after {0}", (CoinUtils.CoinCpuTime() - genStart));
 
                 foreach (Variable var in variables)
                 {
                     int offset = Offset(var);
-
                     solver.setColName(offset, var.Name);
                 }
 
-                Trace.WriteLine(string.Concat("done naming variables after ", (CoinUtils.CoinCpuTime() - genStart)));
+                log.DebugFormat("Done naming variables after {0}", (CoinUtils.CoinCpuTime() - genStart));
             }
 
             // Dump Hint Settings
+            StringBuilder hintsMessage = new StringBuilder();
             foreach (OsiHintParam hintParam in Enum.GetValues(typeof(OsiHintParam)))
             {
                 if (hintParam == OsiHintParam.OsiLastHintParam) continue;
@@ -1043,17 +1032,19 @@ namespace Sonnet
                 OsiHintStrength hintStrength;
 
                 solver.getHintParam(hintParam, out yesNo, out hintStrength);
-                Trace.WriteLine(string.Concat("Hint: ", hintParam, " : ", (yesNo), " at ", hintStrength));
+                hintsMessage.AppendFormat("Hint: {0} : {1} at {2}\n", hintParam, yesNo, hintStrength);
             }
+            if (hintsMessage.Length > 0) log.Debug(hintsMessage.ToString());
 
             System.GC.Collect();
             generated = true;
 
             //if (ProblemType == ProblemType.MILP) SaveBeforeMIPSolve();
+            #endregion
         }
 
         /// <summary>
-        /// Ungenerate the model
+        /// Ungenerate the model.
         /// </summary>
         public void UnGenerate()
         {
@@ -1061,29 +1052,23 @@ namespace Sonnet
             {
                 generated = false;
 
-#if (DEBUG)
                 if (object.ReferenceEquals(null, objective)) throw new NullReferenceException("Ungenerate: A generated model must have a valid objective function");
-                if (!objective.IsRegistered(this)) throw new SonnetException("Ungenerate: A generated model must have a registered objective function");
-#endif
                 objective.Unregister(this);
+
                 foreach (Constraint con in constraints)
                 {
-#if (DEBUG)
-                    if (!con.IsRegistered(this)) throw new SonnetException("Ungenerate: A generated constraint must have be registered");
-#endif
                     con.Unregister(this);
                     rawconstraints.Add(con);
                 }
+                
                 // empty constraints
                 constraints.Clear();
 
                 foreach (Variable var in variables)
                 {
-#if (DEBUG)
-                    if (!var.IsRegistered(this)) throw new SonnetException("Ungenerate: A generated variable must have be registered");
-#endif
                     var.Unregister(this);
                 }
+
                 // empty variables and variablesMap
                 variables.Clear();
             }
@@ -1095,9 +1080,12 @@ namespace Sonnet
         /// Note, after solving a model, the Bounds etc could be left at non-original values!
         /// If you want to export the original bounds etc, then call Generate() before Exporting.
         /// </summary>
-        /// <param name="filename"></param>
-        public void ExportModel(string filename)
+        /// <param name="filename">The full file name to be used to export the model.</param>
+        public void Export(string filename)
         {
+            // All Public methods should call Generate to ensure any new constaints were added properly.
+            Generate();
+
             string directoryName = System.IO.Path.GetDirectoryName(filename);
             if (directoryName.Length == 0) directoryName = ".";
 
@@ -1125,107 +1113,89 @@ namespace Sonnet
         }
 
         #region ToString methods
+        /// <summary>
+        /// Returns a string that represents the current solver.
+        /// Similar to model.ToString().
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
+            // All Public methods should call Generate to ensure any new constaints were added properly.
+            Generate();
+
             StringBuilder tmp = new StringBuilder();
-
-            foreach (Variable aVar in Variables)
-            {
-                tmp.Append(aVar.ToString());
-                tmp.Append("\n");
-            }
-
-            tmp.Append("Objective: ");
-            if (object.ReferenceEquals(null, objective))
-            {
-                tmp.Append("No objective defined");
-                tmp.Append("\n");
-            }
-            else
-            {
-                tmp.Append(objective.ToString());
-                tmp.Append("\n");
-            }
-
-            if (rawconstraints.Count > 0)
-            {
-                tmp.Append("Ungenerated constraints:\n");
-                foreach (Constraint aCon in rawconstraints)
-                {
-                    tmp.Append(aCon.ToString());
-                    tmp.Append("\n");
-                }
-            }
-
-            if (constraints.Count > 0)
-            {
-                tmp.Append("Constraints:\n");
-                foreach (Constraint aCon in Constraints)
-                {
-                    tmp.Append(aCon.ToString());
-                    tmp.Append("\n");
-                }
-            }
-
-            if (rawconstraints.Count == 0 && constraints.Count == 0)
-            {
-                tmp.Append("Model does not contain any constraints!");
-            }
-
+            tmp.AppendLine(string.Format("Solver '{0}'", Name));
+            tmp.Append(model.ToString(variables));
             return tmp.ToString();
         }
 
+        /// <summary>
+        /// Returns a string that represents the current solution of this solver.
+        /// </summary>
+        /// <returns></returns>
         public string ToSolutionString()
         {
+            // All Public methods should call Generate to ensure any new constaints were added properly.
+            Generate();
+
             StringBuilder tmp = new StringBuilder();
+            tmp.AppendLine(string.Format("Solver '{0}'", Name));
+            tmp.AppendLine(string.Format("Model '{0}'", model.Name));
+            tmp.AppendLine(string.Concat("Model status: ", ((this.IsProvenOptimal) ? ("Optimal") : "not Optimal")));
 
-            tmp.Append(string.Concat("Model status: ", ((this.IsProvenOptimal) ? ("Optimal") : "not Optimal")));
-            tmp.Append("\n");
-            tmp.Append("Objective:");
-            tmp.Append(objective.Level());
-            tmp.Append("\n");
+            tmp.AppendLine("Objective: " + objective.Level());
 
-            tmp.Append("Variables:\n");
-            int n = variables.Count;
-            for (int j = 0; j < n; j++)
+            tmp.AppendLine("Variables:");
+            foreach(Variable var in variables)
             {
-                Variable aVar = variables[j];
-                tmp.Append(aVar.ToLevelString());
-                tmp.Append("\n");
+                tmp.AppendLine(var.ToLevelString());
             }
 
-            tmp.Append("Constraints:\n");
-            for (int i = 0; i < constraints.Count; i++)
+            tmp.AppendLine("Constraints:");
+            foreach(Constraint con in constraints)
             {
-                Constraint aCon = constraints[i];
-                tmp.Append(aCon.ToLevelString());
-                tmp.Append("\n");
+                tmp.AppendLine(con.ToLevelString());
             }
 
-            tmp.Append("End");
+            tmp.AppendLine("End");
             return tmp.ToString();
         }
         
+        /// <summary>
+        /// Returns a string the contains statitics for the current model and solver.
+        /// This includes number of variables, constraints, etc.
+        /// </summary>
+        /// <returns></returns>
         public string ToStatisticsString()
         {
+            Generate();
+
             StringBuilder tmp = new StringBuilder();
-            tmp.Append("Model stastics for model ").Append(Name).Append("\n");
-            tmp.Append(" Number of variables  : ").Append(NumberOfVariables.ToString()).Append("\n");
-            tmp.Append(" Number of constraints: ").Append(NumberOfConstraints.ToString()).Append("\n");
-            tmp.Append(" Number of elements   : ").Append(NumberOfElements.ToString()).Append("\n");
+            tmp.AppendLine("Statistics");
+            tmp.AppendLine(string.Format("Solver '{0}'", Name));
+            tmp.AppendLine(string.Format("Model '{0}'", model.Name));
+  
+            tmp.AppendLine(" Number of variables  : " + this.variables.Count);
+            tmp.AppendLine(" Number of constraints: " + this.constraints.Count);
+            tmp.AppendLine(" Number of elements   : " + solver.getNumElements());
 
             return tmp.ToString();
-
         }
         #endregion
 
-        public bool IsRegistered(Objective obj)
+        #region IsRegistered/Contains, for Tests
+        /// <summary>
+        /// Determine whether the given objective was registered 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        internal bool IsRegistered(Objective obj)
         {
             Ensure.NotNull(obj, "objective");
 
             return this.objective.Equals(obj);
         }
-        public bool IsRegistered(Variable v)
+        internal bool IsRegistered(Variable v)
         {
             Ensure.NotNull(v, "variable");
 
@@ -1236,7 +1206,14 @@ namespace Sonnet
 
             return false;
         }
-        public bool IsRegistered(Constraint c)
+        /// <summary>
+        /// For Testing only: Is this Constraint registered? Only generated constraints are generated?
+        /// Not-yet generated constraints are not registered, since changes in the constraints do not need to be passed
+        /// into the COIN solver yet.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        internal bool IsRegistered(Constraint c)
         {
             Ensure.NotNull(c, "constraint");
 
@@ -1247,15 +1224,12 @@ namespace Sonnet
 
             return false;
         }
-
-        //bool Contains(Variable v);		// IsRegistered OR in the (to-be) added list -> NOT do this, since we'd have to check all the new constraints 
-
         /// <summary>
-        /// IsRegistered OR in the (to-be) added list
+        /// For Testing only: IsRegistered OR in the (to-be) added list
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public bool Contains(Constraint c)
+        internal bool Contains(Constraint c)
         {
             // first, check the registered constraint
             if (IsRegistered(c)) return true;
@@ -1267,6 +1241,15 @@ namespace Sonnet
             }
             return false;
         }
+
+        //internal bool Contains(Variable v)
+        //{
+        //    //IsRegistered OR in the (to-be) added list 
+        //    //DONT do this, since we'd have to check all the new constraints..
+        //}
+
+        #endregion
+
 
         /// <summary>
         /// Get the element index (offset) of the constraint in this model. An exception is thrown if no offset found.
@@ -1312,85 +1295,116 @@ namespace Sonnet
             return offset;
         }
 
+
+        #region Obsolete/Deprecated methods
+        // Using the Solver to enumerate the variables/constraints is not in line with the design.
+        // These methods that expose the underlying solver are against the idea that the Solver should only
+        // be used for solving, not retrieving stats of the Model
+        // Also, in practise, enumerating variables (and even constraints) is not necessary. The user will keep these himself. 
+        // Therefore, this is not (longer) supported.
+
+        /// <summary>
+        /// Gets the number of generated constraints.
+        /// </summary>
+        [Obsolete("Deprecated: use property of Model", true)]
+        public int NumberOfConstraints 
+        { 
+            get 
+            {
+                Generate();
+                return solver.getNumRows(); 
+            } 
+        }
+        
+        /// <summary>
+        /// Gets the number of generated variables.
+        /// </summary>
+        [Obsolete("Deprecated: Not supported. Use property of OsiSolver", true)]
+        public int NumberOfVariables 
+        { 
+            get 
+            {
+                Generate();
+                return solver.getNumCols(); 
+            } 
+        }
+        
+        /// <summary>
+        /// Gets the number of elements in the constraint matrix
+        /// </summary>
+        [Obsolete("Deprecated: Not supported. Use property of OsiSolver", true)]
+        public int NumberOfElements 
+        { 
+            get 
+            {
+                Generate();
+                return solver.getNumElements(); 
+            } 
+        }
+
+        /// <summary>
+        /// Gets the number of integer variables
+        /// </summary>
+        [Obsolete("Deprecated: Not supported. Use property of OsiSolver", true)]
+        public int NumberOfIntegerVariables 
+        { 
+            get 
+            {
+                Generate();
+                return solver.getNumIntegers(); 
+            } 
+        }
+        
         /// <summary>
         /// Gets the generated constraints
         /// </summary>
-        public IEnumerable<Constraint> Constraints
+        [Obsolete("Deprecated: use property of Model", true)]
+        private IEnumerable<Constraint> Constraints
         {
             get { return constraints; }
         }
 
         /// <summary>
-        /// Gets the variables currenlty generated
-        /// </summary>
-        public IEnumerable<Variable> Variables
-        {
-            get { return variables; }
-        }
-
-        /// <summary>
-        /// Return the constraint, given its element index in this model
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private Constraint GetConstraint(int index)
-        {
-            if (index < 0 || index >= constraints.Count)
-            {
-                throw new SonnetException(string.Format("Offset of value {0} is not allowed for constraints", index));
-            }
-
-            return constraints[index];
-        }
-
-        /// <summary>
-        /// Return the variable, given its element index in this model
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private Variable GetVariable(int index)
-        {
-            if (index < 0 || index >= variables.Count)
-            {
-                throw new SonnetException(string.Format("Offset of value {0} is not allowed for variables", index));
-            }
-
-            return variables[index];
-        }
-
-        /// <summary>
-        /// return the constraint, given its element index in this model
+        /// Return the constraint, given its name in this model
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Constraint GetConstraint(string name)
+        [Obsolete("Deprecated: use property of Model", true)]
+        private Constraint GetConstraint(string name)
         {
             foreach (Constraint con in constraints) if (con.Name.Equals(name)) return con;
             foreach (Constraint con in rawconstraints) if (con.Name.Equals(name)) return con;
             return null;
         }
 
-        // we dont (bother to) store the constraint and variable names in a Map, so we just search
-        // NOTE: since we dont EXplicitly add variables to any model, but rather this is done
-        // implicitly when the constraints are generated, this means that we cannot find a variable by name
-        // until the model is generated, and thus the list "variables" is built.
-        // Of course, we could enforce that all variables be explicitly add, just like constraints, but 
-        // I dont think this will be necessary.
-        // Alternatively, we could also find the variable by going passed all the variables in the constraints....
-
+        /// <summary>
+        /// Gets the variables currenlty generated
+        /// </summary>
+        [Obsolete("Deprecated: Enumerating variables not supported.", true)]
+        private IEnumerable<Variable> Variables
+        {
+            // we dont (bother to) store the constraint and variable names in a Map, so we just search
+            // NOTE: since we dont EXplicitly add variables to any model, but rather this is done
+            // implicitly when the constraints are generated, this means that we cannot find a variable by name
+            // until the model is generated, and thus the list "variables" is built.
+            // Of course, we could enforce that all variables be explicitly add, just like constraints, but 
+            // I dont think this will be necessary.
+            // Alternatively, we could also find the variable by going passed all the variables in the constraints....
+            get { return variables; }
+        }
 
         /// <summary>
         /// return the variable, given its element index in this model
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Variable GetVariable(string name)
+        [Obsolete("Deprecated: Enumerating variables not supported.", true)]
+        private Variable GetVariable(string name)
         {
             foreach (Variable var in variables) if (var.Name.Equals(name)) return var;
             return null;
         }
 
-        #region Obsolete/Deprecated methods
         /// <summary>
         /// Deprecated: use property of Variable
         /// looks up the ElementID, and retreives value (no storing)
@@ -1462,8 +1476,6 @@ namespace Sonnet
         /// </summary>
         private void AssignSolutionStatus()
         {
-            Ensure.NotNull(solver, "solver");
-
             isAbandoned = solver.isAbandoned();
             isProvenOptimal = solver.isProvenOptimal();
             isProvenPrimalInfeasible = solver.isProvenPrimalInfeasible();
@@ -1504,7 +1516,7 @@ namespace Sonnet
                     {
                         if (!values[col].IsBetween(var.Lower, var.Upper))
                         {
-                            Debug.WriteLine(string.Format("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper));
+                            log.DebugFormat("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper);
                         }
                     }
 #endif
@@ -1518,7 +1530,7 @@ namespace Sonnet
             {
                 if (objective.Level().CompareToEps(objective.Value) != 0)
                 {
-                    Trace.WriteLine(string.Format("Solution is optimal, but objective value {0} is not corrected for constant term (offset) {1}", objective.Value, objective.Level()));
+                    log.DebugFormat("Solution is optimal, but objective value {0} is not corrected for constant term (offset) {1}", objective.Value, objective.Level());
                 }
             }
 #endif
@@ -1587,38 +1599,36 @@ namespace Sonnet
         /// </summary>
         public int IterationCount { get { return this.iterationCount; } }
 
-
         #region Changing Solver data
         // Using these methods to change variables, constraints, or the objective, will NOT change the variable etc. data itself!
         // methods for changing variables
         internal void SetVariableUpper(Variable var, double upper)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(var);
             solver.setColUpper(offset, upper);
         }
+
         internal void SetVariableLower(Variable var, double lower)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(var);
             solver.setColLower(offset, lower);
         }
+        
         internal void SetVariableBounds(Variable var, double lower, double upper)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(var);
             solver.setColBounds(offset, lower, upper);
         }
+
         internal void SetVariableType(Variable var, VariableType type)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(var);
             if (type == VariableType.Continuous) solver.setContinuous(offset);
@@ -1633,8 +1643,7 @@ namespace Sonnet
         internal void SetVariableName(Variable var, string name)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(name, "name");
-            Ensure.NotNull(solver, "solver");
+            Ensure.NotNullOrWhiteSpace(name, "name");
 
             int offset = Offset(var);
             solver.setColName(offset, name);
@@ -1648,7 +1657,6 @@ namespace Sonnet
         internal void SetObjectiveCoefficient(Variable var, double value)
         {
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(var);
             solver.setObjCoeff(offset, value);
@@ -1660,7 +1668,6 @@ namespace Sonnet
         {
             Ensure.NotNull(con, "range constraint");
             Ensure.NotNull(var, "variable");
-            Ensure.NotNull(solver, "solver");
 
             int conOffset = Offset(con);
             int varOffset = Offset(var);
@@ -1671,7 +1678,6 @@ namespace Sonnet
         internal virtual void SetConstraintUpper(RangeConstraint con, double upper)
         {
             Ensure.NotNull(con, "range constraint");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(con);
             //if (SolverType == SolverType.CpxSolver) solver.setRowBounds(offset, con.Lower, upper);
@@ -1680,7 +1686,6 @@ namespace Sonnet
         internal void SetConstraintLower(RangeConstraint con, double lower)
         {
             Ensure.NotNull(con, "range constraint");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(con);
             //if (SolverType == SolverType.CpxSolver) solver.setRowBounds(offset, lower, con.Upper);
@@ -1689,7 +1694,6 @@ namespace Sonnet
         internal void SetConstraintBounds(RangeConstraint con, double lower, double upper)
         {
             Ensure.NotNull(con, "range constraint");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(con);
             solver.setRowBounds(offset, lower, upper);
@@ -1697,7 +1701,6 @@ namespace Sonnet
         internal void SetConstraintEnabled(Constraint con, bool enable)
         {
             Ensure.NotNull(con, "range constraint");
-            Ensure.NotNull(solver, "solver");
 
             int offset = Offset(con);
             if (!enable)
@@ -1723,7 +1726,7 @@ namespace Sonnet
         internal void SetConstraintName(Constraint con, string name)
         {
             Ensure.NotNull(con, "constraint");
-            Ensure.NotNull(solver, "solver");
+            Ensure.NotNullOrWhiteSpace(name, "name");
 
             if (NameDiscipline == 0) return;
 
@@ -1732,16 +1735,20 @@ namespace Sonnet
         }
         #endregion
 
-        private void GutsOfConstructor(Model model, OsiSolverInterface solver)
+        private void GutsOfConstructor(Model model, OsiSolverInterface solver, string name)
         {
             Ensure.NotNull(model, "model");
             Ensure.NotNull(solver, "solver");
+            
             id = numberOfSolvers++;
-
-            DumpAssemblyInfo();
+            log.Info(InternalUtils.GetAssemblyInfo());
 
             this.model = model;
             this.solver = solver;
+
+            if (name != null) Name = name;
+            else Name = string.Format("{0}[{1}]", solver.GetType().FullName, id);
+
             generated = false;
 
             model.Register(this);
@@ -1754,24 +1761,7 @@ namespace Sonnet
             log.PassToSolver(solver);
             ApplyObjectiveSense(model.ObjectiveSense);
 
-            log.InfoFormat("Model {0} created with solver {1}", Name, "TODO");
-        }
-
-        private static void DumpAssemblyInfo()
-        {
-            Trace.WriteLine("Initialising SONNET Model.\nAssembly information:");
-            Trace.WriteLine(String.Concat("File path: ", System.Reflection.Assembly.GetExecutingAssembly().Location));
-            Trace.WriteLine(String.Concat("File date: ", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString()));
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
-            Trace.WriteLine(String.Concat("Framework: ", Environment.Version.ToString()));
-            Trace.WriteLine(String.Concat("Assembly runtime version: ", System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion));
-
-            System.Reflection.PortableExecutableKinds portableExecutableKinds;
-            System.Reflection.ImageFileMachine imageFileMachine;
-            System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out portableExecutableKinds, out imageFileMachine);
-            Trace.WriteLine("Portable executable kinds: " + portableExecutableKinds.ToString());
-            Trace.WriteLine("Image file machine: " + imageFileMachine.ToString());
-            Trace.WriteLine("----------------------------------------------------------");
+            log.InfoFormat("Solver {0} created with model {1}", Name, model.Name);
         }
 
         private static int numberOfSolvers = 0;
@@ -1799,8 +1789,8 @@ namespace Sonnet
 
         private bool isSolving = false; // used for interrupting a solve
 
-        OsiSolverInterface solver;
-        Model model;
+        private OsiSolverInterface solver;
+        private Model model;
 
         #region IDisposable Members
 

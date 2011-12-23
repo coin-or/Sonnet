@@ -36,42 +36,12 @@ namespace Sonnet
     public class Variable : ModelEntity
     {
         /// <summary>
-        /// Initializes a new instance of the Variable class with a default name,
-        /// lower bound of 0, upper bound of +inf and which can take continuous values.
-        /// </summary>
-        public Variable()
-            :this(null, 0.0, MathUtils.Infinity, VariableType.Continuous)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the Variable class of the given type, with a default name,
         /// lower bound of 0 and upper bound of +inf.
         /// </summary>
         /// <param name="type">The type of the new variable.</param>
         public Variable(VariableType type)
-            :this(null, 0.0, MathUtils.Infinity, type)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Variable class with the given name,
-        /// lower bound of 0, upper bound of +inf and which can take continuous values.
-        /// </summary>
-        /// <param name="name">The name of the new variable.</param>
-        public Variable(string name)
-            :this(name, 0.0, MathUtils.Infinity, VariableType.Continuous)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Variable class with a default name,
-        /// and which can take continuous values between the given lower and upper bounds.
-        /// </summary>
-        /// <param name="lower">The lower bound of the new variable.</param>
-        /// <param name="upper">The upper bound of the new variable.</param>
-        public Variable(double lower, double upper)
-            :this(null, lower, upper, VariableType.Continuous)
+            : this(null, 0.0, MathUtils.Infinity, type)
         {
         }
 
@@ -82,8 +52,8 @@ namespace Sonnet
         /// <param name="lower">The lower bound of the new variable.</param>
         /// <param name="upper">The upper bound of the new variable.</param>
         /// <param name="type">The type of the new variable.</param>
-        public Variable(double lower, double upper, VariableType type)
-            :this(null, lower, upper, type)
+        public Variable(double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+            : this(null, lower, upper, type)
         {
         }
 
@@ -94,19 +64,7 @@ namespace Sonnet
         /// <param name="name"></param>
         /// <param name="type"></param>
         public Variable(string name, VariableType type)
-            :this(name, 0.0, MathUtils.Infinity, type)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Variable class with the given name,
-        /// and which can take continuous values between the given lower and upper bounds.
-        /// </summary>
-        /// <param name="name">The name of the new variable.</param>
-        /// <param name="lower">The lower bound of the new variable.</param>
-        /// <param name="upper">The upper bound of the new variable.</param>
-        public Variable(string name, double lower, double upper)
-            :this(name, lower, upper, VariableType.Continuous)
+            : this(name, 0.0, MathUtils.Infinity, type)
         {
         }
 
@@ -118,7 +76,8 @@ namespace Sonnet
         /// <param name="lower">The lower bound of the new variable.</param>
         /// <param name="upper">The upper bound of the new variable.</param>
         /// <param name="type">The type of the new variable.</param>
-        public Variable(string name, double lower, double upper, VariableType type)
+        public Variable(string name, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+            :base(name)
         {
             this.lower = lower;
             this.upper = upper;
@@ -132,58 +91,89 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Returns an array of the given size filled with new Variables constructed with a default name,
-        /// lower bound of 0, upper bound of +inf and which can take continuous values.
+        /// Returns an array of the given size filled with new Variables constructed with a name,
+        /// lower bound, upper bound and of the given type.
+        /// About names: If a name is given, then this will be used as the main part of the name is the variables.
+        /// For example, given name 'x', the variables will be named 'x[0]', 'x[1]', etc.
+        /// If no name is given, then the default names are used.
         /// </summary>
         /// <param name="size">The number of new variables.</param>
-        /// <returns>Array of variables of the given size.</returns>
-        public static Variable[] NewVariables(int size)
-        {
-            Variable[] tmp = new Variable[size];
-            for (int i = 0, n = tmp.Length; i < n; i++)
-            {
-                tmp[i] = new Variable();
-            }
-            return tmp;
-        }
-
-        /// <summary>
-        /// Returns an array of the given size filled with new Variables which can take continuous values,
-        /// constructed with a default name, which can take values between the given lower and upper bounds.
-        /// </summary>
-        /// <param name="size">The number of new variables.</param>
-        /// <param name="lower">The lower bound of the new variables.</param>
-        /// <param name="upper">The upper bound of the new variables.</param>
-        /// <returns>Array of variables of the given size.</returns>
-        public static Variable[] NewVariables(int size, double lower, double upper)
-        {
-            Variable[] tmp = new Variable[size];
-            for (int i = 0, n = tmp.Length; i < n; i++)
-            {
-                tmp[i] = new Variable(lower, upper);
-            }
-            return tmp;
-        }
-
-        /// <summary>
-        /// Returns an array of the given size filled with new Variables of the given type,
-        /// constructed with a default name, which can take values between the given lower and upper bounds.
-        /// </summary>
-        /// <param name="size">The number of new variables.</param>
+        /// <param name="varname">The base part of the name of the new variables.</param>
         /// <param name="lower">The lower bound of the new variables.</param>
         /// <param name="upper">The upper bound of the new variables.</param>
         /// <param name="type">The type of the new variables.</param>
         /// <returns>Array of variables of the given size.</returns>
-        public static Variable[] NewVariables(int size, double lower, double upper, VariableType type)
+        public static Variable[] New(int size, string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
         {
             Variable[] tmp = new Variable[size];
             for (int i = 0, n = tmp.Length; i < n; i++)
             {
-                tmp[i] = new Variable(lower, upper, type);
+                string name = null;
+                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+
+                tmp[i] = new Variable(name, lower, upper, type);
             }
             return tmp;
         }
 
+        /// <summary>
+        /// Returns a dictionary of the given type filled with new Variables constructed with a name,
+        /// lower bound, upper bound and of the given type.
+        /// Example: var x = Variable.New&lt;Product&gt;(MyListOfProducts, "x");
+        /// About names: If a name is given, then this will be used as the main part of the name is the variables.
+        /// For example, given name 'x', the variables will be named 'x[0]', 'x[1]', etc.
+        /// If no name is given, then the default names are used.
+        /// </summary>
+        /// <typeparam name="T">Type of elements of the set (eg string)</typeparam>
+        /// <param name="set">The set for which to create a variable for each element.</param>
+        /// <param name="varname">The base part of the name of the new variables.</param>
+        /// <param name="lower">The lower bound of the new variables.</param>
+        /// <param name="upper">The upper bound of the new variables.</param>
+        /// <param name="type">The type of the new variables.</param>
+        /// <returns>Array of variables of the given size.</returns>
+        public static Dictionary<T, Variable> New<T>(IEnumerable<T> set, string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+        {
+            Dictionary<T, Variable> tmp = new Dictionary<T,Variable>();
+            foreach(T i in set) 
+            {
+                string name = null;
+                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+
+                tmp[i] = new Variable(name, lower, upper, type);
+            }
+            return tmp;
+        }
+
+        /// <summary>
+        /// Returns a dictionary of the given type filled with new Variables constructed with a name,
+        /// lower bound, upper bound and of the given type. 
+        /// The type T must be an enum.
+        /// About names: If a name is given, then this will be used as the main part of the name is the variables.
+        /// For example, given name 'x', the variables will be named 'x[0]', 'x[1]', etc.
+        /// If no name is given, then the default names are used.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="varname"></param>
+        /// <param name="lower"></param>
+        /// <param name="upper"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Dictionary<T, Variable> New<T>(string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+            where T : struct, IConvertible
+        {
+            if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
+
+            Dictionary<T, Variable> tmp = new Dictionary<T, Variable>();
+            foreach (T i in Enum.GetValues(typeof(T)))
+            {
+                string name = null;
+                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+
+                tmp[i] = new Variable(name, lower, upper, type);
+            }
+            return tmp;
+        }
+        
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
@@ -207,6 +197,10 @@ namespace Sonnet
 
         /// <summary>
         /// Returns a string that represents the current variable.
+        /// The string is built up like
+        /// {0} : {1} : [{2}, {3}]
+        /// where {0} is the Name, {1} is the Type, 
+        /// {2} is the lower bound and {3} is the upper bound
         /// </summary>
         /// <returns>A string that represents the current variable.</returns>
         public override string ToString()
@@ -215,8 +209,12 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Returns a string that represent the current variable and its value 
-        /// and reduced cost.
+        /// Returns a string that represent the current variable, together with its value 
+        /// and reduced cost:
+        /// {0} = {1}   ( {2} )
+        /// where {0} is the normal string representation,
+        /// {1} is the current value, and
+        /// {2} is the reduced cost.
         /// </summary>
         /// <returns>A string representation of this instance using its value and reduced cost.</returns>
         public string ToLevelString()
@@ -279,16 +277,16 @@ namespace Sonnet
         {
             set
             {
-                if (!name.Equals(value))
+                if (!Name.Equals(value))
                 {
-                    name = value;
-                    foreach(Solver solver in solvers) solver.SetVariableName(this, name);
+                    base.Name = value;
+                    foreach(Solver solver in solvers) solver.SetVariableName(this, Name);
                 }
             }
         }
 
         /// <summary>
-        /// Return whether the value of this variable was frozen.
+        /// Return whether the value of this variable is frozen.
         /// </summary>
         public bool IsFrozen
         {
@@ -373,9 +371,9 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Test whether this the current value of this variable is within the bounds and is integer if applicable.
+        /// Test whether the current value of this variable is within the bounds and is integer if applicable.
         /// </summary>
-        /// <returns>True if bound and type are satisfied.</returns>
+        /// <returns>True iff bounds and type are satisfied.</returns>
         public bool IsFeasible()
         {
             if (!value.IsBetween(lower, upper)) return false;

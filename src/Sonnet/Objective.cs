@@ -34,24 +34,13 @@ namespace Sonnet
     public class Objective : ModelEntity
     {
         /// <summary>
-        /// Initializes a new instance of the Objective class with an 
-        /// empty expression.
-        /// </summary>
-        public Objective()
-            : base()
-        {
-            GutsOfConstructor(null, null);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the Objective class with the given 
         /// name and an empty expression. 
         /// </summary>
         /// <param name="name">The given name.</param>
-        public Objective(string name)
-            : base()
+        public Objective(string name = null)
+            : this(name, new Expression())
         {
-            GutsOfConstructor(name, null);
         }
 
         /// <summary>
@@ -60,11 +49,8 @@ namespace Sonnet
         /// </summary>
         /// <param name="expr">The expression whose elements are copied to the new objective.</param>
         public Objective(Expression expr)
-            : base()
+            : this(null, expr)
         {
-            Ensure.NotNull(expr, "expression");
-
-            GutsOfConstructor(name, expr);
         }
 
         /// <summary>
@@ -74,7 +60,7 @@ namespace Sonnet
         /// <param name="name">The name for the new objective.</param>
         /// <param name="expr">The expression whose elements are copied to the new objective.</param>
         public Objective(string name, Expression expr)
-            : base()
+            : base(name)
         {
             Ensure.NotNull(expr, "expression");
 
@@ -97,6 +83,20 @@ namespace Sonnet
             return new Objective(expr);
         }
 
+        /// <summary>
+        /// Implicitly initializes a new instance of the Objective class
+        /// that contains only the given variable.
+        /// For example: 
+        /// Variable x = new Variable();
+        /// Objective obj = x;
+        /// // Objective obj = 1.0 * x; // same thing.
+        /// </summary>
+        /// <param name="x">The variable that makes up the new objective.</param>
+        /// <returns>The new objective.</returns>
+        public static implicit operator Objective(Variable x)
+        {
+            return new Objective(1.0 * x);
+        }
         /// <summary>
         /// Removes all elements from the Objective.
         /// </summary>

@@ -15,6 +15,12 @@ using COIN;
 
 namespace Sonnet
 {
+    /// <summary>
+    /// The Model class holds the objective and a collection of constraints.
+    /// Unlike constraints, the variables are not explicitly added to the model.
+    /// Rather, the variables of a model are only implied by variables use within the objective and constraints.
+    /// This is also the reason why export functionality of the model is limited.
+    /// </summary>
     public class Model : Named
     {
 #if (DYNAMIC_LOADING)
@@ -44,18 +50,20 @@ namespace Sonnet
         }
 #endif
         #region Constructors
-        public Model()
-            : this(string.Empty)
-        {
-        }
-
-        public Model(string name)
+        /// <summary>
+        /// Initializes a new instance of the Model class with the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        public Model(string name = null)
             : base(name)
         {
-            GutsOfConstructor();
+            GutsOfConstructor(name);
         }
         #endregion
 
+        /// <summary>
+        /// Clears the objective and all constraints of this model.
+        /// </summary>
         public void Clear()
         {
             if (!object.ReferenceEquals(objective, null)) objective.Clear();
@@ -65,49 +73,67 @@ namespace Sonnet
         }
 
         #region ToString() methods
-        public override string ToString()
+        /// <summary>
+        /// Returns a System.String that represents the current Model, given the set of variables,
+        /// This includes the name of the model, all variables, the objective and all constraints.
+        /// </summary>
+        /// <param name="variables">The set of variables.</param>
+        /// <returns>A string that represents the current Model.</returns>
+        internal string ToString(IEnumerable<Variable> variables)
         {
             StringBuilder tmp = new StringBuilder();
+            tmp.AppendLine("Model '" + Name + "'");
 
-            IEnumerable<Variable> variables = GetVariables();
             foreach (Variable variable in variables)
             {
-                tmp.Append(variable.ToString());
-                tmp.Append("\n");
+                tmp.AppendLine(variable.ToString());
             }
 
             tmp.Append("Objective: ");
             if (object.ReferenceEquals(null, objective))
             {
-                tmp.Append("No objective defined");
-                tmp.Append("\n");
+                tmp.AppendLine("No objective defined");
             }
             else
             {
-                tmp.Append(objective.ToString());
-                tmp.Append("\n");
+                tmp.AppendLine(objective.ToString());
             }
 
             if (constraints.Count > 0)
             {
-                tmp.Append("Constraints:\n");
+                tmp.AppendLine("Constraints:");
                 foreach (Constraint constraint in Constraints)
                 {
-                    tmp.Append(constraint.ToString());
-                    tmp.Append("\n");
+                    tmp.AppendLine(constraint.ToString());
                 }
             }
 
             if (constraints.Count == 0)
             {
-                tmp.Append("Model does not contain any constraints!");
+                tmp.AppendLine("Model does not contain any constraints!");
             }
 
             return tmp.ToString();
         }
+
+        /// <summary>
+        /// Returns a System.String that represents the current Model.
+        /// This includes the name of the model, all variables, the objective and all constraints.
+        /// Note, this method iterates over all constraints (!) to build the set of variables in use.
+        /// </summary>
+        /// <returns>A string that represents the current Model.</returns>
+        public override string ToString()
+        {
+            return ToString(GetVariables());
+        }
         #endregion
 
         #region Objective Property
+        /// <summary>
+        /// Gets or sets the objective of this model.
+        /// Solvers are updated accordingly.
+        /// Objective must be not-null.
+        /// </summary>
         public Objective Objective
         {
             get { return objective; }
@@ -125,6 +151,10 @@ namespace Sonnet
         #endregion
 
         #region ObjectiveSense Property
+        /// <summary>
+        /// Gets or sets the objective sense (Max/Min) of this model.
+        /// Solvers are updated accordingly.
+        /// </summary>
         public ObjectiveSense ObjectiveSense
         {
             get { return objectiveSense; }
@@ -150,7 +180,8 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the constraints
+        /// Gets the constraints of this model.
+        /// Use model.Add(..) to add constraints.
         /// </summary>
         public IEnumerable<Constraint> Constraints
         {
@@ -158,30 +189,40 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the number of constraints.
+        /// Gets the number of constraints of this model.
         /// </summary>
         public int NumberOfConstraints
         {
             get { return constraints.Count; }
         }
-        
+
         #endregion
 
         #region Add constraints methods
         /// <summary>
-        /// Adds a reference to the given constraint with the given name to this model.
+        /// Adds a reference to the given constraint to this model, and sets its name.
         /// </summary>
         /// <param name="con">The constraint to be added.</param>
-        /// <param name="name">The name of the constraint within this model.</param>
+        /// <param name="name">The name of the constraint within this model. Null existing con name.</param>
         /// <returns>The given constraint.</returns>
-        public Constraint Add(Constraint con, string name = "")
+        public Constraint Add(string name, Constraint con)
         {
             Ensure.NotNull(con, "con");
             if (!string.IsNullOrEmpty(name)) con.Name = name;
             constraints.Add(con);
 
-            foreach(Solver solver in solvers) solver.Add(con);
+            foreach (Solver solver in solvers) solver.Add(con);
             return con;
+        }
+
+        /// <summary>
+        /// Adds a reference to the given constraint to this model.
+        /// </summary>
+        /// <param name="con">The constraint to be added.</param>
+        /// <returns>The given constraint.</returns>
+        public Constraint Add(Constraint con)
+        {
+            return Add(null, con);
         }
 
         /// <summary>
@@ -228,15 +269,35 @@ namespace Sonnet
         public static Version Version { get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version; } }
         #endregion
 
-        #region Import and Export methods
+        #region New and Export methods
+
+        //Let's move this to Solver, or move it out all together.
+        // Like, Model.FromFile(..)
+        
         /// <summary>
-        /// Imports the model in the given file into this model.
-        /// Only MPS files are supported.
+        /// Creates a new model from the given file.
+        /// Supported file extensions: .mps only.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns>The new model, or null if an error occurred.</returns>
+        public static Model New(string fileName)
+        {
+            Variable[] variables;
+            return Model.New(fileName, out variables);
+        }
+
+        /// <summary>
+        /// Creates a new model from the given file.
+        /// Supported file extensions: .mps only.
         /// </summary>
         /// <param name="fileName">The mps file to be imported.</param>
-        /// <returns>True if the file was successfully imported.</returns>
-        public bool ImportModel(string fileName)
+        /// <param name="variables">The full array of variables created for this new model.</param>
+        /// <returns>The new model, or null if an error occurred.</returns>
+        public static Model New(string fileName, out Variable[] variables)
         {
+            Model model = new Model();
+            variables = new Variable[0];
+
             string directoryName = System.IO.Path.GetDirectoryName(fileName);
             if (directoryName.Length == 0) directoryName = ".";
 
@@ -244,15 +305,21 @@ namespace Sonnet
             string extension = System.IO.Path.GetExtension(fileName);
             if (extension.Equals(".mps"))
             {
+                #region New Model from .mps file
                 CoinMpsIO m = new CoinMpsIO();
                 log.PassToCoinMpsIO(m);
 
-                m.setInfinity(Infinity);
+                m.setInfinity(model.Infinity);
                 //m.passInMessageHandler(modelPtr_.messageHandler());
                 //*m.messagesPointer()=modelPtr_.coinMessages();
 
                 int numberErrors = m.readMps(fullPathWithoutExtension);
-                if (numberErrors != 0) return false;
+                if (numberErrors != 0)
+                {
+                    string message = string.Format("Errors occurred when reading the mps file '{0}'.", fileName);
+                    SonnetLog.Default.Error(message);
+                    throw new SonnetException(message);
+                }
 
                 // set objective function offest
                 // setDblParam(OsiObjOffset,m.objectiveOffset()); // WHAT IS THIS??
@@ -265,12 +332,13 @@ namespace Sonnet
 
                 int numberVariables = m.getNumCols();
 
-                Variable[] rawVariables = new Variable[numberVariables];
+                variables = new Variable[numberVariables];
+                
                 int i = 0;
                 for (i = 0; i < numberVariables; i++)
                 {
                     Variable var = new Variable();
-                    rawVariables[i] = var;
+                    variables[i] = var;
 
                     double lower = colLower[i];
                     double upper = colUpper[i];
@@ -287,9 +355,8 @@ namespace Sonnet
                     objExpr.Add(objCoefs[i], var);
                 }
 
-                Objective objective = new Objective(objName, objExpr);
-                Objective = objective;
-                ObjectiveSense = ObjectiveSense.Minimise;
+                model.Objective = new Objective(objName, objExpr);
+                model.ObjectiveSense = ObjectiveSense.Minimise;
                 // NOTE: MPS DOESNT STORE MAXIMIZATION OR MINIMIZATION!
 
                 int numberConstraints = m.getNumRows();
@@ -309,7 +376,7 @@ namespace Sonnet
                     for (int e = 0; e < nElements; e++)
                     {
                         int index = indices[e];
-                        Variable var = rawVariables[index];
+                        Variable var = variables[index];
                         double coef = elements[e];
 
                         expr.Add(coef, var);
@@ -331,7 +398,7 @@ namespace Sonnet
                                 Expression upperExpr = new Expression(upper);
                                 Constraint con = new Constraint(conName, expr, type, upperExpr);
                                 upperExpr.Clear();
-                                this.Add(con);
+                                model.Add(con);
                                 break;
                             }
                         case 'E': //=  constraint
@@ -340,7 +407,7 @@ namespace Sonnet
                                 Expression upperExpr = new Expression(upper);
                                 Constraint con = new Constraint(conName, expr, type, upperExpr);
                                 upperExpr.Clear();
-                                this.Add(con);
+                                model.Add(con);
                                 break;
                             }
                         case 'G': //>= constraint and rhs()[i] == rowlower()[i]
@@ -349,41 +416,46 @@ namespace Sonnet
                                 Expression lowerExpr = new Expression(lower);
                                 Constraint con = new Constraint(conName, expr, type, lowerExpr);
                                 lowerExpr.Clear();
-                                this.Add(con);
+                                model.Add(con);
                                 break;
                             }
                         case 'R': //ranged constraint
                             {
                                 RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
-                                this.Add(con);
+                                model.Add(con);
                                 break;
                             }
                         case 'N': //free constraint
                             {
                                 RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
                                 con.Enabled = false;
-                                this.Add(con);
+                                model.Add(con);
                                 break;
                             }
                         default:
                             break;
                     }
                 }
-
-                return true;
+                #endregion
             }
             else
             {
-                throw new SonnetException(string.Concat("Cannot import file ", fileName, " : unknown extension '", extension, "'."));
+                string message = string.Format("Cannot import file {0} : unknown extension '{1}'.", fileName, extension);
+                SonnetLog.Default.Error(message);
+                throw new SonnetException(message);
             }
+
+            return model;
         }
 
         /// <summary>
-        /// Exports the model in SONNET format.
+        /// Exports this model to file.
+        /// Support file extensions: .sonnet only.
+        /// This method simply calls Model.ToString() and writes the output to file.
         /// To export to different formats, use the Solver.
         /// </summary>
         /// <param name="filename">The sonnet file to be exported to.</param>
-        public void ExportModel(string filename)
+        public void Export(string filename)
         {
             string directoryName = System.IO.Path.GetDirectoryName(filename);
             if (directoryName.Length == 0) directoryName = ".";
@@ -439,16 +511,16 @@ namespace Sonnet
             return variables.Values;
         }
 
-
-        private void GutsOfConstructor()
+        private void GutsOfConstructor(string name)
         {
-            Utils.DumpAssemblyInfo();
-
             id = numberOfModels++;
 
             objective = new Objective("obj");
             objectiveSense = ObjectiveSense.Minimise;
             constraints = new List<Constraint>();
+
+            if (name != null) Name = name;
+            else Name = string.Format("Model[{0}]", id);
         }
         #endregion
 

@@ -26,7 +26,7 @@ namespace Sonnet
         public override string ToString()
         {
             StringBuilder tmp = new StringBuilder();
-            string varName = var.name;
+            string varName = var.Name;
 
             if (coef == 1.0) tmp.AppendFormat("{0}", varName);
             else if (coef == -1.0) tmp.AppendFormat("- {0}", varName);
@@ -86,7 +86,7 @@ namespace Sonnet
     {
         public void Remove(int index)
         {
-            Utils.Remove<Coef>(this, index);
+            InternalUtils.Remove<Coef>(this, index);
         }
 
         //public override bool Equals(object obj)

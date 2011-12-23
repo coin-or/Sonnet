@@ -1,28 +1,18 @@
-﻿// Copyright (C) 2011, Jan-Willem Goossens 
-// All Rights Reserved.
-// This code is licensed under the terms of the Eclipse Public License (EPL).
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-//
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-//
-[assembly: AssemblyTitle("Sonnet")]
-[assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
+[assembly: AssemblyTitle("SonnetExamples")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SONNET")]
-[assembly: AssemblyCopyright("Copyright © 2011")]
-[assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
+[assembly: AssemblyProduct("SonnetExamples")]
+[assembly: AssemblyCopyright("Copyright ©  2011")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
-// Specifies that types that are ordinarily visible only within the current
-// assembly are visible to a specified assembly.
-[assembly: InternalsVisibleTo("SonnetTest")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -30,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("31965bf3-860b-4643-b104-5b5be1957a65")]
+[assembly: Guid("ec3696a2-221f-4208-a78c-2b946eb84359")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -39,7 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Revision and Build Numbers 
+// You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.1.0.0")]
 [assembly: AssemblyFileVersion("1.1.0.0")]

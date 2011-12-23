@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Sonnet
 {
@@ -117,25 +118,36 @@ namespace Sonnet
         }
     }
 
-    internal static class Utils
+    public static class Utils
     {
-        public static void DumpAssemblyInfo()
+        public static Variable GetVariable(this IEnumerable<Variable> variables, string name)
         {
-            Trace.WriteLine("Initialising SONNET Model.\nAssembly information:");
-            Trace.WriteLine(String.Concat("File path: ", System.Reflection.Assembly.GetExecutingAssembly().Location));
-            Trace.WriteLine(String.Concat("File date: ", System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString()));
-            Trace.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
-            Trace.WriteLine(String.Concat("Framework: ", Environment.Version.ToString()));
-            Trace.WriteLine(String.Concat("Assembly runtime version: ", System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion));
+            Ensure.NotNull(variables, "variables");
+            Ensure.NotNull(name, "name");
+            return variables.First(v => string.Equals(v.Name, name));
+        }
+    }
+
+    internal static class InternalUtils
+    {
+        public static string GetAssemblyInfo()
+        {
+            StringBuilder message = new StringBuilder();
+            message.AppendLine("Assembly information:");
+            message.AppendLine("File path: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
+            message.AppendLine("File date: " + System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString());
+            message.AppendLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
+            message.AppendLine("Framework: " + Environment.Version.ToString());
+            message.AppendLine("Assembly runtime version: " + System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion);
 
             System.Reflection.PortableExecutableKinds portableExecutableKinds;
             System.Reflection.ImageFileMachine imageFileMachine;
             System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out portableExecutableKinds, out imageFileMachine);
-            Trace.WriteLine("Portable executable kinds: " + portableExecutableKinds.ToString());
-            Trace.WriteLine("Image file machine: " + imageFileMachine.ToString());
-            Trace.WriteLine("----------------------------------------------------------");
-        }
+            message.AppendLine("Portable executable kinds: " + portableExecutableKinds.ToString());
+            message.AppendLine("Image file machine: " + imageFileMachine.ToString());
 
+            return message.ToString();
+        }
 
         public static char GetOsiConstraintType(this ConstraintType constraintType)
         {
@@ -195,6 +207,22 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Throws and ArgumentOutOfRangeException is the given type is not derived from the generic type.
+        /// Uses derived.IsSubclassOf.
+        /// </summary>
+        /// <typeparam name="Base">The base type</typeparam>
+        /// <param name="derived">The derived type</param>
+        /// <param name="paramName"></param>
+        public static void Is<Base>(Type derived, string paramName = null)
+        {
+            if (!derived.IsSubclassOf(typeof(Base)))
+            {
+                string message = string.Format("Type {0} is not derived from type {1}", derived.Name, typeof(Base).Name);
+                if (paramName != null) throw new ArgumentOutOfRangeException(paramName, message);
+                else throw new ArgumentOutOfRangeException(message, (Exception)null);
+            }
+        }
+        /// <summary>
         /// Throws an ArgumentException if a and b are not equal.
         /// </summary>
         /// <typeparam name="T">The type of objects.</typeparam>
@@ -209,19 +237,28 @@ namespace Sonnet
         /// Throws an ArgumentNullException if the object is null.
         /// </summary>
         /// <param name="obj">The given object.</param>
-        public static void NotNull(object obj)
+        /// <param name="paramName">The given parameter name to be reported.</param>
+        public static void NotNull(object obj, string paramName = null)
         {
-            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException();
+            if (object.ReferenceEquals(obj, null))
+            {
+                if (paramName != null) throw new ArgumentNullException(paramName);
+                else throw new ArgumentNullException();
+            }
         }
 
         /// <summary>
-        /// Throws an ArgumentNullException for the given parameter name if the object is null.
+        /// Throws an ArgumentNullException for the given parameter name if the object is null or only spaces.
         /// </summary>
-        /// <param name="obj">The given object.</param>
+        /// <param name="value">The given string value.</param>
         /// <param name="paramName">The given parameter name to be reported.</param>
-        public static void NotNull(object obj, string paramName)
+        public static void NotNullOrWhiteSpace(string value, string paramName = null)
         {
-            if (object.ReferenceEquals(obj, null)) throw new ArgumentNullException(paramName);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                if (paramName != null) throw new ArgumentNullException(paramName);
+                else throw new ArgumentNullException();
+            }
         }
     }
 }

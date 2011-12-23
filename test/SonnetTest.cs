@@ -29,41 +29,10 @@ namespace SonnetTest
             return 0;
         }
     }
+
     public class SonnetTest
     {
-        /// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main(string[] args)
-		{
-#if (DYNAMIC_LOADING)
-            string assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.proxy.dll"))
-                || !File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.x86.dll"))
-                || !File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.x64.dll")))
-            {
-                throw new InvalidOperationException("Found SonnetWrapper.proxy.dll which cannot exist. "
-                    + "Must instead have SonnetWrapper.x86.dll and SonnetWrapper.x64.dll. Check your build settings.");
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += (_, e) =>
-            {
-                if (e.Name.StartsWith("SonnetWrapper.proxy,", StringComparison.OrdinalIgnoreCase))
-                {
-                    string fileName = Path.Combine(assemblyDir,
-                        string.Format("SonnetWrapper.{0}.dll", (IntPtr.Size == 4) ? "x86" : "x64"));
-                    return Assembly.LoadFile(fileName);
-                }
-                return null;
-            };
-#endif
-            SonnetTest test = new SonnetTest();
-
-			test.TestMain(args);
-		}
-
-        public SolverType solverType;
+        public Type solverType;
 
         public string FindBinParent(string directory)
         {
@@ -119,11 +88,9 @@ namespace SonnetTest
             SonnetLog.Default.LogLevel = 1;
 
             // dont test VolSolver..
-            foreach (SolverType lpSolver in Enum.GetValues(typeof(SolverType)))
+            foreach (Type lpSolver in Solver.GetOsiSolverTypes())
             {
                 this.solverType = lpSolver;
-                if (!Solver.CanCreateSolver(solverType)) continue;
-
                 try
                 {
                     SonnetTest0();
@@ -200,8 +167,8 @@ namespace SonnetTest
 
             RangeConstraint con0 = -model.Infinity <= x0 * 2 + x1 * 1 <= 10;
             RangeConstraint con1 = -model.Infinity <= x0 * 1 + x1 * 3 <= 15;
-            model.Add(con0, "con0");
-            model.Add(con1, "con1");
+            model.Add("con0", con0); // same as con0.Name = "con0"; model.Add(con0);
+            model.Add("con1", con1);
 
             Objective obj = model.Objective = x0 * 3 + x1 * 1;
             x0.Lower = 0;
@@ -230,7 +197,7 @@ namespace SonnetTest
                 MathExtension.CompareDouble(x1.Value, 0.0) == 0);
 
             Assert(MathExtension.CompareDouble(con0.Value, 10.0) == 0 &&
-                MathExtension.CompareDouble(solver.GetConstraint("con1").Value, 5.0) == 0);
+                MathExtension.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
 
             model.Objective.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -244,8 +211,8 @@ namespace SonnetTest
             Assert(MathExtension.CompareDouble(x0.Value, 3.0) == 0 &&
                 MathExtension.CompareDouble(x1.Value, 4.0) == 0);
 
-            Assert(MathExtension.CompareDouble(solver.GetConstraint("con0").Value, 10.0) == 0 &&
-                MathExtension.CompareDouble(solver.GetConstraint("con1").Value, 15.0) == 0);
+            Assert(MathExtension.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
+                MathExtension.CompareDouble(model.GetConstraint("con1").Value, 15.0) == 0);
         }
 
 
@@ -313,11 +280,11 @@ namespace SonnetTest
             RangeConstraint con0 = 0.0 <= x0 * 2 + x1 * 1 <= 10;
             RangeConstraint con1 = 0.0 <= x0 * 1 + x1 * 3 <= 15;
 
-            model.Add(con0, "con0");
+            model.Add("con0", con0);
 
             solver.Generate();
 
-            model.Add(con1, "con1");
+            model.Add("con1", con1);
 
             Objective obj = model.Objective = (x0 * 3 + x1 * 1);
 
@@ -932,7 +899,7 @@ namespace SonnetTest
 
             Variable x1, x2, x3, x4, x5;
 
-            Variable[] xArray = Variable.NewVariables(5);
+            Variable[] xArray = Variable.New(5);
             int i = 0;
             foreach (Variable x in xArray)
             {
@@ -1100,11 +1067,11 @@ namespace SonnetTest
             Constraint con0 = x0 * 2 + x1 * 1 <= 10;
             Constraint con1 = x0 * 1 + x1 * 3 <= 15;
 
-            model.Add(con0, "con0");
+            model.Add("con0", con0);
 
             solver.Generate();
 
-            model.Add(con1, "con1");
+            model.Add("con1", con1);
 
             Objective obj = model.Objective = (x0 * 3 + x1 * 1);
 
@@ -1282,14 +1249,14 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest0");
 
-            Model model = new Model();
-            Solver solver = new Solver(model, solverType);
+            Model model = new Model("SonnetTest0");
+            Solver solver = new Solver(model, solverType, "SonnetTest0");
 
             GetNumberOfVariablesOfVariableClass().SetValue(null, 0);
             GetNumberOfConstraintsOfConstraintClass().SetValue(null, 0);
             GetNumberOfObjectivesOfObjectiveClass().SetValue(null, 0);
 
-            if (solverType != SolverType.CpxSolver) solver.OsiSolver.setIntParam(OsiIntParam.OsiNameDiscipline, 2);
+            if (solverType.FullName != "COIN.OsiCpxSolverInterface") solver.OsiSolver.setIntParam(OsiIntParam.OsiNameDiscipline, 2);
 
             Variable x1 = new Variable();
             x1.Name = "x1";
@@ -1376,56 +1343,57 @@ namespace SonnetTest
             }
 
             string referenceUngeneratedModelToString =
-                "x1 : Continuous : [0, Inf]\n" +
-                "x2 : Continuous : [0, Inf]\n" +
-                "x8 : Continuous : [-1, 2]\n" +
-                "x3 : Continuous : [-1, 1]\n" +
-                "x4 : Continuous : [-1, 1]\n" +
-                "x5 : Continuous : [0, Inf]\n" +
-                "x6 : Continuous : [0, 2]\n" +
-                "x7 : Integer : [0, Inf]\n" +
-                "Objective: Objective obj : 0\n" +
-                "Constraints:\n" +
-                "Expr_con0 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Expr_con1 : x1 <= x1 + 2 x2\n" +
-                "Expr_con2 : x1 <= 1\n" +
-                "Expr_con3 : x1 <= 0\n" +
-                "Expr_con4 : x1 <= x1\n" +
-                "Expr_con5 : x1 <= x1 + 5 x2\n" +
-                "Expr_con6 : x1 <= x1 + 5 x2 + 5\n" +
-                "Expr_con7 : x1 <= x1\n" +
-                "Expr_con8 : x1 <= x2 + x3\n" +
-                "Expr_con9 : x1 <= x4 + 1\n" +
-                "Expr_con10 : x1 <= x5 + 1\n" +
-                "Expr_con11 : x1 <= x6\n" +
-                "Expr_con12 : x1 <= 2 x7\n" +
-                "Expr_con13 : x1 <= 0.5 x8\n" +
-                "Expr_con14 : x1 <= 1\n" +
-                "Expr_con15 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Expr_con16 : x1 <= - x1 - x1 - 2 x2 - 3.5 x8 - 1\n" +
-                "Expr_con17 : x1 <= 0\n" +
-                "Expr_con18 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1\n" +
-                "Expr_con19 : x1 <= x1 + x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Expr_con20 : x1 <= x1 - x1 - 5 x2 - x1 - x1 - 2 x2 - 3.5 x8 - 1\n" +
-                "Expr_con21 : x1 <= x1 - x2\n" +
-                "Expr_con22 : x1 <= x1 - 1\n" +
-                "Expr_con23 : x1 <= - x1 + 1\n" +
-                "Expr_con24 : x1 <= - x1 - 5 x2 - x1 - x1 - 2 x2 - 3.5 x8\n" +
-                "Expr_con25 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 2\n" +
-                "Expr_con26 : x1 <= 0.5 x1 + 2.5 x2 + 0.5 x1 + 0.5 x1 + x2 + 1.75 x8 + 0.5\n" +
-                "Expr_con27 : x1 <= 0.5 x1\n" +
-                "Con[28] : 1 == x1\n" +
-                "Con[29] : x1 == 1\n" +
-                "Con[30] : x2 == x1\n" +
-                "Con[31] : x1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Con[32] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1 == x1\n" +
-                "Con[33] : 1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Con[34] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1 == 1\n" +
-                "Con[35] : 1 >= x3\n" +
-                "Con[36] : 1 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n" +
-                "Con[37] : x2 >= 1\n" +
-                "Con[38] : x2 >= x3\n" +
-                "Con[39] : x2 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\n";
+                "Model 'SonnetTest0'\r\n" +
+                "x1 : Continuous : [0, Inf]\r\n" +
+                "x2 : Continuous : [0, Inf]\r\n" +
+                "x8 : Continuous : [-1, 2]\r\n" +
+                "x3 : Continuous : [-1, 1]\r\n" +
+                "x4 : Continuous : [-1, 1]\r\n" +
+                "x5 : Continuous : [0, Inf]\r\n" +
+                "x6 : Continuous : [0, 2]\r\n" +
+                "x7 : Integer : [0, Inf]\r\n" +
+                "Objective: Objective obj : 0\r\n" +
+                "Constraints:\r\n" +
+                "Expr_con0 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Expr_con1 : x1 <= x1 + 2 x2\r\n" +
+                "Expr_con2 : x1 <= 1\r\n" +
+                "Expr_con3 : x1 <= 0\r\n" +
+                "Expr_con4 : x1 <= x1\r\n" +
+                "Expr_con5 : x1 <= x1 + 5 x2\r\n" +
+                "Expr_con6 : x1 <= x1 + 5 x2 + 5\r\n" +
+                "Expr_con7 : x1 <= x1\r\n" +
+                "Expr_con8 : x1 <= x2 + x3\r\n" +
+                "Expr_con9 : x1 <= x4 + 1\r\n" +
+                "Expr_con10 : x1 <= x5 + 1\r\n" +
+                "Expr_con11 : x1 <= x6\r\n" +
+                "Expr_con12 : x1 <= 2 x7\r\n" +
+                "Expr_con13 : x1 <= 0.5 x8\r\n" +
+                "Expr_con14 : x1 <= 1\r\n" +
+                "Expr_con15 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Expr_con16 : x1 <= - x1 - x1 - 2 x2 - 3.5 x8 - 1\r\n" +
+                "Expr_con17 : x1 <= 0\r\n" +
+                "Expr_con18 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1\r\n" +
+                "Expr_con19 : x1 <= x1 + x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Expr_con20 : x1 <= x1 - x1 - 5 x2 - x1 - x1 - 2 x2 - 3.5 x8 - 1\r\n" +
+                "Expr_con21 : x1 <= x1 - x2\r\n" +
+                "Expr_con22 : x1 <= x1 - 1\r\n" +
+                "Expr_con23 : x1 <= - x1 + 1\r\n" +
+                "Expr_con24 : x1 <= - x1 - 5 x2 - x1 - x1 - 2 x2 - 3.5 x8\r\n" +
+                "Expr_con25 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 2\r\n" +
+                "Expr_con26 : x1 <= 0.5 x1 + 2.5 x2 + 0.5 x1 + 0.5 x1 + x2 + 1.75 x8 + 0.5\r\n" +
+                "Expr_con27 : x1 <= 0.5 x1\r\n" +
+                "Con[28] : 1 == x1\r\n" +
+                "Con[29] : x1 == 1\r\n" +
+                "Con[30] : x2 == x1\r\n" +
+                "Con[31] : x1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con[32] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1 == x1\r\n" +
+                "Con[33] : 1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con[34] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1 == 1\r\n" +
+                "Con[35] : 1 >= x3\r\n" +
+                "Con[36] : 1 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con[37] : x2 >= 1\r\n" +
+                "Con[38] : x2 >= x3\r\n" +
+                "Con[39] : x2 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n";
 
             string modelUngeneratedString = model.ToString();
             Assert(SonnetTest.EqualsString(modelUngeneratedString, referenceUngeneratedModelToString));
@@ -1459,234 +1427,231 @@ namespace SonnetTest
 
             solver.Generate();
 
-            string referenceGeneratedModel;
-
-            referenceGeneratedModel =
-                    "x1 : Continuous : [0, Inf]\n" +
-                    "x2 : Continuous : [0, Inf]\n" +
-                    "x8 : Continuous : [-1, 2]\n" +
-                    "x3 : Continuous : [-1, 1]\n" +
-                    "x7 : Integer : [0, Inf]\n" +
-                    "x6 : Continuous : [0, 2]\n" +
-                    "x5 : Continuous : [0, Inf]\n" +
-                    "x4 : Continuous : [-1, 1]\n" +
-                    "xNEW : Continuous : [0, Inf]\n" +
-                    "Objective: Objective obj : 0\n" +
-                    "Constraints:\n" +
-                    "Expr_con0 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\n" +
-                    "Con[38] : x2 - x3 >= 0\n" +
-                    "Con[37] : x2 >= 1\n" +
-                    "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\n" +
-                    "Con[35] : - x3 >= -1\n" +
-                    "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\n" +
-                    "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\n" +
-                    "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\n" +
-                    "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\n" +
-                    "Con[30] : - x1 + x2 == 0\n" +
-                    "Con[29] : x1 == 1\n" +
-                    "Con[28] : - x1 == -1\n" +
-                    "Expr_con27 : 0.5 x1 <= 0\n" +
-                    "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\n" +
-                    "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\n" +
-                    "Expr_con24 : 4 x1 + 7 x2 + 3.5 x8 <= 0\n" +
-                    "Expr_con23 : 2 x1 <= 1\n" +
-                    "Expr_con22 : 0 <= -1\n" +
-                    "Expr_con21 : x2 <= 0\n" +
-                    "Expr_con20 : 3 x1 + 7 x2 + 3.5 x8 <= -1\n" +
-                    "Expr_con19 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con18 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con17 : x1 <= 0\n" +
-                    "Expr_con16 : 3 x1 + 2 x2 + 3.5 x8 <= -1\n" +
-                    "Expr_con15 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con14 : x1 <= 1\n" +
-                    "Expr_con13 : x1 - 0.5 x8 <= 0\n" +
-                    "Expr_con12 : x1 - 2 x7 <= 0\n" +
-                    "Expr_con11 : x1 - x6 <= 0\n" +
-                    "Expr_con10 : x1 - x5 <= 1\n" +
-                    "Expr_con9 : x1 - x4 <= 1\n" +
-                    "Expr_con8 : x1 - x2 - x3 <= 0\n" +
-                    "Expr_con7 : 0 <= 0\n" +
-                    "Expr_con6 : - 5 x2 <= 5\n" +
-                    "Expr_con5 : - 5 x2 <= 0\n" +
-                    "Expr_con4 : 0 <= 0\n" +
-                    "Expr_con3 : x1 <= 0\n" +
-                    "Expr_con2 : x1 <= 1\n" +
-                    "Expr_con1 : - 2 x2 <= 0\n" +
-                    "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\n" +
-                    "Con[56] : 1.2 xNEW >= 0\n" +
-                    "Con[55] : 0 >= 0\n" +
-                    "othercon : 0 == -1\n" +
-                    "Con[53] : 0 == -1\n" +
-                    "mycon : 0 == -1\n" +
-                    "Con[51] : 2 x1 + 5 x2 + 3.5 x8 == -1\n" +
-                    "Con[50] : 2 x1 + 5 x2 + 3.5 x8 <= -1\n" +
-                    "Con[49] : 2 x1 + 7 x2 + 3.5 x8 <= -1\n" +
-                    "Con[48] : 3 x1 + 7 x2 + 3.5 x8 <= 0\n" +
-                    "Con[47] : - 3 x1 - 6 x2 - 3.5 x8 <= 1\n" +
-                    "Con[46] : x2 - x3 <= 0\n" +
-                    "Con[45] : x2 <= 1\n" +
-                    "Con[44] : - 3 x1 - 7 x2 - 3.5 x8 <= 0\n" +
-                    "Con[43] : - x3 <= -1\n" +
-                    "Con[42] : 2 x1 + 5 x2 + 3.5 x8 >= -1\n" +
-                    "Con[41] : 2 x1 + 7 x2 + 3.5 x8 >= -1\n";
+            string referenceGeneratedModel =
+                "Solver 'SonnetTest0'\r\n" +
+                "Model 'SonnetTest0'\r\n" +
+                "x1 : Continuous : [0, Inf]\r\n" +
+                "x2 : Continuous : [0, Inf]\r\n" +
+                "x8 : Continuous : [-1, 2]\r\n" +
+                "x3 : Continuous : [-1, 1]\r\n" +
+                "x4 : Continuous : [-1, 1]\r\n" +
+                "x5 : Continuous : [0, Inf]\r\n" +
+                "x6 : Continuous : [0, 2]\r\n" +
+                "x7 : Integer : [0, Inf]\r\n" +
+                "xNEW : Continuous : [0, Inf]\r\n" +
+                "Objective: Objective obj : 0\r\n" +
+                "Constraints:\r\n" +
+                "Expr_con0 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\r\n" +
+                "Expr_con1 : - 2 x2 <= 0\r\n" +
+                "Expr_con2 : x1 <= 1\r\n" +
+                "Expr_con3 : x1 <= 0\r\n" +
+                "Expr_con4 : 0 <= 0\r\n" +
+                "Expr_con5 : - 5 x2 <= 0\r\n" +
+                "Expr_con6 : - 5 x2 <= 5\r\n" +
+                "Expr_con7 : 0 <= 0\r\n" +
+                "Expr_con8 : x1 - x2 - x3 <= 0\r\n" +
+                "Expr_con9 : x1 - x4 <= 1\r\n" +
+                "Expr_con10 : x1 - x5 <= 1\r\n" +
+                "Expr_con11 : x1 - x6 <= 0\r\n" +
+                "Expr_con12 : x1 - 2 x7 <= 0\r\n" +
+                "Expr_con13 : x1 - 0.5 x8 <= 0\r\n" +
+                "Expr_con14 : x1 <= 1\r\n" +
+                "Expr_con15 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\r\n" +
+                "Expr_con16 : 3 x1 + 2 x2 + 3.5 x8 <= -1\r\n" +
+                "Expr_con17 : x1 <= 0\r\n" +
+                "Expr_con18 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\r\n" +
+                "Expr_con19 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\r\n" +
+                "Expr_con20 : 3 x1 + 7 x2 + 3.5 x8 <= -1\r\n" +
+                "Expr_con21 : x2 <= 0\r\n" +
+                "Expr_con22 : 0 <= -1\r\n" +
+                "Expr_con23 : 2 x1 <= 1\r\n" +
+                "Expr_con24 : 4 x1 + 7 x2 + 3.5 x8 <= 0\r\n" +
+                "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\r\n" +
+                "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\r\n" +
+                "Expr_con27 : 0.5 x1 <= 0\r\n" +
+                "Con[28] : - x1 == -1\r\n" +
+                "Con[29] : x1 == 1\r\n" +
+                "Con[30] : - x1 + x2 == 0\r\n" +
+                "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\r\n" +
+                "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\r\n" +
+                "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\r\n" +
+                "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\r\n" +
+                "Con[35] : - x3 >= -1\r\n" +
+                "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\r\n" +
+                "Con[37] : x2 >= 1\r\n" +
+                "Con[38] : x2 - x3 >= 0\r\n" +
+                "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\r\n" +
+                "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\r\n" +
+                "Con[41] : 2 x1 + 7 x2 + 3.5 x8 >= -1\r\n" +
+                "Con[42] : 2 x1 + 5 x2 + 3.5 x8 >= -1\r\n" +
+                "Con[43] : - x3 <= -1\r\n" +
+                "Con[44] : - 3 x1 - 7 x2 - 3.5 x8 <= 0\r\n" +
+                "Con[45] : x2 <= 1\r\n" +
+                "Con[46] : x2 - x3 <= 0\r\n" +
+                "Con[47] : - 3 x1 - 6 x2 - 3.5 x8 <= 1\r\n" +
+                "Con[48] : 3 x1 + 7 x2 + 3.5 x8 <= 0\r\n" +
+                "Con[49] : 2 x1 + 7 x2 + 3.5 x8 <= -1\r\n" +
+                "Con[50] : 2 x1 + 5 x2 + 3.5 x8 <= -1\r\n" +
+                "Con[51] : 2 x1 + 5 x2 + 3.5 x8 == -1\r\n" +
+                "mycon : 0 == -1\r\n" +
+                "Con[53] : 0 == -1\r\n" +
+                "othercon : 0 == -1\r\n" +
+                "Con[55] : 0 >= 0\r\n" +
+                "Con[56] : 1.2 xNEW >= 0\r\n";
 
             string modelString = solver.ToString();
             Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
 
-            solver.ExportModel("test.mps");
+            solver.Export("test.mps");
             System.IO.StreamReader test = new System.IO.StreamReader("test.mps");
             string testMps = test.ReadToEnd();
 
-            string referenceTestMps;
-
-            referenceTestMps =
-                "NAME BLANK FREE\n" +
+            string referenceTestMps = "NAME BLANK FREE\n" +
                 "ROWS\n" +
                 " N OBJROW\n" +
                 " L Expr_con0\n" +
-                " G Con[39]\n" +
-                " G Con[38]\n" +
-                " G Con[37]\n" +
-                " G Con[36]\n" +
-                " G Con[35]\n" +
-                " E Con[34]\n" +
-                " E Con[33]\n" +
-                " E Con[32]\n" +
-                " E Con[31]\n" +
-                " E Con[30]\n" +
-                " E Con[29]\n" +
-                " E Con[28]\n" +
-                " L Expr_con27\n" +
-                " L Expr_con26\n" +
-                " L Expr_con25\n" +
-                " L Expr_con24\n" +
-                " L Expr_con23\n" +
-                " L Expr_con22\n" +
-                " L Expr_con21\n" +
-                " L Expr_con20\n" +
-                " L Expr_con19\n" +
-                " L Expr_con18\n" +
-                " L Expr_con17\n" +
-                " L Expr_con16\n" +
-                " L Expr_con15\n" +
-                " L Expr_con14\n" +
-                " L Expr_con13\n" +
-                " L Expr_con12\n" +
-                " L Expr_con11\n" +
-                " L Expr_con10\n" +
-                " L Expr_con9\n" +
-                " L Expr_con8\n" +
-                " L Expr_con7\n" +
-                " L Expr_con6\n" +
-                " L Expr_con5\n" +
-                " L Expr_con4\n" +
-                " L Expr_con3\n" +
-                " L Expr_con2\n" +
                 " L Expr_con1\n" +
+                " L Expr_con2\n" +
+                " L Expr_con3\n" +
+                " L Expr_con4\n" +
+                " L Expr_con5\n" +
+                " L Expr_con6\n" +
+                " L Expr_con7\n" +
+                " L Expr_con8\n" +
+                " L Expr_con9\n" +
+                " L Expr_con10\n" +
+                " L Expr_con11\n" +
+                " L Expr_con12\n" +
+                " L Expr_con13\n" +
+                " L Expr_con14\n" +
+                " L Expr_con15\n" +
+                " L Expr_con16\n" +
+                " L Expr_con17\n" +
+                " L Expr_con18\n" +
+                " L Expr_con19\n" +
+                " L Expr_con20\n" +
+                " L Expr_con21\n" +
+                " L Expr_con22\n" +
+                " L Expr_con23\n" +
+                " L Expr_con24\n" +
+                " L Expr_con25\n" +
+                " L Expr_con26\n" +
+                " L Expr_con27\n" +
+                " E Con[28]\n" +
+                " E Con[29]\n" +
+                " E Con[30]\n" +
+                " E Con[31]\n" +
+                " E Con[32]\n" +
+                " E Con[33]\n" +
+                " E Con[34]\n" +
+                " G Con[35]\n" +
+                " G Con[36]\n" +
+                " G Con[37]\n" +
+                " G Con[38]\n" +
+                " G Con[39]\n" +
                 " G Con[40]\n" +
-                " G Con[56]\n" +
-                " G Con[55]\n" +
-                " E othercon\n" +
-                " E Con[53]\n" +
-                " E mycon\n" +
-                " E Con[51]\n" +
-                " L Con[50]\n" +
-                " L Con[49]\n" +
-                " L Con[48]\n" +
-                " L Con[47]\n" +
-                " L Con[46]\n" +
-                " L Con[45]\n" +
-                " L Con[44]\n" +
-                " L Con[43]\n" +
-                " G Con[42]\n" +
                 " G Con[41]\n" +
+                " G Con[42]\n" +
+                " L Con[43]\n" +
+                " L Con[44]\n" +
+                " L Con[45]\n" +
+                " L Con[46]\n" +
+                " L Con[47]\n" +
+                " L Con[48]\n" +
+                " L Con[49]\n" +
+                " L Con[50]\n" +
+                " E Con[51]\n" +
+                " E mycon\n" +
+                " E Con[53]\n" +
+                " E othercon\n" +
+                " G Con[55]\n" +
+                " G Con[56]\n" +
                 "COLUMNS\n" +
-                " x1 Expr_con0 -2. Con[39] -3. \n" +
-                " x1 Con[36] -3. Con[34] 3. \n" +
-                " x1 Con[33] -3. Con[32] 3. \n" +
-                " x1 Con[31] -2. Con[30] -1. \n" +
-                " x1 Con[29] 1. Con[28] -1. \n" +
-                " x1 Expr_con27 0.5 Expr_con26 -0.5 \n" +
-                " x1 Expr_con25 -2. Expr_con24 4. \n" +
-                " x1 Expr_con23 2. Expr_con20 3. \n" +
-                " x1 Expr_con19 -3. Expr_con18 -3. \n" +
-                " x1 Expr_con17 1. Expr_con16 3. \n" +
-                " x1 Expr_con15 -2. Expr_con14 1. \n" +
-                " x1 Expr_con13 1. Expr_con12 1. \n" +
-                " x1 Expr_con11 1. Expr_con10 1. \n" +
-                " x1 Expr_con9 1. Expr_con8 1. \n" +
-                " x1 Expr_con3 1. Expr_con2 1. \n" +
-                " x1 Con[40] 3. Con[51] 2. \n" +
-                " x1 Con[50] 2. Con[49] 2. \n" +
-                " x1 Con[48] 3. Con[47] -3. \n" +
-                " x1 Con[44] -3. Con[42] 2. \n" +
-                " x1 Con[41] 2. \n" +
-                " x2 Expr_con0 -7. Con[39] -6. \n" +
-                " x2 Con[38] 1. Con[37] 1. \n" +
-                " x2 Con[36] -7. Con[34] 7. \n" +
-                " x2 Con[33] -7. Con[32] 7. \n" +
-                " x2 Con[31] -7. Con[30] 1. \n" +
-                " x2 Expr_con26 -3.5 Expr_con25 -7. \n" +
-                " x2 Expr_con24 7. Expr_con21 1. \n" +
-                " x2 Expr_con20 7. Expr_con19 -7. \n" +
-                " x2 Expr_con18 -7. Expr_con16 2. \n" +
-                " x2 Expr_con15 -7. Expr_con8 -1. \n" +
-                " x2 Expr_con6 -5. Expr_con5 -5. \n" +
-                " x2 Expr_con1 -2. Con[40] 7. \n" +
-                " x2 Con[51] 5. Con[50] 5. \n" +
-                " x2 Con[49] 7. Con[48] 7. \n" +
-                " x2 Con[47] -6. Con[46] 1. \n" +
-                " x2 Con[45] 1. Con[44] -7. \n" +
-                " x2 Con[42] 5. Con[41] 7. \n" +
-                " x8 Expr_con0 -3.5 Con[39] -3.5 \n" +
-                " x8 Con[36] -3.5 Con[34] 3.5 \n" +
-                " x8 Con[33] -3.5 Con[32] 3.5 \n" +
-                " x8 Con[31] -3.5 Expr_con26 -1.75 \n" +
-                " x8 Expr_con25 -3.5 Expr_con24 3.5 \n" +
-                " x8 Expr_con20 3.5 Expr_con19 -3.5 \n" +
-                " x8 Expr_con18 -3.5 Expr_con16 3.5 \n" +
-                " x8 Expr_con15 -3.5 Expr_con13 -0.5 \n" +
-                " x8 Con[40] 3.5 Con[51] 3.5 \n" +
-                " x8 Con[50] 3.5 Con[49] 3.5 \n" +
-                " x8 Con[48] 3.5 Con[47] -3.5 \n" +
-                " x8 Con[44] -3.5 Con[42] 3.5 \n" +
-                " x8 Con[41] 3.5 \n" +
-                " x3 Con[38] -1. Con[35] -1. \n" +
-                " x3 Expr_con8 -1. Con[46] -1. \n" +
-                " x3 Con[43] -1. \n" +
-                " x7 Expr_con12 -2. \n" +
-                " x6 Expr_con11 -1. \n" +
-                " x5 Expr_con10 -1. \n" +
+                " x1 Expr_con0 -2. Expr_con2 1. \n" +
+                " x1 Expr_con3 1. Expr_con8 1. \n" +
+                " x1 Expr_con9 1. Expr_con10 1. \n" +
+                " x1 Expr_con11 1. Expr_con12 1. \n" +
+                " x1 Expr_con13 1. Expr_con14 1. \n" +
+                " x1 Expr_con15 -2. Expr_con16 3. \n" +
+                " x1 Expr_con17 1. Expr_con18 -3. \n" +
+                " x1 Expr_con19 -3. Expr_con20 3. \n" +
+                " x1 Expr_con23 2. Expr_con24 4. \n" +
+                " x1 Expr_con25 -2. Expr_con26 -0.5 \n" +
+                " x1 Expr_con27 0.5 Con[28] -1. \n" +
+                " x1 Con[29] 1. Con[30] -1. \n" +
+                " x1 Con[31] -2. Con[32] 3. \n" +
+                " x1 Con[33] -3. Con[34] 3. \n" +
+                " x1 Con[36] -3. Con[39] -3. \n" +
+                " x1 Con[40] 3. Con[41] 2. \n" +
+                " x1 Con[42] 2. Con[44] -3. \n" +
+                " x1 Con[47] -3. Con[48] 3. \n" +
+                " x1 Con[49] 2. Con[50] 2. \n" +
+                " x1 Con[51] 2. \n" +
+                " x2 Expr_con0 -7. Expr_con1 -2. \n" +
+                " x2 Expr_con5 -5. Expr_con6 -5. \n" +
+                " x2 Expr_con8 -1. Expr_con15 -7. \n" +
+                " x2 Expr_con16 2. Expr_con18 -7. \n" +
+                " x2 Expr_con19 -7. Expr_con20 7. \n" +
+                " x2 Expr_con21 1. Expr_con24 7. \n" +
+                " x2 Expr_con25 -7. Expr_con26 -3.5 \n" +
+                " x2 Con[30] 1. Con[31] -7. \n" +
+                " x2 Con[32] 7. Con[33] -7. \n" +
+                " x2 Con[34] 7. Con[36] -7. \n" +
+                " x2 Con[37] 1. Con[38] 1. \n" +
+                " x2 Con[39] -6. Con[40] 7. \n" +
+                " x2 Con[41] 7. Con[42] 5. \n" +
+                " x2 Con[44] -7. Con[45] 1. \n" +
+                " x2 Con[46] 1. Con[47] -6. \n" +
+                " x2 Con[48] 7. Con[49] 7. \n" +
+                " x2 Con[50] 5. Con[51] 5. \n" +
+                " x8 Expr_con0 -3.5 Expr_con13 -0.5 \n" +
+                " x8 Expr_con15 -3.5 Expr_con16 3.5 \n" +
+                " x8 Expr_con18 -3.5 Expr_con19 -3.5 \n" +
+                " x8 Expr_con20 3.5 Expr_con24 3.5 \n" +
+                " x8 Expr_con25 -3.5 Expr_con26 -1.75 \n" +
+                " x8 Con[31] -3.5 Con[32] 3.5 \n" +
+                " x8 Con[33] -3.5 Con[34] 3.5 \n" +
+                " x8 Con[36] -3.5 Con[39] -3.5 \n" +
+                " x8 Con[40] 3.5 Con[41] 3.5 \n" +
+                " x8 Con[42] 3.5 Con[44] -3.5 \n" +
+                " x8 Con[47] -3.5 Con[48] 3.5 \n" +
+                " x8 Con[49] 3.5 Con[50] 3.5 \n" +
+                " x8 Con[51] 3.5 \n" +
+                " x3 Expr_con8 -1. Con[35] -1. \n" +
+                " x3 Con[38] -1. Con[43] -1. \n" +
+                " x3 Con[46] -1. \n" +
                 " x4 Expr_con9 -1. \n" +
+                " x5 Expr_con10 -1. \n" +
+                " x6 Expr_con11 -1. \n" +
+                " x7 Expr_con12 -2. \n" +
                 " xNEW Con[56] 1.2 \n" +
                 "RHS\n" +
-                " RHS Expr_con0 1. Con[39] 1. \n" +
-                " RHS Con[37] 1. Con[35] -1. \n" +
-                " RHS Con[32] -1. Con[31] 1. \n" +
-                " RHS Con[29] 1. Con[28] -1. \n" +
-                " RHS Expr_con26 0.5 Expr_con25 2. \n" +
-                " RHS Expr_con23 1. Expr_con22 -1. \n" +
-                " RHS Expr_con20 -1. Expr_con19 1. \n" +
-                " RHS Expr_con18 1. Expr_con16 -1. \n" +
-                " RHS Expr_con15 1. Expr_con14 1. \n" +
-                " RHS Expr_con10 1. Expr_con9 1. \n" +
-                " RHS Expr_con6 5. Expr_con2 1. \n" +
-                " RHS othercon -1. Con[53] -1. \n" +
-                " RHS mycon -1. Con[51] -1. \n" +
-                " RHS Con[50] -1. Con[49] -1. \n" +
-                " RHS Con[47] 1. Con[45] 1. \n" +
-                " RHS Con[43] -1. Con[42] -1. \n" +
-                " RHS Con[41] -1. \n" +
+                " RHS Expr_con0 1. Expr_con2 1. \n" +
+                " RHS Expr_con6 5. Expr_con9 1. \n" +
+                " RHS Expr_con10 1. Expr_con14 1. \n" +
+                " RHS Expr_con15 1. Expr_con16 -1. \n" +
+                " RHS Expr_con18 1. Expr_con19 1. \n" +
+                " RHS Expr_con20 -1. Expr_con22 -1. \n" +
+                " RHS Expr_con23 1. Expr_con25 2. \n" +
+                " RHS Expr_con26 0.5 Con[28] -1. \n" +
+                " RHS Con[29] 1. Con[31] 1. \n" +
+                " RHS Con[32] -1. Con[35] -1. \n" +
+                " RHS Con[37] 1. Con[39] 1. \n" +
+                " RHS Con[41] -1. Con[42] -1. \n" +
+                " RHS Con[43] -1. Con[45] 1. \n" +
+                " RHS Con[47] 1. Con[49] -1. \n" +
+                " RHS Con[50] -1. Con[51] -1. \n" +
+                " RHS mycon -1. Con[53] -1. \n" +
+                " RHS othercon -1. \n" +
                 "BOUNDS\n" +
                 " LO BOUND x8 -1. \n" +
                 " UP BOUND x8 2. \n" +
                 " LO BOUND x3 -1. \n" +
                 " UP BOUND x3 1. \n" +
-                " UI BOUND x7 1e+30\n" +
-                " UP BOUND x6 2. \n" +
                 " LO BOUND x4 -1. \n" +
                 " UP BOUND x4 1. \n" +
+                " UP BOUND x6 2. \n" +
+                " UI BOUND x7 1e+30\n" +
                 "ENDATA\n";
 
             testMps = testMps.Replace("\r", "");
@@ -1695,38 +1660,78 @@ namespace SonnetTest
                 testMps = testMps.Replace("  ", " ");
             }
 
-            if (solverType != SolverType.CpxSolver) Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
+            if (solverType.FullName != "COIN.OsiCpxSolverInterface") Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
         }
 
         public void SonnetTest0b()
         {
             Console.WriteLine("SonnetTest0b");
 
-            Model model = new Model();
-            Solver solver = new Solver(model, solverType);
-
-            Assert(model.ImportModel("test.mps"));
+            Variable[] variables;
+            Model model = Model.New("test.mps", out variables);
+            model.Name = "SonnetTest0b";
+            Assert(model != null);
+            Solver solver = new Solver(model, solverType, "SonnetTest0b");
             solver.Generate();
 
-            Variable x7 = solver.GetVariable("x7");
+            Variable x7 = variables.GetVariable("x7");
             x7.Upper = model.Infinity;
 
-
-            string referenceGeneratedModel;
-
-                referenceGeneratedModel =
+            string referenceGeneratedModel =
+                    "Solver 'SonnetTest0b'\r\n" +
+                    "Model 'SonnetTest0b'\r\n" +
                     "x1 : Continuous : [0, Inf]\n" +
                     "x2 : Continuous : [0, Inf]\n" +
                     "x8 : Continuous : [-1, 2]\n" +
                     "x3 : Continuous : [-1, 1]\n" +
-                    "xNEW : Continuous : [0, Inf]\n" +
                     "x4 : Continuous : [-1, 1]\n" +
                     "x5 : Continuous : [0, Inf]\n" +
                     "x6 : Continuous : [0, 2]\n" +
                     "x7 : Integer : [0, Inf]\n" +
+                    "xNEW : Continuous : [0, Inf]\n" +
                     "Objective: Objective OBJROW : 0\n" +
                     "Constraints:\n" +
                     "Expr_con0 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\n" +
+                    "Expr_con1 : - 2 x2 <= 0\n" +
+                    "Expr_con2 : x1 <= 1\n" +
+                    "Expr_con3 : x1 <= 0\n" +
+                    "Expr_con4 : 0 <= 0\n" +
+                    "Expr_con5 : - 5 x2 <= 0\n" +
+                    "Expr_con6 : - 5 x2 <= 5\n" +
+                    "Expr_con7 : 0 <= 0\n" +
+                    "Expr_con8 : x1 - x2 - x3 <= 0\n" +
+                    "Expr_con9 : x1 - x4 <= 1\n" +
+                    "Expr_con10 : x1 - x5 <= 1\n" +
+                    "Expr_con11 : x1 - x6 <= 0\n" +
+                    "Expr_con12 : x1 - 2 x7 <= 0\n" +
+                    "Expr_con13 : x1 - 0.5 x8 <= 0\n" +
+                    "Expr_con14 : x1 <= 1\n" +
+                    "Expr_con15 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\n" +
+                    "Expr_con16 : 3 x1 + 2 x2 + 3.5 x8 <= -1\n" +
+                    "Expr_con17 : x1 <= 0\n" +
+                    "Expr_con18 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
+                    "Expr_con19 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
+                    "Expr_con20 : 3 x1 + 7 x2 + 3.5 x8 <= -1\n" +
+                    "Expr_con21 : x2 <= 0\n" +
+                    "Expr_con22 : 0 <= -1\n" +
+                    "Expr_con23 : 2 x1 <= 1\n" +
+                    "Expr_con24 : 4 x1 + 7 x2 + 3.5 x8 <= 0\n" +
+                    "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\n" +
+                    "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\n" +
+                    "Expr_con27 : 0.5 x1 <= 0\n" +
+                    "Con[28] : - x1 == -1\n" +
+                    "Con[29] : x1 == 1\n" +
+                    "Con[30] : - x1 + x2 == 0\n" +
+                    "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\n" +
+                    "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\n" +
+                    "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\n" +
+                    "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\n" +
+                    "Con[35] : - x3 >= -1\n" +
+                    "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\n" +
+                    "Con[37] : x2 >= 1\n" +
+                    "Con[38] : x2 - x3 >= 0\n" +
+                    "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\n" +
+                    "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\n" +
                     "Con[41] : 2 x1 + 7 x2 + 3.5 x8 >= -1\n" +
                     "Con[42] : 2 x1 + 5 x2 + 3.5 x8 >= -1\n" +
                     "Con[43] : - x3 <= -1\n" +
@@ -1742,51 +1747,13 @@ namespace SonnetTest
                     "Con[53] : 0 == -1\n" +
                     "othercon : 0 == -1\n" +
                     "Con[55] : 0 >= 0\n" +
-                    "Con[56] : 1.2 xNEW >= 0\n" +
-                    "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\n" +
-                    "Expr_con1 : - 2 x2 <= 0\n" +
-                    "Expr_con2 : x1 <= 1\n" +
-                    "Expr_con3 : x1 <= 0\n" +
-                    "Expr_con4 : 0 <= 0\n" +
-                    "Expr_con5 : - 5 x2 <= 0\n" +
-                    "Expr_con6 : - 5 x2 <= 5\n" +
-                    "Expr_con7 : 0 <= 0\n" +
-                    "Expr_con8 : x1 - x2 - x3 <= 0\n" +
-                    "Expr_con9 : x1 - x4 <= 1\n" +
-                    "Expr_con10 : x1 - x5 <= 1\n" +
-                    "Expr_con11 : x1 - x6 <= 0\n" +
-                    "Expr_con12 : x1 - 2 x7 <= 0\n" +
-                    "Expr_con13 : x1 - 0.5 x8 <= 0\n" +
-                    "Expr_con14 : x1 <= 1\n" +
-                    "Expr_con15 : - 2 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con16 : 3 x1 + 2 x2 + 3.5 x8 <= -1\n" +
-                    "Expr_con17 : x1 <= 0\n" +
-                    "Expr_con18 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con19 : - 3 x1 - 7 x2 - 3.5 x8 <= 1\n" +
-                    "Expr_con20 : 3 x1 + 7 x2 + 3.5 x8 <= -1\n" +
-                    "Expr_con21 : x2 <= 0\n" +
-                    "Expr_con22 : 0 <= -1\n" +
-                    "Expr_con23 : 2 x1 <= 1\n" +
-                    "Expr_con24 : 4 x1 + 7 x2 + 3.5 x8 <= 0\n" +
-                    "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\n" +
-                    "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\n" +
-                    "Expr_con27 : 0.5 x1 <= 0\n" +
-                    "Con[28] : - x1 == -1\n" +
-                    "Con[29] : x1 == 1\n" +
-                    "Con[30] : - x1 + x2 == 0\n" +
-                    "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\n" +
-                    "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\n" +
-                    "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\n" +
-                    "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\n" +
-                    "Con[35] : - x3 >= -1\n" +
-                    "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\n" +
-                    "Con[37] : x2 >= 1\n" +
-                    "Con[38] : x2 - x3 >= 0\n" +
-                    "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\n";
+                    "Con[56] : 1.2 xNEW >= 0\n";
 
-            string modelString = solver.ToString();
 
-            if (solverType != SolverType.CpxSolver) Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
+            referenceGeneratedModel = referenceGeneratedModel.Replace("\r\n", "\n");
+            string modelString = solver.ToString().Replace("\r\n", "\n");
+
+            if (solverType.FullName != "COIN.OsiCpxSolverInterface") Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
         }
 
         public void SonnetTest20()
@@ -1942,17 +1909,17 @@ namespace SonnetTest
             Solver solver;
             int value;
 
-            solver = new Solver(model, SolverType.ClpSolver);
+            solver = new Solver(model, typeof(COIN.OsiClpSolverInterface));
             solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, 1234);
             solver.OsiSolver.getIntParam(OsiIntParam.OsiMaxNumIteration, out value);
             Assert(value == 1234);
 
-            solver = new Solver(model, SolverType.CbcSolver);// new: we DONT copy parameters
+            solver = new Solver(model, typeof(COIN.OsiCbcSolverInterface));// new: we DONT copy parameters
             solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, 1234);
             solver.OsiSolver.getIntParam(OsiIntParam.OsiMaxNumIteration, out value);
             Assert(value == 1234);
 
-            solver = new Solver(model, SolverType.ClpSolver); // new: we DONT copy parameters
+            solver = new Solver(model, typeof(COIN.OsiClpSolverInterface)); // new: we DONT copy parameters
             solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, 1234);
             solver.OsiSolver.getIntParam(OsiIntParam.OsiMaxNumIteration, out value);
             Assert(value == 1234);
@@ -1990,12 +1957,12 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest24");
 
-            Model model = new Model();
+            Model model = Model.New("expect-feasible.mps"); // added file to project, "Copy Always"
             Solver solver = new Solver(model, solverType);
 
             //string bin = FindBinParent(Environment.CurrentDirectory);
             //string filePath = (bin != null && bin.Length > 0) ? bin + "\\..\\" : "";
-            Assert(model.ImportModel("expect-feasible.mps")); // added file to project, "Copy Always"
+            Assert(model != null); // added file to project, "Copy Always"
 
             solver.Generate();
             solver.Resolve();
@@ -2022,15 +1989,15 @@ namespace SonnetTest
             model.ObjectiveSense = ObjectiveSense.Maximise;
 
             solver.Generate();
-            int numElements = solver.NumberOfElements;
-            int numInts = solver.NumberOfIntegerVariables;
+            int numElements = solver.OsiSolver.getNumElements();
+            int numInts = solver.OsiSolver.getNumIntegers();
             solver.Solve();
 
             Assert(solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
-            Assert(numElements == solver.NumberOfElements);
-            Assert(numInts == solver.NumberOfIntegerVariables);
+            Assert(numElements == solver.OsiSolver.getNumElements());
+            Assert(numInts == solver.OsiSolver.getNumIntegers());
 
             // with resetaftermipsolve the objectivevalue() doesnt work.
             //Assert(MathExtension.CompareDouble(model.Objective.Value, model.ObjectiveValue()) == 0);
@@ -2082,15 +2049,15 @@ namespace SonnetTest
         public void SonnetTest26b()
         {
             Console.WriteLine("SonnetTest26b");
-            if (solverType != SolverType.CbcSolver) return;
+            if (solverType != typeof(OsiCbcSolverInterface)) return;
 
-            Model model = new Model();
+            Model model = Model.New("egout.mps");
+            Assert(model != null);
             Solver solver = new Solver(model, solverType);
 
-            Assert(model.ImportModel("egout.mps"));
             solver.Generate();
-            int numElements = solver.NumberOfElements;
-            int numInts = solver.NumberOfIntegerVariables;
+            int numElements = solver.OsiSolver.getNumElements();
+            int numInts = solver.OsiSolver.getNumIntegers();
 
             solver.Solve();
 
@@ -2101,8 +2068,8 @@ namespace SonnetTest
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
             Assert(MathExtension.CompareDouble(model.Objective.Value, 568.1007) == 0);
-            Assert(numElements == solver.NumberOfElements);
-            Assert(numInts == solver.NumberOfIntegerVariables);
+            Assert(numElements == solver.OsiSolver.getNumElements());
+            Assert(numInts == solver.OsiSolver.getNumIntegers());
         }
 
         public void SonnetTest27()
@@ -2174,27 +2141,28 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest28");
 
-            Model model = new Model();
+            Variable[] variables;
+            Model model = Model.New("egout.mps", out variables);
+            Assert(model != null);
             Solver solver = new Solver(model, solverType);
-
-            Assert(model.ImportModel("egout.mps"));
             solver.Generate();
-            foreach (Variable variable in solver.Variables)
+            
+            foreach (Variable variable in variables)
             {
                 variable.Type = VariableType.Continuous;
             }
 
-            solver.Solve();
+            solver.Solve(true);
 
             Assert(solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
             Assert(MathExtension.CompareDouble(model.Objective.Value, 149.58876622009566) == 0);
 
-            model.Objective = (Expression.Sum(solver.Variables));
+            model.Objective = (Expression.Sum(variables));
             model.ObjectiveSense = (ObjectiveSense.Minimise);
 
-            foreach (Variable variable in solver.Variables)
+            foreach (Variable variable in variables)
             {
                 variable.Freeze();
             }
@@ -2230,14 +2198,15 @@ namespace SonnetTest
             // the stress test
             int N = (int)(f * 3000); // number of variables
             int M = (int)(f * 30000); // number of rangeconstraints
+            int p = (int)M / 10;
             int Z = 100; // number nonzeros per constraint
 
             Variable x = new Variable();
-            Variable[] vars = Variable.NewVariables(N);
+            Variable[] vars = Variable.New(N);
 
             for (int m = 0; m < M; m++)
             {
-                if (m % 10000 == 0) Console.WriteLine(string.Format("Thread {0}: {1}", threadid, (1.0 * m / M).ToString("p")));
+                if (m % p == 0) Console.WriteLine(string.Format("Thread {0}: Building {1}", threadid, (1.0 * m / M).ToString("p")));
                 Expression expr = new Expression();
                 expr.Add(x);
 
@@ -2250,8 +2219,8 @@ namespace SonnetTest
                 int available = m;
 
                 string rowName = "MyConstraint(" + m + ")";
-                RangeConstraint con = (RangeConstraint)model.Add(
-                    -model.Infinity <= expr <= available, rowName);
+                RangeConstraint con = (RangeConstraint)model.Add(rowName, 
+                    -model.Infinity <= expr <= available);
 
                 expr.Assemble();
                 Assert(expr.NumberOfCoefficients == Z + 1);
@@ -2259,15 +2228,17 @@ namespace SonnetTest
                 expr.Clear();
             }
 
+            Console.WriteLine(string.Format("Thread {0}: Start Generate... (this can take a while)", threadid));
+            
             solver.Generate();
 
-            Assert(solver.NumberOfConstraints == model.NumberOfConstraints);
-            Assert(solver.NumberOfConstraints == M);
-            Assert(solver.NumberOfElements == M * (Z + 1));
+            Assert(solver.OsiSolver.getNumRows() == model.NumberOfConstraints);
+            Assert(model.NumberOfConstraints == M);
+            Assert(solver.OsiSolver.getNumElements() == M * (Z + 1));
 
-            Console.WriteLine(string.Format("Thread {0}: finished", threadid));
+            Console.WriteLine(string.Format("Thread {0}: Finished", threadid));
             model.Clear();
-            Console.WriteLine(string.Format("Thread {0}: closed", threadid));
+            Console.WriteLine(string.Format("Thread {0}: Closed", threadid));
         }
 
         public void SonnetTest30()
@@ -2335,9 +2306,9 @@ namespace SonnetTest
             Constraint r1 = x0 * 1 + x1 * 3 <= 15;
             Constraint r2 = x0 * 1 + x1 * 1 <= 10;
 
-            model.Add(r0, "r0");
-            model.Add(r1, "r1");
-            model.Add(r2, "r2");
+            model.Add("r0", r0);
+            model.Add("r1", r1);
+            model.Add("r2", r2);
             model.Objective = (obj);
 
             solver.Maximise();
@@ -2356,7 +2327,7 @@ namespace SonnetTest
             Assert(solver.IterationCount == 0);
         }
 
-        private void BuildChipsModel(Model model)
+        private void BuildChipsModel(Model model, out Variable[] variables)
         {
             Variable xp = new Variable("xp"); // plain chips
             Variable xm = new Variable("xm"); // Mexican chips
@@ -2370,16 +2341,19 @@ namespace SonnetTest
             model.Objective = (P);
             model.ObjectiveSense = (ObjectiveSense.Maximise);
 
-            model.Add(slicing, "SlicingConstraint");
-            model.Add(frying, "FryingConstraint");
-            model.Add(packing, "PackingConstraint");
+            model.Add("SlicingConstraint", slicing);
+            model.Add("FryingConstraint", frying);
+            model.Add("PackingConstraint", packing);
+
+            variables = new Variable[]{xp, xm, xt};
         }
 
         public void SonnetTest32()
         {
             Console.WriteLine("SonnetTest32 : WarmStart test 2");
             Model model = new Model();
-            BuildChipsModel(model);
+            Variable[] variables;
+            BuildChipsModel(model, out variables);
 
             Solver solver = new Solver(model, solverType);
 
@@ -2413,14 +2387,15 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest33 : WarmStart test 3");
 
-            Model model = new Model();
+            Variable[] variables;
+            Model model = Model.New("brandy.mps", out variables);
             Solver solver = new Solver(model, solverType);
             WarmStart emptyWarmStart = solver.GetEmptyWarmStart();
 
-            Assert(model.ImportModel("brandy.mps"));
+            Assert(model != null);
 
             solver.Generate();
-            foreach (Variable variable in solver.Variables)
+            foreach (Variable variable in variables)
             {
                 variable.Type = VariableType.Continuous;
             }
@@ -2453,19 +2428,20 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest34 : WarmStart test 4: add variables to the model between warmstarts");
 
+            Variable[] variables;
             Model model = new Model();
             Solver solver = new Solver(model, new OsiCbcSolverInterface());
 
             solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInInitial, false, OsiHintStrength.OsiHintDo);
             solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInResolve, false, OsiHintStrength.OsiHintDo);
-            BuildChipsModel(model);
+            BuildChipsModel(model, out variables);
             Objective originalObjective = model.Objective;
 
             solver.Solve();
             WarmStart warmStart = solver.GetWarmStart();
 
             model.GetConstraint("PackingConstraint").Enabled = false;
-            model.Objective = solver.Variables.Sum();
+            model.Objective = variables.Sum();
             solver.Resolve();
 
             model.GetConstraint("PackingConstraint").Enabled = true;
@@ -2514,24 +2490,21 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest36 - testing objective values");
 
-            Model model = new Model();
+            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always"
+            Assert(model != null);
             Solver solver = new Solver(model, solverType);
-
-            Assert(model.ImportModel("MIP-124725.mps")); // added file to project, "Copy Always"
-
             solver.Minimise();
             Assert(MathExtension.CompareDouble(model.Objective.Value, 124725) == 0);
         }
 
         public void SonnetTest37()
         {
-            if (solverType != SolverType.CbcSolver) return;
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
             Console.WriteLine("SonnetTest37 - Cbc test set CbcStrategyNull and addCutGenerator");
 
-            Model model = new Model();
+            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always";
+            Assert(model != null);
             Solver solver = new Solver(model, solverType);
-
-            Assert(model.ImportModel("MIP-124725.mps")); // added file to project, "Copy Always"
 
             OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
             Assert(osisolver != null);
@@ -2550,14 +2523,14 @@ namespace SonnetTest
 
         public void SonnetTest38()
         {
-            if (solverType != SolverType.CbcSolver) return;
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
 
             Console.WriteLine("SonnetTest38 - Cbc set CbcStrategyDefault");
 
-            Model model = new Model();
+            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always"
+            Assert(model != null);
+            
             Solver solver = new Solver(model, solverType);
-
-            Assert(model.ImportModel("MIP-124725.mps")); // added file to project, "Copy Always"
             model.ObjectiveSense = ObjectiveSense.Minimise;
 
             OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
@@ -2588,7 +2561,7 @@ namespace SonnetTest
             Variable x = new Variable(VariableType.Integer);
             Variable y = new Variable(VariableType.Integer);
 
-            m.Add(0 <= 1.3 * x + 3 * y <= 10, "con1");
+            m.Add("con1", 0 <= 1.3 * x + 3 * y <= 10);
             m.Objective = x + 2 * y;
 
             Solver s = new Solver(m, solverType);

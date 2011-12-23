@@ -33,12 +33,23 @@ namespace Sonnet
     public class Constraint : ModelEntity
     {
         /// <summary>
+        /// Initializes a new instance of the Constraint class based on a copy of the given constraint.
+        /// A default name is used.
+        /// </summary>
+        /// <param name="con">The constraint to be copied.</param>
+        public Constraint(Constraint con)
+            : this(null, con)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the Constraint class based on a copy of the given constraint,
         /// but with the given name.
         /// </summary>
         /// <param name="name">The name for the new constraint.</param>
         /// <param name="con">The constraint to be copied.</param>
         public Constraint(string name, Constraint con)
+            :base(name)
         {
             Ensure.NotNull(con, "constraint");
 
@@ -46,12 +57,15 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Initializes a new instance of the Constraint class based on a copy of the given constraint,
-        /// but with a new default name.
+        /// Initializes a new instance of the Constraint class with the default name, 
+        /// of the given type with the given left and right-hand side expressions.
+        /// The given expressions are copied, and therefore are no longer needed after this constructor is called.
         /// </summary>
-        /// <param name="con">The constraint to be copied.</param>
-        public Constraint(Constraint con)
-            : this(null, con)
+        /// <param name="lhs">The left-hand side expression of the constraint.</param>
+        /// <param name="type">The type of the constraint.</param>
+        /// <param name="rhs">The right-hand side expression of the consrtaint.</param>
+        public Constraint(Expression lhs, ConstraintType type, Expression rhs)
+            : this(null, lhs, type, rhs)
         {
         }
 
@@ -65,24 +79,12 @@ namespace Sonnet
         /// <param name="type">The type of the constraint.</param>
         /// <param name="rhs">The right-hand side expression of the consrtaint.</param>
         public Constraint(string name, Expression lhs, ConstraintType type, Expression rhs)
+            : base(name)
         {
             Ensure.NotNull(lhs, "expression");
             Ensure.NotNull(rhs, "rhs expression");
 
             GutsOfConstructor(name, lhs, type, rhs);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Constraint class with a default name, 
-        /// of the given type with the given left and right-hand side expressions.
-        /// The given expressions are copied, and therefore are no longer needed after this constructor is called.
-        /// </summary>
-        /// <param name="lhs">The left-hand side expression of the constraint.</param>
-        /// <param name="type">The type of the constraint.</param>
-        /// <param name="rhs">The right-hand side expression of the consrtaint.</param>
-        public Constraint(Expression lhs, ConstraintType type, Expression rhs)
-            : this(null, lhs, type, rhs)
-        {
         }
 
         /// <summary>
@@ -233,10 +235,10 @@ namespace Sonnet
         {
             set
             {
-                if (!name.Equals(value))
+                if (!Name.Equals(value))
                 {
-                    name = value;
-                    foreach (Solver solver in solvers) solver.SetConstraintName(this, name);
+                    base.Name = value;
+                    foreach (Solver solver in solvers) solver.SetConstraintName(this, Name);
                 }
             }
         }

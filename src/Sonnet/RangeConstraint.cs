@@ -11,37 +11,68 @@ namespace Sonnet
     /// <summary>
     /// The class RangeConstraint respresents a special type of constraints.
     /// By definition, a range constraint can be formulated as
-    ///  l &lt;= expression &lt;= u
+    ///  lower &lt;= expression &lt;= upper
     /// where l and u are constants.
     /// RangeConstraints can change coefficients of individual variables.
     /// </summary>
     public class RangeConstraint : Constraint
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of the RangeConstraint class based on a copy of the given constraint.
+        /// A default name is used.
         /// </summary>
-        /// <param name="lower"></param>
-        /// <param name="expr"></param>
-        /// <param name="upper"></param>
-        public RangeConstraint(double lower, Expression expr, double upper)
-            : base(expr, ConstraintType.LE, new Expression(upper))
+        /// <param name="rangeConstraint">The range constraint to be copied.</param>
+        public RangeConstraint(RangeConstraint rangeConstraint)
+            : base(null, rangeConstraint)
         {
-            this.lower = lower;
-            Name = string.Format("RangeCon[{0}]", id);
+            this.lower = rangeConstraint.lower;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RangeConstraint class based on a copy of the given constraint,
+        /// but with the given name.
+        /// </summary>
+        /// <param name="name">The name for the new constraint.</param>
+        /// <param name="rangeConstraint">The range constraint to be copied.</param>
         public RangeConstraint(string name, RangeConstraint rangeConstraint)
             : base(name, rangeConstraint)
         {
             this.lower = rangeConstraint.lower;
         }
 
-        public RangeConstraint(string name, double lhs, Expression expr, double rhs)
-            : base(name, expr, ConstraintType.LE, new Expression(rhs))
+        /// <summary>
+        /// Initializes a new instance of the RangeConstraint class with the default name, 
+        /// and of the form      lower &lt;= expr &lt;= upper
+        /// The given expression is copied, and therefore are no longer needed after this constructor is called.
+        /// </summary>
+        /// <param name="lower">The left-hand side constant of the range constraint.</param>
+        /// <param name="expr">The middle expression of the constraint.</param>
+        /// <param name="upper">The right-hand side constant of the range consrtaint.</param>
+        public RangeConstraint(double lower, Expression expr, double upper)
+            : base(null, expr, ConstraintType.LE, new Expression(upper))
         {
-            this.lower = lhs;
+            this.lower = lower;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RangeConstraint class with the given name, 
+        /// and of the form      lower &lt;= expr &lt;= upper
+        /// The given expression is copied, and therefore are no longer needed after this constructor is called.
+        /// </summary>
+        /// <param name="name">The name for the new constraint.</param>
+        /// <param name="lower">The left-hand side constant of the range constraint.</param>
+        /// <param name="expr">The middle expression of the constraint.</param>
+        /// <param name="upper">The right-hand side constant of the range consrtaint.</param>
+        public RangeConstraint(string name, double lower, Expression expr, double upper)
+            : base(name, expr, ConstraintType.LE, new Expression(upper))
+        {
+            this.lower = lower;
+        }
+
+        /// <summary>
+        /// Returns a System.String that represents the current RangeConstraint.
+        /// </summary>
+        /// <returns>A System.String that represents the current RangeConstraint.</returns>
         public override string ToString()
         {
             if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
@@ -49,6 +80,10 @@ namespace Sonnet
             return string.Format("{0} : {1} <= {2} <= {3}", Name, Lower, expr.ToString(), Upper);
         }
 
+        /// <summary>
+        /// Returns a string that represents the value of this instance using the Level of the expressions.
+        /// </summary>
+        /// <returns>A string representation of this instance using the Level.</returns>
         public override string ToLevelString()
         {
             if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
@@ -56,6 +91,9 @@ namespace Sonnet
             return string.Format("{0} : {1} <= {2} <= {3}  ( {4} )", Name, Lower, expr.Level(), Upper, Price);
         }
 
+        /// <summary>
+        /// Gets or sets the lower bound of this range constraint. Note that range constaints can only be '&lt;=' constraints.
+        /// </summary>
         public override double Lower
         {
             get { return this.lower; }
@@ -66,6 +104,9 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override double Upper
         {
             get { return rhs.Constant; }

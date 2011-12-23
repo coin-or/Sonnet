@@ -108,6 +108,9 @@ namespace Sonnet
             coefs.AddRange(expr.coefs);
         }
 
+        /// <summary>
+        /// Removes all coefficients from this expression and set the constant to 0.
+        /// </summary>
         public void Clear()
         {
             if (!object.ReferenceEquals(coefs, null))
@@ -940,32 +943,6 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Returns a new expression that is the sum of the given expressions or variables.
-        /// An exception is thrown if an element is neither an expression nor a variable.
-        /// </summary>
-        /// <param name="expressions">The expressions or variables to be summed up.</param>
-        /// <returns>A new expression that is the sum of the given expressions.</returns>
-        public static Expression Sum(System.Collections.IEnumerable expressions)
-        {
-            Expression sum = new Expression();
-            foreach (object obj in expressions)
-            {
-                // is this "obj" another Expression, or else a Variable?
-                Expression expr = obj as Expression;
-                if (!object.ReferenceEquals(null, expr))
-                {
-                    sum.Add(expr);
-                }
-                else
-                {
-                    Variable var = (Variable)obj;
-                    sum.Add(var);
-                }
-            }
-            return sum;
-        }
-
-        /// <summary>
         /// Returns a new expression that is the sum of the given variables.
         /// </summary>
         /// <param name="variables">The variables to be summed up.</param>
@@ -979,37 +956,6 @@ namespace Sonnet
             }
             return sum;
         }
-
-        //public static Expression ScalarProduct(double[] coefs, System.Collections.Generic.IList<Variable> variables)
-        //{
-        //            public static Expression ScalarProduct(double[] coefs, System.Collections.IList variables)
-        //}
-
-        /// <summary>
-        /// Returns an expression that is the scalar product of the array of coefficients and list of variables: 
-        ///   sum_i { coefs_i * variables_i }
-        /// Note that the number of coefficients and variables must be equal.
-        /// </summary>
-        /// <param name="coefs">The coefficients to be used.</param>
-        /// <param name="variables">The variables to be used.</param>
-        /// <returns>The new expression.</returns>
-        public static Expression ScalarProduct(double[] coefs, System.Collections.IList variables)
-        {
-            if (coefs.Length != variables.Count)
-            {
-                throw new SonnetException("For scalar product, the number of coefficients and variables must be the same.");
-            }
-
-            Expression sum = new Expression();
-            int n = variables.Count;
-            for (int i = 0; i < n; i++)
-            {
-                Variable variable = (Variable)variables[i];
-                sum.Add(coefs[i], variable);
-            }
-            return sum;
-        }
-
 
         /// <summary>
         /// Returns an expression that is the scalar product of the array of coefficients and array of variables: 

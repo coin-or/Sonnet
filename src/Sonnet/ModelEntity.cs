@@ -8,16 +8,28 @@ using System.Text;
 
 namespace Sonnet
 {
+    /// <summary>
+    /// The class Named is a base class for entities that have a Name and 
+    /// are Compared using an integer ID. 
+    /// The ID must be set within the derived constructor.
+    /// </summary>
     public class Named : IComparable<Named>
     {
-        public Named()
+        /// <summary>
+        /// Constructor of a new Named object with the given name.
+        /// Empty string is used if no name is provided.
+        /// </summary>
+        /// <param name="name">The name is the new object, or empty string is not provided.</param>
+        public Named(string name = null)
         {
-        }
-        public Named(string aName)
-        {
-            Name = aName;
+            if (name != null) Name = name;
+            else Name = "";
         }
 
+        /// <summary>
+        /// Gets or sets the name of this object.
+        /// Name must be not-null.
+        /// </summary>
         public virtual string Name
         {
             get
@@ -26,53 +38,87 @@ namespace Sonnet
             }
             set
             {
+                Ensure.NotNull(value, "name");
                 this.name = value;
             }
         }
 
+        /// <summary>
+        /// Returns the ID of this object.
+        /// </summary>
         public int ID
         {
             get { return id; }
         }
 
+        /// <summary>
+        /// Compares this object to the given object and returns true iff the objects are of the same type, and have the same ID.
+        /// </summary>
+        /// <param name="obj">The object to compare this to.</param>
+        /// <returns>True iff the objects are of the same type, and have the same ID.</returns>
         public override bool Equals(object obj)
         {
             return Equals(obj as Named);
         }
 
+        /// <summary>
+        /// Returns the ID of this object as hash code.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return id;
         }
 
-        bool Equals(Named rhs)
+        /// <summary>
+        /// Compares this object to the given object and returns true iff the objects are of the same type, and have the same ID.
+        /// </summary>
+        /// <param name="obj">The object to compare this to.</param>
+        /// <returns>True iff the objects are of the same type, and have the same ID.</returns>
+        public bool Equals(Named obj)
         {
-            return id.Equals(rhs.id) && this.GetType().Equals(rhs.GetType());
+            if (obj == null) return false;
+            return id.Equals(obj.id) && this.GetType().Equals(obj.GetType());
         }
 
-        public virtual int CompareTo(Named rhs)
+        /// <summary>
+        /// Compares the ID of this object to the ID of the given object.
+        /// </summary>
+        /// <param name="obj">The object to compare this to.</param>
+        /// <returns>The int.CompareTo value.</returns>
+        public virtual int CompareTo(Named obj)
         {
-            return id.CompareTo(rhs.id);
+            return id.CompareTo(obj.id);
         }
 
-        internal string name = string.Empty;
+        private string name = string.Empty;
         internal int id;
     }
 
+    /// <summary>
+    /// The class ModelEntity is a base class for entities that are registered with solvers.
+    /// </summary>
 	public class ModelEntity : Named
 	{
         private static SonnetLog log = SonnetLog.Default;
 
-        public ModelEntity()
-        {
-            solver = null;
-        }
-        public ModelEntity(string name)
+        /// <summary>
+        /// Constructs a new ModelEntity with the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        public ModelEntity(string name = null)
             : base(name)
         {
             solver = null;
         }
 
+        /// <summary>
+        /// Register the given solver with this entity.
+        /// Whenever changes are made to this entity, these will be passed on to registerd solvers,
+        /// such that the COIN solver can be updated.
+        /// Therefore, only Generated entities (passed to the COIN solver) need to be registered.
+        /// </summary>
+        /// <param name="solver">The solver of which this constraint is part.</param>
         internal void Register(Solver solver)
         {
             if (IsRegistered(solver))
@@ -84,19 +130,30 @@ namespace Sonnet
             solvers.Add(solver);
         }
 
+        /// <summary>
+        /// Remove the given solver from the list of registered solvers.
+        /// If the solver was not registered, an exception will be thrown.
+        /// </summary>
+        /// <param name="solver">The solver</param>
         internal void Unregister(Solver solver)
         {
-            solvers.Remove(solver);
+            if (!solvers.Remove(solver))
+            {
+                string message = log.ErrorFormat("Solver {0} cannot be unregisterd because it is not registered with {1} '{2}'!", solver.Name, this.GetType().Name, this.Name);
+                throw new SonnetException(message);
+            }
+
             if (AssignedTo(solver))
             {
                 Unassign();
             }
         }
-        internal bool IsRegistered()
-        {
-            return solvers.Count > 0;
-        }
 
+        /// <summary>
+        /// Returns true iff the given solver is registered with this entity.
+        /// </summary>
+        /// <param name="solver">The solver</param>
+        /// <returns>True iff the given solver is registered with this entity.</returns>
         internal bool IsRegistered(Solver solver)
         {
             // first, if this modelEntity is Assigned 
@@ -108,6 +165,11 @@ namespace Sonnet
             return solvers.Find(s => string.Equals(s.ID, id)) != null;
         }
 
+        /// <summary>
+        /// Set the given solver to be the assigned solver, where this entity has the given offset.
+        /// </summary>
+        /// <param name="solver">The newly assigned solver.</param>
+        /// <param name="offset">The offset of the current entity in the solver.</param>
         internal void Assign(Solver solver, int offset)
         {
             // if this modelEntity is already assigned, 
@@ -129,33 +191,46 @@ namespace Sonnet
             offset = -1;
         }
 
-        internal List<Solver> Solvers
-        {
-            get { return this.solvers; }
-        }
-
+        /// <summary>
+        /// Gets the offset of this entity in the assigned solver.
+        /// </summary>
         internal int Offset
         {
             get { return offset; }
         }
 
+        /// <summary>
+        /// Determines whether the given solver is the current Assigned solver.
+        /// </summary>
+        /// <param name="solver">The solver to compare.</param>
+        /// <returns>True iff the given solver is the same as the current solver.</returns>
         public bool AssignedTo(Solver solver)
         {
             return this.solver == solver;
         }
 
+        /// <summary>
+        /// Gets the currently assigned solver.
+        /// </summary>
         internal Solver AssignedSolver
         {
             get { return solver; }
         }
 
+        /// <summary>
+        /// Determines whether this entity is assigned to a solver.
+        /// </summary>
         internal bool Assigned
         {
             get { return solver != null; }
         }
 
-		protected List<Solver> solvers = new List<Solver>();		// should be set in derived class'  Load(Model ^model,....)
-        protected Solver solver = null;
-		protected int offset = -1;
+        /// <summary>
+        /// The list of solvers with which this entity is registered.
+        /// Derived classes use this to notify solvers of any changes to them (name, bounds, etc)
+        /// </summary>
+		protected List<Solver> solvers = new List<Solver>();
+        private Solver solver = null;
+		private int offset = -1;
 	}
 }

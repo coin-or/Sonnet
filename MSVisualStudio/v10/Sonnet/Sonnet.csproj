@@ -79,7 +79,9 @@
     <Compile Include="..\..\..\src\Sonnet\Model.cs" />
     <Compile Include="..\..\..\src\Sonnet\ModelEntity.cs" />
     <Compile Include="..\..\..\src\Sonnet\Objective.cs" />
-    <Compile Include="..\..\..\src\Sonnet\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\src\Sonnet\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\src\Sonnet\RangeConstraint.cs">
       <Link>RangeConstraint.cs</Link>
     </Compile>

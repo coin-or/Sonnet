@@ -70,7 +70,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\test\AssemblyInfo.cs">
-      <SubType>Code</SubType>
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\test\Program.cs">
+      <Link>Program.cs</Link>
     </Compile>
     <Compile Include="..\..\..\test\SonnetTest.cs">
       <Link>SonnetTest.cs</Link>
