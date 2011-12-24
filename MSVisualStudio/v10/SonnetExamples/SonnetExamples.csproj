@@ -39,6 +39,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\examples\AssemblyInfo.cs">
@@ -52,6 +54,9 @@
     </Compile>
     <Compile Include="..\..\..\examples\Example3.cs">
       <Link>Example3.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\examples\Example4.cs">
+      <Link>Example4.cs</Link>
     </Compile>
     <Compile Include="..\..\..\examples\Program.cs">
       <Link>Program.cs</Link>

@@ -25,6 +25,38 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Computes an expression which is the sum of the sequence of Variables that are obtained
+        /// by invoking a transform function on each element of the input sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <param name="source">A sequence that is used to calculate a sum.</param>
+        /// <param name="selector">A transform function to apply to each element which returns a Variable.</param>
+        /// <returns>The sum of the projected variables.</returns>
+        public static Expression Sum<TSource>(this IEnumerable<TSource> source, Func<TSource, Variable> selector)
+        {
+            Ensure.NotNull(source, "source");
+            Ensure.NotNull(selector, "selector");
+
+            return source.Select(selector).Sum();
+        }
+
+        /// <summary>
+        /// Computes an expression which is the sum of the sequence of Expressions that are obtained
+        /// by invoking a transform function on each element of the input sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of source.</typeparam>
+        /// <param name="source">A sequence that is used to calculate a sum.</param>
+        /// <param name="selector">A transform function to apply to each element which returns an Expression.</param>
+        /// <returns>The sum of the projected variables.</returns>
+        public static Expression Sum<TSource>(this IEnumerable<TSource> source, Func<TSource, Expression> selector)
+        {
+            Ensure.NotNull(source, "source");
+            Ensure.NotNull(selector, "selector");
+
+            return source.Select(selector).Sum();
+        }
+
+        /// <summary>
         /// Returns a new expression that is the sum of the given variables.
         /// </summary>
         /// <typeparam name="TKey">This type is ignored.</typeparam>
