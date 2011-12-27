@@ -58,6 +58,9 @@
     <Compile Include="..\..\..\examples\Example4.cs">
       <Link>Example4.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\examples\Example5.cs">
+      <Link>Example5.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\examples\Program.cs">
       <Link>Program.cs</Link>
     </Compile>

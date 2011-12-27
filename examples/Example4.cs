@@ -12,6 +12,24 @@ using System.Xml;
 namespace SonnetExamples.Example4
 {
     /// <summary>
+    /// Buy or Clean
+    /// Taken from Task 2.4 - Orientatie Besliskunde (FdEW - RuL)
+    /// 
+    /// Description:
+    /// A linnen company suplies napkins for a five day convention.
+    /// Across these five days, the demand per day is 900, 1440, 1260, 1620 and 1296 napkins.
+    /// For this occassion a special logo will be printed on the napkins. 
+    /// As a result, the napkins will be worthless after the convention.
+    /// The price per napkin is $2.50. 
+    /// The company has its own cleaning division, which offers three alternative methods:
+    /// 1. One-hour cleaning: Napkins are ready to be used the next day.
+    /// 2. Priority cleaning: Napkins are ready to be used two days later.
+    /// 3. Regular cleaning: Napkins are ready to be used three days later.
+    /// The cost per napkin for each of these methods is $0.50, $0.25 and $0.10 respectively.
+    /// With each cleaning method there is a change of discolouration of the logo, which would make the napkin unusable.
+    /// The probablity of discolouration is 40%, 20% and 10% respectively.
+    /// The cleaning cost of a napkin that became unusable still needs to be paid.
+    /// Which buying and cleaning strategy minimises the total costs while meeting demand?
     /// </summary>
     public class Example4
     {
