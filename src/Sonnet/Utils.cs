@@ -118,8 +118,18 @@ namespace Sonnet
         }
     }
 
+    /// <summary>
+    /// This static class contains extension methods.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// Returns the first variable from the enumerable for which the Name strign Equals the given name. 
+        /// This is case sensitive.
+        /// </summary>
+        /// <param name="variables">The variables to search.</param>
+        /// <param name="name">The name of the variable to look for.</param>
+        /// <returns>The first variable from the enumerable for which the Name strign Equals the given name.</returns>
         public static Variable GetVariable(this IEnumerable<Variable> variables, string name)
         {
             Ensure.NotNull(variables, "variables");
@@ -212,7 +222,7 @@ namespace Sonnet
         /// </summary>
         /// <typeparam name="Base">The base type</typeparam>
         /// <param name="derived">The derived type</param>
-        /// <param name="paramName"></param>
+        /// <param name="paramName">The given parameter name to be reported.</param>
         public static void Is<Base>(Type derived, string paramName = null)
         {
             if (!derived.IsSubclassOf(typeof(Base)))

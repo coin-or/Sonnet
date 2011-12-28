@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
-
+using System.Xml;
 using COIN;
 using Sonnet;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Xml;
 
 namespace SonnetExamples.Example5
 {
@@ -16,6 +13,35 @@ namespace SonnetExamples.Example5
     /// Taken from Task 2.5 - Orientatie Besliskunde (FdEW - RuL)
     /// 
     /// Description:
+    /// An agricultural cooperation of four grain producers maintains a fleet
+    /// of harvesting machines. The fleet consists of three types of machines: Senior 1, 2 and 3.
+    /// The cooperation owns six vehicles of each of the types.
+    /// Historical data shows that there are large differences between 
+    /// the maintenance costs of the three types of machines. Futhermore, then 
+    /// maintenance costs depend on the producer where the machine is used.
+    /// The average weekfly maintenance costs per machine per producer are 
+    /// shown in the following table:
+    /// Costs             Senior
+    /// Producer    1       2       3
+    /// A           $16     $13     $15
+    /// B           $20     $29     $25
+    /// C           $40     $38     $42
+    /// D           $37     $49     $45
+    /// 
+    /// The capacity (in ton of grain) of each of the types of machines also 
+    /// depends on produre where the machine is operated, as shown in the 
+    /// following tabel:
+    /// Capacity          Senior
+    /// Producer    1       2       3
+    /// A           250    200    230
+    /// B           270    350    300
+    /// C           490    470    520
+    /// D           460    630    550
+    /// 
+    /// For the upcoming season, the weekly production of grain is 
+    /// estimate to be 950 (A), 1200 (B), 1500 (C) and 1800 (D) ton.
+    /// Determine the optimal assignment of the machines to producers
+    /// for the coming season.
     /// </summary>
     public class Example5
     {
@@ -64,9 +90,9 @@ namespace SonnetExamples.Example5
     [DataContract(Namespace = "http://www.agricoop.org")]
     public class AgriCoop
     {
-        [DataMember(Order = 1)]
+        [DataMember(Order = 1)] // set order to ensure that these Machines will be the base for the references used in MachineAssignments
         public IEnumerable<Machine> Machines { get; private set; }
-        [DataMember(Order = 2)]
+        [DataMember(Order = 2)] // set order to ensure that these Producers will be the base for the references used in MachineAssignments
         public IEnumerable<Producer> Producers { get; private set; }
         [DataMember(Order = 3)]
         public IEnumerable<MachineAssignment> MachineAssignments { get; private set; }
@@ -87,8 +113,10 @@ namespace SonnetExamples.Example5
                 writer.Formatting = Formatting.Indented;
 
                 DataContractSerializer ser = new DataContractSerializer(typeof(AgriCoop));
-                //ser.WriteObject(writer, this);
-
+                
+                // Using references for Machine and Producer means that the Id attribute is used, which is defined in the MS Serialization namespace
+                // To get cleaner XML, we declare this namespace first.
+                // ser.WriteObject(writer, this); // replace by following lines.
                 ser.WriteStartObject(writer, this);
                 writer.WriteAttributeString("xmlns", "z", null, "http://schemas.microsoft.com/2003/10/Serialization/");
                 ser.WriteObjectContent(writer, this);

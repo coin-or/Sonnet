@@ -61,8 +61,8 @@ namespace Sonnet
         /// Initializes a new instance of the Variable class of the given type, with the given name,
         /// lower bound of 0 and upper bound of +inf.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="type"></param>
+        /// <param name="name">The name of this variable.</param>
+        /// <param name="type">The type of this variable.</param>
         public Variable(string name, VariableType type)
             : this(name, 0.0, MathUtils.Infinity, type)
         {
@@ -152,12 +152,12 @@ namespace Sonnet
         /// For example, given name 'x', the variables will be named 'x[0]', 'x[1]', etc.
         /// If no name is given, then the default names are used.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="varname"></param>
-        /// <param name="lower"></param>
-        /// <param name="upper"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Enum type of elements of the set.</typeparam>
+        /// <param name="varname">The base part of the name of the new variables.</param>
+        /// <param name="lower">The lower bound of the new variables.</param>
+        /// <param name="upper">The upper bound of the new variables.</param>
+        /// <param name="type">The type of the new variables.</param>
+        /// <returns>Array of variables of the given size.</returns>
         public static Dictionary<T, Variable> New<T>(string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
             where T : struct, IConvertible
         {

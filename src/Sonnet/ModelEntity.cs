@@ -64,7 +64,7 @@ namespace Sonnet
         /// <summary>
         /// Returns the ID of this object as hash code.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A hash code (ID) for the current object.</returns>
         public override int GetHashCode()
         {
             return id;
@@ -105,7 +105,7 @@ namespace Sonnet
         /// <summary>
         /// Constructs a new ModelEntity with the given name.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The name of this entity.</param>
         public ModelEntity(string name = null)
             : base(name)
         {

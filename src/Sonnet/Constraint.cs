@@ -344,7 +344,7 @@ namespace Sonnet
         /// Determines the slack of this constraint in the current solution. Regardless of the type of constraint, the slack should 
         /// be non-negative in a feasible solution.
         /// </summary>
-        /// <returns>The slack of this constraint in the current solution</returns>
+        /// <returns>The slack of this constraint in the current solution.</returns>
         public virtual double Slack()
         {
             //the slack values returned consist of the right-hand side minus the row activity level

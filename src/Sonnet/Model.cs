@@ -53,7 +53,7 @@ namespace Sonnet
         /// <summary>
         /// Initializes a new instance of the Model class with the given name.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The name of this model.</param>
         public Model(string name = null)
             : base(name)
         {
@@ -252,10 +252,10 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// return the constraint, given its element index in this model
+        /// Returns the first constraint with a Name that Equals the given name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The name to look for.</param>
+        /// <returns>The first constraint with a Name that Equals the given name, or null if not found.</returns>
         public Constraint GetConstraint(string name)
         {
             return constraints.Find(con => con.Name.Equals(name));
@@ -278,7 +278,7 @@ namespace Sonnet
         /// Creates a new model from the given file.
         /// Supported file extensions: .mps only.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="fileName">The mps file to be imported.</param>
         /// <returns>The new model, or null if an error occurred.</returns>
         public static Model New(string fileName)
         {

@@ -160,7 +160,7 @@ namespace Sonnet
         /// <summary>
         /// Return all types that are derived from OsiSolverInterface in the SonnetWrapper.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An array of Types within the SonnetWrapper that are derived from OsiSolverInterface.</returns>
         public static Type[] GetOsiSolverTypes()
         {
             Type[] types = System.Reflection.Assembly.GetAssembly(typeof(COIN.OsiSolverInterface)).GetTypes();
@@ -250,11 +250,10 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Adds (a reference) the given constraint to the mode with the given name
+        /// Adds (a reference) the given constraint to the model
         /// </summary>
-        /// <param name="con"></param>
-        /// <returns></returns>
-        internal void Add(Constraint con)// overrides any given name. Adds a reference!
+        /// <param name="con">The constraint to add to the model.</param>
+        internal void Add(Constraint con)
         {
             Ensure.NotNull(con, "con");
 
@@ -365,7 +364,7 @@ namespace Sonnet
         /// <summary>
         /// Determine whether the current solution satisfies all constraints and variables bounds and types.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True iff the current solution is feasible.</returns>
         public bool IsFeasible()
         {
             Generate();
@@ -532,7 +531,7 @@ namespace Sonnet
         /// If the model has _not_ been generated (yet), the constraint is not loaded into the solver here. Instead, this is done in bulk in ::Generate()
         /// If the model has been generated, the constraint is added into the solver here.
         /// </summary>
-        /// <param name="con"></param>
+        /// <param name="con">The constraint to generate.</param>
         private void Generate(Constraint con)
         {
             Ensure.NotNull(con, "constraint");
@@ -591,7 +590,7 @@ namespace Sonnet
         /// If the model has _not_ been generated (yet), the objective is not loaded into the solver here. Instead, this is done in bulk in ::Generate()
         /// If the model has been generated, the constraint is added into the solver here.
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="obj">The objective to generate.</param>
         private void Generate(Objective obj)
         {
             Ensure.NotNull(obj, "objective");
@@ -1117,7 +1116,7 @@ namespace Sonnet
         /// Returns a string that represents the current solver.
         /// Similar to model.ToString().
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String representation of the current solver and model.</returns>
         public override string ToString()
         {
             // All Public methods should call Generate to ensure any new constaints were added properly.
@@ -1132,7 +1131,7 @@ namespace Sonnet
         /// <summary>
         /// Returns a string that represents the current solution of this solver.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String representation of the current solution.</returns>
         public string ToSolutionString()
         {
             // All Public methods should call Generate to ensure any new constaints were added properly.
@@ -1165,7 +1164,7 @@ namespace Sonnet
         /// Returns a string the contains statitics for the current model and solver.
         /// This includes number of variables, constraints, etc.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String representation of statistics of the current solver.</returns>
         public string ToStatisticsString()
         {
             Generate();
@@ -1187,8 +1186,8 @@ namespace Sonnet
         /// <summary>
         /// Determine whether the given objective was registered 
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="obj">The objective</param>
+        /// <returns>True iff the given objective equals the current objective.</returns>
         internal bool IsRegistered(Objective obj)
         {
             Ensure.NotNull(obj, "objective");
@@ -1211,8 +1210,8 @@ namespace Sonnet
         /// Not-yet generated constraints are not registered, since changes in the constraints do not need to be passed
         /// into the COIN solver yet.
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
+        /// <param name="c">The constraint.</param>
+        /// <returns>True iff one of the constraints Equals the given constraint.</returns>
         internal bool IsRegistered(Constraint c)
         {
             Ensure.NotNull(c, "constraint");
@@ -1227,8 +1226,8 @@ namespace Sonnet
         /// <summary>
         /// For Testing only: IsRegistered OR in the (to-be) added list
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
+        /// <param name="c">The constraint.</param>
+        /// <returns>True iff the given constraint is registered, or Equals one of the raw constraints (not yet generated).</returns>
         internal bool Contains(Constraint c)
         {
             // first, check the registered constraint
@@ -1254,8 +1253,8 @@ namespace Sonnet
         /// <summary>
         /// Get the element index (offset) of the constraint in this model. An exception is thrown if no offset found.
         /// </summary>
-        /// <param name="con"></param>
-        /// <returns></returns>
+        /// <param name="con">The constraint.</param>
+        /// <returns>The integer offset of the given constraint in the current solver.</returns>
         private int Offset(Constraint con)
         {
             Ensure.NotNull(con, "constraint");
@@ -1274,8 +1273,8 @@ namespace Sonnet
         /// <summary>
         /// Get the element index (offset) of the variable in this model
         /// </summary>
-        /// <param name="var"></param>
-        /// <returns></returns>
+        /// <param name="var">The variable.</param>
+        /// <returns>The integer offset of the given variable in the current solver.</returns>
         private int Offset(Variable var)
         {
             Ensure.NotNull(var, "variable");
@@ -1367,8 +1366,8 @@ namespace Sonnet
         /// <summary>
         /// Return the constraint, given its name in this model
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The name of the constraint to get.</param>
+        /// <returns>The first constraint with Name that Equals the given name, or null if not found.</returns>
         [Obsolete("Deprecated: use property of Model", true)]
         private Constraint GetConstraint(string name)
         {
@@ -1396,8 +1395,8 @@ namespace Sonnet
         /// <summary>
         /// return the variable, given its element index in this model
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The name of the variable to get.</param>
+        /// <returns>The first variable with Name that Equals the given name, or null if not found.</returns>
         [Obsolete("Deprecated: Enumerating variables not supported.", true)]
         private Variable GetVariable(string name)
         {
@@ -1407,10 +1406,10 @@ namespace Sonnet
 
         /// <summary>
         /// Deprecated: use property of Variable
-        /// looks up the ElementID, and retreives value (no storing)
+        /// Looks up the offset, and retrieves value.
         /// </summary>
-        /// <param name="v"></param>
-        /// <returns></returns>
+        /// <param name="v">The variable to return the value for.</param>
+        /// <returns>The value of the variable in the current solution at the solver.</returns>
         [Obsolete("Deprecated: use property Objective.Value", true)]
         public double Value(Variable v)
         {
@@ -1426,10 +1425,10 @@ namespace Sonnet
 
         /// <summary>
         /// Deprecated: use property of Variable
-        /// same, but for the reduced costs (no storing)
+        /// Looks up the offset, and retrieves the reduced cost.
         /// </summary>
-        /// <param name="v"></param>
-        /// <returns></returns>
+        /// <param name="v">The variable to return the reduced cost for.</param>
+        /// <returns>The reduced cost of the variable in the current solution at the solver.</returns>
         [Obsolete("Deprecated: use property of Variable", true)]
         public double ReducedCost(Variable v)
         {
@@ -1445,10 +1444,10 @@ namespace Sonnet
 
         /// <summary>
         /// Deprecated: Use property of Constraint.
-        /// same, but for the prices of constraints (dual sol) (no storing)
+        /// Looks up the offset, and retreives the price.
         /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
+        /// <param name="c">The constraint to return the price for.</param>
+        /// <returns>The price of the given constraint in the current solution at the solver.</returns>
         [Obsolete("Deprecated: Use property of Constraint", true)]
         public double Price(Constraint c)
         {
@@ -1464,6 +1463,10 @@ namespace Sonnet
         #endregion
 
         #region Assign Solution methods
+        /// <summary>
+        /// Get and store the solution status (optimal, etc), and the solution values for the variables and constraints from the solver.
+        /// These values are subsequently stored at the variables and constraints for later retrieval via variable.Value etc.
+        /// </summary>
         public void AssignSolution()
         {
             AssignSolutionStatus();
@@ -1564,7 +1567,9 @@ namespace Sonnet
             }
         }
         #endregion //Assign Solution methods
-
+        /// <summary>
+        /// Is the solver busy Solving?
+        /// </summary>
         public bool IsSolving { get { return this.isSolving; } }
         /// <summary>
         /// Are there numerical difficulties?
@@ -1638,8 +1643,8 @@ namespace Sonnet
         /// <summary>
         /// Set the name of the given variable within the solver (only) 
         /// </summary>
-        /// <param name="var"></param>
-        /// <param name="name"></param>
+        /// <param name="var">The variable to set the name for.</param>
+        /// <param name="name">The new name to set for this variable within the solver.</param>
         internal void SetVariableName(Variable var, string name)
         {
             Ensure.NotNull(var, "variable");
@@ -1652,8 +1657,8 @@ namespace Sonnet
         /// <summary>
         /// methods for changing the objective function
         /// </summary>
-        /// <param name="var"></param>
-        /// <param name="value"></param>
+        /// <param name="var">The variable to set the objective coefficient for.</param>
+        /// <param name="value">The new coefficient to set for this variable within the solver.</param>
         internal void SetObjectiveCoefficient(Variable var, double value)
         {
             Ensure.NotNull(var, "variable");
@@ -1793,14 +1798,29 @@ namespace Sonnet
         private Model model;
 
         #region IDisposable Members
+        // See http://msdn.microsoft.com/en-us/library/system.idisposable.aspx
 
-        //Implement IDisposable.
+        /// <summary>
+        /// Implement IDisposable.
+        /// Do not make this method virtual.
+        /// A derived class should not be able to override this method.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Dispose(bool disposing) executes in two distinct scenarios.
+        /// If disposing equals true, the method has been called directly
+        /// or indirectly by a user's code. Managed and unmanaged resources
+        /// can be disposed.
+        /// If disposing equals false, the method has been called by the
+        /// runtime from inside the finalizer and you should not reference
+        /// other objects. Only unmanaged resources can be disposed.
+        /// </summary>
+        /// <param name="disposing">Whether this method has been called by user's code.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -1822,7 +1842,13 @@ namespace Sonnet
             // Set large fields to null.
         }
 
-        // Use C# destructor syntax for finalization code.
+        /// <summary>
+        /// Use C# destructor syntax for finalization code.
+        /// This destructor will run only if the Dispose method
+        /// does not get called.
+        /// It gives your base class the opportunity to finalize.
+        /// Do not provide destructors in types derived from this class.
+        /// </summary>
         ~Solver()
         {
             // Simply call Dispose(false).

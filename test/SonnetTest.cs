@@ -956,7 +956,6 @@ namespace SonnetTest
 
         /// <summary>
         /// Test default variable bounds: no given bound sets [0, inf)
-        /// 
         /// </summary>
         /// <param name="model"></param>
         public void SonnetTest15()

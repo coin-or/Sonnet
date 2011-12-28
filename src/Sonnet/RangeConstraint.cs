@@ -92,7 +92,8 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets or sets the lower bound of this range constraint. Note that range constaints can only be '&lt;=' constraints.
+        /// Gets or sets the constant lower (left-hand-side) bound of this range constraint. 
+        /// Note that range constaints can only be '&lt;=' constraints.
         /// </summary>
         public override double Lower
         {
@@ -105,7 +106,8 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the constant upper (right-hand-side) bound of this range constraint.
+        /// Note that range constaints can only be '&lt;=' constraints.
         /// </summary>
         public override double Upper
         {
@@ -117,6 +119,12 @@ namespace Sonnet
             }
         }
 
+        /// <summary>
+        /// Sets both the constant lower and upper bound of this range constraint.
+        /// Note that range constaints can only be '&lt;=' constraints.
+        /// </summary>
+        /// <param name="lower">The lower bound.</param>
+        /// <param name="upper">The upper bound.</param>
         public void SetBounds(double lower, double upper)
         {
             rhs.Assign(upper);
@@ -125,6 +133,11 @@ namespace Sonnet
             foreach (Solver solver in solvers) solver.SetConstraintBounds(this, lower, upper);
         }
 
+        /// <summary>
+        /// Retrieve the overall coefficient of the given variable in the expression part of this range constraint.
+        /// </summary>
+        /// <param name="var">The variable for which to retrieve the coefficient.</param>
+        /// <returns>The overall coefficient of the given variable.</returns>
         public double GetCoefficient(Variable var)
         {
             return expr.GetCoefficient(var);
@@ -142,7 +155,12 @@ namespace Sonnet
             return oldValue;
         }
 #endif
-        public override double Slack() // for a feasible solution, the Slack is non-negative!
+        /// <summary>
+        /// Determines the slack compared to the upper bound (only) of this range constraint in the current solution. 
+        /// The slack should be non-negative in a feasible solution.
+        /// </summary>
+        /// <returns>The slack compared to the upper bound of this constraint in the current solution.</returns>
+        public override double Slack() 
         {
             return rhs.Level() - Level();
         }
