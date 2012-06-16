@@ -326,7 +326,31 @@ namespace Sonnet
                     isSolving = true;
                     if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
 
-                    solver.branchAndBound();
+                    if (solver is OsiCbcSolverInterface)
+                    {
+                        OsiCbcSolverInterface cbcSolver = (OsiCbcSolverInterface)solver;
+                        if (cbcSolver.UseBranchAndBound())
+                        {
+                            cbcSolver.branchAndBound();
+                        }
+                        else
+                        {
+                            string[] cbcMainArgs = cbcSolver.GetCbcSolverArgs();
+                            List<string> args = new List<string>();
+                            args.Add("Sonnet");
+                            args.AddRange(cbcMainArgs);
+                            args.Add("-solve");
+                            args.Add("-quit");
+
+                            CbcSolver.CbcMain0(cbcSolver.getModelPtr());
+                            CbcSolver.CbcMain1(args.ToArray(), cbcSolver.getModelPtr());
+                        }
+                    }
+                    else
+                    {
+                        solver.branchAndBound();
+                    }
+
 
                     AssignSolution();
                     if (AutoResetMIPSolve) ResetAfterMIPSolveInternal(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
@@ -1005,6 +1029,8 @@ namespace Sonnet
             // Full Names
             if (NameDiscipline > 0)
             {
+                solver.setObjName(model.Objective.Name);
+
                 foreach (Constraint con in constraints)
                 {
                     int offset = Offset(con);

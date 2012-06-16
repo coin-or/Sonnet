@@ -93,6 +93,9 @@
     <Compile Include="..\..\..\src\Sonnet\WarmStart.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\CHANGELOG.txt">
+      <Link>CHANGELOG.txt</Link>
+    </Content>
     <Content Include="..\..\..\src\Sonnet\ReadMe.txt">
       <Link>ReadMe.txt</Link>
     </Content>

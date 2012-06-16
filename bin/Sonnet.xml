@@ -661,6 +661,31 @@
             <param name="name">The name of the variable to look for.</param>
             <returns>The first variable from the enumerable for which the Name strign Equals the given name.</returns>
         </member>
+        <member name="M:Sonnet.Utils.GetCbcSolverArgs(COIN.OsiCbcSolverInterface)">
+            <summary>
+            Returns the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
+            Returns an empty array if no arguments were found.
+            See also Sonnet.Solve(..)
+            </summary>
+            <param name="solver">The OsiCbcSolverInterface instance.</param>
+            <returns>The arguments for CbcMain1(..).</returns>
+        </member>
+        <member name="M:Sonnet.Utils.SetCbcSolverArgs(COIN.OsiCbcSolverInterface,System.String[])">
+            <summary>
+            Sets the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
+            See also Sonnet.Solve(..)
+            </summary>
+            <param name="solver">The OsiCbcSolverInterface instance.</param>
+            <param name="args">The arguments for CbcMain1(..).</param>
+        </member>
+        <member name="M:Sonnet.InternalUtils.UseBranchAndBound(COIN.OsiCbcSolverInterface)">
+            <summary>
+            Returns true iff exactly one argument is set for this solver using SetCbcMainArgs, 
+            and that argument is "-branchAndBound".
+            </summary>
+            <param name="solver"></param>
+            <returns></returns>
+        </member>
         <member name="T:Sonnet.Ensure">
             <summary>
             The Ensure class contains various tests that will throw an exception if a condition is not met.
@@ -2385,6 +2410,12 @@
             Pass this message handler to the given CoinMpsIO instance.
             </summary>
             <param name="obj">The CoinMpsIO instance to pass this message handler to.</param>
+        </member>
+        <member name="M:Sonnet.SonnetLog.PassToCoinLpIO(COIN.CoinLpIO)">
+            <summary>
+            Pass this message handler to the given CoinLpIO instance.
+            </summary>
+            <param name="obj">The CoinLpIO instance to pass this message handler to.</param>
         </member>
         <member name="M:Sonnet.SonnetLog.Debug(System.String)">
             <summary>

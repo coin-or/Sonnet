@@ -1,0 +1,12 @@
+Change log
+-------------------------------
+[1.1.1]	SonnetWrapper: 
+		- CbcSolver: Added class with CbcMain0 and CbcMain1.
+		- CoinLpIO: Added class, used to read LP files to build a Sonnet Model.
+		- OsiSolverInterface: Added methods for get/set ObjName
+		Sonnet: 
+		- Solver: For OsiCbcSolverInterface solver use CbcMain0 and CbcMain1 for solving (M)IP. 
+		- Added extension Get/SetCbcSolverArgs(..) OsiCbcSolverInterface to set CbcMain1 arguments.
+		When CbcSolverArgs = "-branchAndBound", the Osi branchAndBound() method is used.
+
+				

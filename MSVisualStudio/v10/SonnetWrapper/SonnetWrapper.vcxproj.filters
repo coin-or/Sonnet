@@ -52,6 +52,12 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\SonnetWrapper\CoinLpIO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CbcSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.h">
@@ -100,6 +106,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SonnetWrapper\CoinLpIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CbcSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

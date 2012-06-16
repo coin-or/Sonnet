@@ -1,10 +1,10 @@
 #include <VerRsrc.h>
 
-#define VER_FILEVERSION			1,0,0,1
-#define VER_FILEVERSION_STR		"1.0.0.1"
+#define VER_FILEVERSION			1,1,1,0
+#define VER_FILEVERSION_STR		"1.1.1.0"
 
-#define VER_PRODUCTVERSION		1,0,0,0
-#define VER_PRODUCTVERSION_STR	"1.0.0.0"
+#define VER_PRODUCTVERSION		1,1,1,0
+#define VER_PRODUCTVERSION_STR	"1.1.1.0"
 
 #ifdef _DEBUG
 #ifdef WIN64
@@ -40,10 +40,10 @@ BEGIN
         BEGIN
             VALUE "Comments", "See http://sourceforge.net/projects/sonnet-project and http://www.coin-or.org"
             VALUE "CompanyName", ""
-            VALUE "FileDescription", "SonnetWrapper"
+            VALUE "FileDescription", VER_INTERNALNAME
 			VALUE "FileVersion", VER_FILEVERSION_STR
 			VALUE "InternalName", VER_INTERNALNAME
-			VALUE "LegalCopyright", "Copyright (C) 2011"
+			VALUE "LegalCopyright", "Copyright (C) 2012"
             VALUE "LegalTrademarks", "This code is licensed under the terms of the Eclipse Public License (EPL)"
             VALUE "OriginalFilename", "SonnetWrapper.dll"
             VALUE "ProductName", "SONNET"

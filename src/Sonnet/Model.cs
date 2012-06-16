@@ -295,21 +295,22 @@ namespace Sonnet
         /// <returns>The new model, or null if an error occurred.</returns>
         public static Model New(string fileName, out Variable[] variables)
         {
-            Model model = new Model();
-            variables = new Variable[0];
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            string extension = Path.GetExtension(fileName).ToLower();
 
-            string directoryName = System.IO.Path.GetDirectoryName(fileName);
-            if (directoryName.Length == 0) directoryName = ".";
-
-            string fullPathWithoutExtension = string.Concat(directoryName, (System.IO.Path.DirectorySeparatorChar), System.IO.Path.GetFileNameWithoutExtension(fileName));
-            string extension = System.IO.Path.GetExtension(fileName);
+            Model model = null;
             if (extension.Equals(".mps"))
             {
                 #region New Model from .mps file
+                string directoryName = Path.GetDirectoryName(fileName);
+                if (directoryName.Length == 0) directoryName = ".";
+
+                string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
+
                 CoinMpsIO m = new CoinMpsIO();
                 log.PassToCoinMpsIO(m);
 
-                m.setInfinity(model.Infinity);
+                m.setInfinity(MathUtils.Infinity);
                 //m.passInMessageHandler(modelPtr_.messageHandler());
                 //*m.messagesPointer()=modelPtr_.coinMessages();
 
@@ -324,118 +325,30 @@ namespace Sonnet
                 // set objective function offest
                 // setDblParam(OsiObjOffset,m.objectiveOffset()); // WHAT IS THIS??
 
-                double[] colLower = m.getColLower();
-                double[] colUpper = m.getColUpper();
-                string objName = m.getObjectiveName();
-                double[] objCoefs = m.getObjCoefficients();
-                Expression objExpr = new Expression();
-
-                int numberVariables = m.getNumCols();
-
-                variables = new Variable[numberVariables];
+                model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
+                    m.getColLower(), m.getColUpper(), m.getObjectiveName(), m.getObjCoefficients(),
+                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
                 
-                int i = 0;
-                for (i = 0; i < numberVariables; i++)
-                {
-                    Variable var = new Variable();
-                    variables[i] = var;
+                model.Name = fileNameWithoutExtension;
+                #endregion
+            }
+            else if (extension.Equals(".lp"))
+            {
+                #region New Model from .lp file
+                CoinLpIO m = new CoinLpIO();
+                log.PassToCoinLpIO(m);
 
-                    double lower = colLower[i];
-                    double upper = colUpper[i];
-                    bool isInteger = m.isInteger(i);
+                m.setInfinity(MathUtils.Infinity);
+                /// If the original problem is
+                /// a maximization problem, the objective function is immediadtly 
+                /// flipped to get a minimization problem.  
+                m.readLp(fileName);
+                
+                model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName, 
+                    m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(), 
+                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
 
-                    string name = m.columnName(i);
-                    if (!string.IsNullOrEmpty(name)) var.Name = name;
-                    else var.Name = string.Concat("VAR", i);
-
-                    var.Lower = lower;
-                    var.Upper = upper;
-                    var.Type = (isInteger) ? VariableType.Integer : VariableType.Continuous;
-
-                    objExpr.Add(objCoefs[i], var);
-                }
-
-                model.Objective = new Objective(objName, objExpr);
-                model.ObjectiveSense = ObjectiveSense.Minimise;
-                // NOTE: MPS DOESNT STORE MAXIMIZATION OR MINIMIZATION!
-
-                int numberConstraints = m.getNumRows();
-                char[] rowSenses = m.getRowSense();
-                CoinPackedMatrix rowMatrix = m.getMatrixByRow();
-                double[] rowLowers = m.getRowLower();
-                double[] rowUppers = m.getRowUpper();
-
-                for (int j = 0; j < numberConstraints; j++)
-                {
-                    Expression expr = new Expression();
-                    CoinShallowPackedVector vector = rowMatrix.getVector(j); // I guess..
-                    int nElements = vector.getNumElements();
-                    int[] indices = vector.getIndices();
-                    double[] elements = vector.getElements();
-
-                    for (int e = 0; e < nElements; e++)
-                    {
-                        int index = indices[e];
-                        Variable var = variables[index];
-                        double coef = elements[e];
-
-                        expr.Add(coef, var);
-                    }
-
-                    double lower = rowLowers[j];
-                    double upper = rowUppers[j];
-
-                    string name = m.rowName(j);
-                    string conName;
-                    if (!string.IsNullOrEmpty(name)) conName = name;
-                    else conName = string.Concat("CON", i);
-
-                    switch (rowSenses[j])
-                    {
-                        case 'L': //<= constraint and rhs()[i] == rowupper()[i]
-                            {
-                                ConstraintType type = ConstraintType.LE;
-                                Expression upperExpr = new Expression(upper);
-                                Constraint con = new Constraint(conName, expr, type, upperExpr);
-                                upperExpr.Clear();
-                                model.Add(con);
-                                break;
-                            }
-                        case 'E': //=  constraint
-                            {
-                                ConstraintType type = ConstraintType.EQ;
-                                Expression upperExpr = new Expression(upper);
-                                Constraint con = new Constraint(conName, expr, type, upperExpr);
-                                upperExpr.Clear();
-                                model.Add(con);
-                                break;
-                            }
-                        case 'G': //>= constraint and rhs()[i] == rowlower()[i]
-                            {
-                                ConstraintType type = ConstraintType.GE;
-                                Expression lowerExpr = new Expression(lower);
-                                Constraint con = new Constraint(conName, expr, type, lowerExpr);
-                                lowerExpr.Clear();
-                                model.Add(con);
-                                break;
-                            }
-                        case 'R': //ranged constraint
-                            {
-                                RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
-                                model.Add(con);
-                                break;
-                            }
-                        case 'N': //free constraint
-                            {
-                                RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
-                                con.Enabled = false;
-                                model.Add(con);
-                                break;
-                            }
-                        default:
-                            break;
-                    }
-                }
+                model.Name = fileNameWithoutExtension;
                 #endregion
             }
             else
@@ -445,6 +358,114 @@ namespace Sonnet
                 throw new SonnetException(message);
             }
 
+            return model;
+        }
+
+        private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
+            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers)
+        {
+            Model model = new Model();
+            variables = new Variable[numberVariables];
+
+            Expression objExpr = new Expression();
+
+            int i = 0;
+            for (i = 0; i < numberVariables; i++)
+            {
+                Variable var = new Variable();
+                variables[i] = var;
+
+                double lower = colLower[i];
+                double upper = colUpper[i];
+                bool isInteger = isIntegerFunc.Invoke(i);
+
+                string name = columnNameFunc.Invoke(i);
+                if (!string.IsNullOrEmpty(name)) var.Name = name;
+                else var.Name = string.Concat("VAR", i);
+
+                var.Lower = lower;
+                var.Upper = upper;
+                var.Type = (isInteger) ? VariableType.Integer : VariableType.Continuous;
+
+                objExpr.Add(objCoefs[i], var);
+            }
+
+            model.Objective = new Objective(objName, objExpr);
+            model.ObjectiveSense = ObjectiveSense.Minimise;
+            // NOTE: MPS DOESNT STORE MAXIMIZATION OR MINIMIZATION!
+            // bUT LP always returns Minimization (and transforms objective accordingly if original is max)
+
+            for (int j = 0; j < numberConstraints; j++)
+            {
+                Expression expr = new Expression();
+                CoinShallowPackedVector vector = rowMatrix.getVector(j); // I guess..
+                int nElements = vector.getNumElements();
+                int[] indices = vector.getIndices();
+                double[] elements = vector.getElements();
+
+                for (int e = 0; e < nElements; e++)
+                {
+                    int index = indices[e];
+                    Variable var = variables[index];
+                    double coef = elements[e];
+
+                    expr.Add(coef, var);
+                }
+
+                double lower = rowLowers[j];
+                double upper = rowUppers[j];
+
+                string name = rowNameFunc.Invoke(j);
+                string conName;
+                if (!string.IsNullOrEmpty(name)) conName = name;
+                else conName = string.Concat("CON", i);
+
+                switch (rowSenses[j])
+                {
+                    case 'L': //<= constraint and rhs()[i] == rowupper()[i]
+                        {
+                            ConstraintType type = ConstraintType.LE;
+                            Expression upperExpr = new Expression(upper);
+                            Constraint con = new Constraint(conName, expr, type, upperExpr);
+                            upperExpr.Clear();
+                            model.Add(con);
+                            break;
+                        }
+                    case 'E': //=  constraint
+                        {
+                            ConstraintType type = ConstraintType.EQ;
+                            Expression upperExpr = new Expression(upper);
+                            Constraint con = new Constraint(conName, expr, type, upperExpr);
+                            upperExpr.Clear();
+                            model.Add(con);
+                            break;
+                        }
+                    case 'G': //>= constraint and rhs()[i] == rowlower()[i]
+                        {
+                            ConstraintType type = ConstraintType.GE;
+                            Expression lowerExpr = new Expression(lower);
+                            Constraint con = new Constraint(conName, expr, type, lowerExpr);
+                            lowerExpr.Clear();
+                            model.Add(con);
+                            break;
+                        }
+                    case 'R': //ranged constraint
+                        {
+                            RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
+                            model.Add(con);
+                            break;
+                        }
+                    case 'N': //free constraint
+                        {
+                            RangeConstraint con = new RangeConstraint(conName, lower, expr, upper);
+                            con.Enabled = false;
+                            model.Add(con);
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
             return model;
         }
 

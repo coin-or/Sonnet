@@ -100,6 +100,15 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Pass this message handler to the given CoinLpIO instance.
+        /// </summary>
+        /// <param name="obj">The CoinLpIO instance to pass this message handler to.</param>
+        public void PassToCoinLpIO(COIN.CoinLpIO obj)
+        {
+            obj.passInMessageHandler(messageHandler);
+        }
+
+        /// <summary>
         /// Gets or sets the logLevel of this message handler. See COIN documentation.
         /// </summary>
         public int LogLevel

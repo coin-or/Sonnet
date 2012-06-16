@@ -136,6 +136,34 @@ namespace Sonnet
             Ensure.NotNull(name, "name");
             return variables.First(v => string.Equals(v.Name, name));
         }
+
+        private static Dictionary<COIN.OsiCbcSolverInterface, string[]> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, string[]>();
+        
+        /// <summary>
+        /// Returns the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
+        /// Returns an empty array if no arguments were found.
+        /// See also Sonnet.Solve(..)
+        /// </summary>
+        /// <param name="solver">The OsiCbcSolverInterface instance.</param>
+        /// <returns>The arguments for CbcMain1(..).</returns>
+        public static string[] GetCbcSolverArgs(this COIN.OsiCbcSolverInterface solver)
+        {
+            string []result;
+            if (cbcSolverArgs.TryGetValue(solver, out result)) return result;
+            else return new string[0];
+        }
+
+        /// <summary>
+        /// Sets the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
+        /// See also Sonnet.Solve(..)
+        /// </summary>
+        /// <param name="solver">The OsiCbcSolverInterface instance.</param>
+        /// <param name="args">The arguments for CbcMain1(..).</param>
+        public static void SetCbcSolverArgs(this COIN.OsiCbcSolverInterface solver, params string []args)
+        {
+            cbcSolverArgs[solver] = args;
+        }
+
     }
 
     internal static class InternalUtils
@@ -168,6 +196,24 @@ namespace Sonnet
                 case ConstraintType.GE: return 'G';
                 default: throw new SonnetException("Unknown constraint type " + constraintType);
             }
+        }
+
+        /// <summary>
+        /// Returns true iff exactly one argument is set for this solver using SetCbcMainArgs, 
+        /// and that argument is "-branchAndBound".
+        /// </summary>
+        /// <param name="solver"></param>
+        /// <returns></returns>
+        public static bool UseBranchAndBound(this COIN.OsiCbcSolverInterface solver)
+        {
+            string[] args = solver.GetCbcSolverArgs();
+            if (args.Length == 1 && string.Equals(args[0], "-branchAndBound", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
         public static void Remove<T>(this List<T> list, int index)

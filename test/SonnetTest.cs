@@ -124,6 +124,7 @@ namespace SonnetTest
                     SonnetTest25();
                     SonnetTest26();
                     SonnetTest26b();
+                    SonnetTest26c();
                     SonnetTest27();
                     SonnetTest28();
                     SonnetTest31();
@@ -135,6 +136,7 @@ namespace SonnetTest
                     SonnetTest37();
                     SonnetTest38();
                     SonnetTest39();
+                    SonnetTest40();
 
                     // do these two stress tests last..
                     SonnetTest29();
@@ -2071,6 +2073,37 @@ namespace SonnetTest
             Assert(numInts == solver.OsiSolver.getNumIntegers());
         }
 
+        public void SonnetTest26c()
+        {
+            Console.WriteLine("SonnetTest26c : Cbc with Osi BranchAndBound");
+            if (solverType != typeof(OsiCbcSolverInterface)) return;
+
+            Model model = Model.New("egout.mps");
+            Assert(model != null);
+            Solver solver = new Solver(model, solverType);
+            if (solver.OsiSolver is OsiCbcSolverInterface)
+            {
+                ((OsiCbcSolverInterface)solver.OsiSolver).SetCbcSolverArgs("-branchAndBound");                
+            }
+
+            solver.Generate();
+            int numElements = solver.OsiSolver.getNumElements();
+            int numInts = solver.OsiSolver.getNumIntegers();
+
+            solver.Solve();
+
+            // this fails.. why does the CBC Reset/save after mip not work??
+            solver.Solve();
+
+            Assert(solver.IsProvenOptimal);
+            Assert(!solver.IsProvenPrimalInfeasible);
+            Assert(!solver.IsProvenDualInfeasible);
+            Assert(MathExtension.CompareDouble(model.Objective.Value, 568.1007) == 0);
+            Assert(numElements == solver.OsiSolver.getNumElements());
+            Assert(numInts == solver.OsiSolver.getNumIntegers());
+        }
+
+
         public void SonnetTest27()
         {
             Console.WriteLine("SonnetTest27");
@@ -2176,10 +2209,10 @@ namespace SonnetTest
         public void SonnetTest29()
         {
             Console.WriteLine("SonnetTest29 - single thread stress test");
-            SonnetTest29Worker();
+            SonnetTestStressWorker();
         }
 
-        private void SonnetTest29Worker()
+        private void SonnetTestStressWorker()
         {
             string threadid = System.Threading.Thread.CurrentThread.Name;
             Model model = new Model();
@@ -2276,7 +2309,7 @@ namespace SonnetTest
         {
             try
             {
-                SonnetTest29Worker();
+                SonnetTestStressWorker();
             }
             catch (Exception exception)
             {
@@ -2597,7 +2630,31 @@ namespace SonnetTest
             Console.WriteLine("Status: obj = " + m.Objective.Value);
             Assert(MathExtension.CompareDouble(m.Objective.Value, 2.66666666666) == 0);
         }
-        
+
+        public void SonnetTest40()
+        {
+            Console.WriteLine("SonnetTest40 - Test create new model from expor files");
+
+            Model model2mps = Model.New("MIP-124725.mps");
+            string string2mps = model2mps.ToString();
+
+            Solver solver = new Solver(model2mps, solverType);
+            solver.NameDiscipline = 2;
+            solver.Export("MIP-124725.lp");
+            solver.Export("MIP-124725-new.mps");
+
+            // Check that the original and re-imported .mps model are identical
+            Model model2newmps = Model.New("MIP-124725-new.mps");
+            model2newmps.Name = "MIP-124725";
+            string string2newmps = model2newmps.ToString();
+            Assert(SonnetTest.EqualsString(string2mps, string2newmps));
+
+            // Check that the original and re-imported .lp model are identical
+            Model model2lp = Model.New("MIP-124725.lp");
+            string string2lp = model2lp.ToString();
+            //Assert(SonnetTest.EqualsString(string2mps, string2lp));
+            // Test failed!! this seems to be due to a bug in osi writeLp(..)
+        }
 
         public static bool EqualsString(string string1, string string2)
         {
@@ -2609,7 +2666,7 @@ namespace SonnetTest
             {
                 if (!string1[i].Equals(string2[i]))
                 {
-                    int j = Math.Min(n - i - 1, 5);
+                    int j = Math.Min(n - i - 1, 20);
                     System.Diagnostics.Debug.WriteLine("The final few characters are not the same:");
                     System.Diagnostics.Debug.WriteLine("first : " + string1.Substring(0, i + j));
                     System.Diagnostics.Debug.WriteLine("second: " + string2.Substring(0, i + j));

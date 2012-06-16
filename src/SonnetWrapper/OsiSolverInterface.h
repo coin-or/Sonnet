@@ -100,6 +100,25 @@ namespace COIN
 		void setContinuous(int index);
 		void setInteger(int index);
 
+		String ^ getObjName ()
+		{
+			String ^ result = gcnew String(Base->getObjName().c_str());
+			return result;
+		}
+		void setObjName (String ^ name)
+		{
+			try
+			{
+				char * charName = (char*)Marshal::StringToHGlobalAnsi(name).ToPointer();
+				Base->setObjName(charName);
+				Marshal::FreeHGlobal((IntPtr)charName);
+			}
+			catch (::CoinError err)
+			{
+				throw gcnew CoinError(err);
+			}
+		}
+
 		void setObjCoeff(int index, double value);
 		void setObjSense(double sense);
 		void setObjective(array<double> ^coefs);
@@ -224,7 +243,7 @@ namespace COIN
 	};
 
 	template <class T> 
-	public ref class OsiSolverInterfaceGeneric : public OsiSolverInterface
+	public ref class OsiSolverInterfaceGeneric abstract : public OsiSolverInterface 
 	{
 	public:
 		OsiSolverInterfaceGeneric()

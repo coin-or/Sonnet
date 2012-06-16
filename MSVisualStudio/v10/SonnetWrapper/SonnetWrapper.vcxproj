@@ -192,6 +192,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SonnetWrapper\AssemblyInfo.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.cpp" />
+    <ClCompile Include="..\..\..\src\SonnetWrapper\CoinLpIO.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\Helpers.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcModel.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcStrategy.cpp" />
@@ -207,12 +208,14 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.cpp" />
+    <ClCompile Include="..\..\..\src\SonnetWrapper\CbcSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcModel.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcStrategy.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CglCutGenerator.h" />
+    <ClInclude Include="..\..\..\src\SonnetWrapper\CoinLpIO.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\Helpers.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CglProbing.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinError.h" />
@@ -225,11 +228,15 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.h" />
+    <ClInclude Include="..\..\..\src\SonnetWrapper\CbcSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\SonnetWrapper\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v10\libCbcSolver\libCbcSolver.vcxproj">
+      <Project>{71da4595-e8a7-4b21-a00a-d96d29d11e3e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v10\libCbc\libCbc.vcxproj">
       <Project>{363ba154-fec9-4e1e-bc23-93cec58ab785}</Project>
     </ProjectReference>
