@@ -2633,27 +2633,29 @@ namespace SonnetTest
 
         public void SonnetTest40()
         {
-            Console.WriteLine("SonnetTest40 - Test create new model from expor files");
+            Console.WriteLine("SonnetTest40 - Test create new model from export files");
 
-            Model model2mps = Model.New("MIP-124725.mps");
-            string string2mps = model2mps.ToString();
+            Model modelOrig = Model.New("MIP-124725.mps");
 
-            Solver solver = new Solver(model2mps, solverType);
+            string stringOrig = modelOrig.ToString();
+            Solver solver = new Solver(modelOrig, solverType);          
             solver.NameDiscipline = 2;
-            solver.Export("MIP-124725.lp");
-            solver.Export("MIP-124725-new.mps");
+            solver.Export("export-test.lp"); // export LP has strict rules about valid row&col names!! Check log for warnings!
+            solver.Export("export-test.mps");
 
             // Check that the original and re-imported .mps model are identical
-            Model model2newmps = Model.New("MIP-124725-new.mps");
-            model2newmps.Name = "MIP-124725";
-            string string2newmps = model2newmps.ToString();
-            Assert(SonnetTest.EqualsString(string2mps, string2newmps));
+            Model modelMps = Model.New("export-test.mps");
+            modelMps.Name = modelOrig.Name;
+            string stringMps = modelMps.ToString();
+            Assert(SonnetTest.EqualsString(stringOrig, stringMps));
+            //File.Delete("export-test.mps");
 
             // Check that the original and re-imported .lp model are identical
-            Model model2lp = Model.New("MIP-124725.lp");
-            string string2lp = model2lp.ToString();
-            //Assert(SonnetTest.EqualsString(string2mps, string2lp));
-            // Test failed!! this seems to be due to a bug in osi writeLp(..)
+            Model modelLp = Model.New("export-test.lp");
+            modelLp.Name = modelOrig.Name;
+            string stringLp = modelLp.ToString();
+            Assert(SonnetTest.EqualsString(stringOrig, stringLp));
+            //File.Delete("export-test.lp");
         }
 
         public static bool EqualsString(string string1, string string2)
