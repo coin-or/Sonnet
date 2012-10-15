@@ -541,7 +541,7 @@ namespace Sonnet
             constraints = new List<Constraint>();
 
             if (name != null) Name = name;
-            else Name = string.Format("Model[{0}]", id);
+            else Name = string.Format("Model_{0}", id);
         }
         #endregion
 

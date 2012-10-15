@@ -87,7 +87,7 @@ namespace Sonnet
             this.id = numberOfVariables++;
 
             if (name != null) Name = name;
-            else Name = string.Format("Var[{0}]", id);
+            else Name = string.Format("Var_{0}", id);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Sonnet
             for (int i = 0, n = tmp.Length; i < n; i++)
             {
                 string name = null;
-                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+                if (varname != null) name = string.Format("{0}_{1}", varname, i.ToString());
 
                 tmp[i] = new Variable(name, lower, upper, type);
             }
@@ -137,7 +137,7 @@ namespace Sonnet
             foreach(T i in set) 
             {
                 string name = null;
-                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+                if (varname != null) name = string.Format("{0}_{1}", varname, i.ToString());
 
                 tmp[i] = new Variable(name, lower, upper, type);
             }
@@ -167,7 +167,7 @@ namespace Sonnet
             foreach (T i in Enum.GetValues(typeof(T)))
             {
                 string name = null;
-                if (varname != null) name = string.Format("{0}[{1}]", varname, i.ToString());
+                if (varname != null) name = string.Format("{0}_{1}", varname, i.ToString());
 
                 tmp[i] = new Variable(name, lower, upper, type);
             }

@@ -1778,7 +1778,7 @@ namespace Sonnet
             this.solver = solver;
 
             if (name != null) Name = name;
-            else Name = string.Format("{0}[{1}]", solver.GetType().FullName, id);
+            else Name = string.Format("{0}_{1}", solver.GetType().FullName, id);
 
             generated = false;
 

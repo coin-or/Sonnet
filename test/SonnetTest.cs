@@ -1383,18 +1383,18 @@ namespace SonnetTest
                 "Expr_con25 : x1 <= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 2\r\n" +
                 "Expr_con26 : x1 <= 0.5 x1 + 2.5 x2 + 0.5 x1 + 0.5 x1 + x2 + 1.75 x8 + 0.5\r\n" +
                 "Expr_con27 : x1 <= 0.5 x1\r\n" +
-                "Con[28] : 1 == x1\r\n" +
-                "Con[29] : x1 == 1\r\n" +
-                "Con[30] : x2 == x1\r\n" +
-                "Con[31] : x1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
-                "Con[32] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1 == x1\r\n" +
-                "Con[33] : 1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
-                "Con[34] : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1 == 1\r\n" +
-                "Con[35] : 1 >= x3\r\n" +
-                "Con[36] : 1 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
-                "Con[37] : x2 >= 1\r\n" +
-                "Con[38] : x2 >= x3\r\n" +
-                "Con[39] : x2 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n";
+                "Con_28 : 1 == x1\r\n" +
+                "Con_29 : x1 == 1\r\n" +
+                "Con_30 : x2 == x1\r\n" +
+                "Con_31 : x1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con_32 : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + x1 + 1 == x1\r\n" +
+                "Con_33 : 1 == x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con_34 : x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1 == 1\r\n" +
+                "Con_35 : 1 >= x3\r\n" +
+                "Con_36 : 1 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n" +
+                "Con_37 : x2 >= 1\r\n" +
+                "Con_38 : x2 >= x3\r\n" +
+                "Con_39 : x2 >= x1 + 5 x2 + x1 + x1 + 2 x2 + 3.5 x8 + 1\r\n";
 
             string modelUngeneratedString = model.ToString();
             Assert(SonnetTest.EqualsString(modelUngeneratedString, referenceUngeneratedModelToString));
@@ -1470,35 +1470,35 @@ namespace SonnetTest
                 "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\r\n" +
                 "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\r\n" +
                 "Expr_con27 : 0.5 x1 <= 0\r\n" +
-                "Con[28] : - x1 == -1\r\n" +
-                "Con[29] : x1 == 1\r\n" +
-                "Con[30] : - x1 + x2 == 0\r\n" +
-                "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\r\n" +
-                "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\r\n" +
-                "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\r\n" +
-                "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\r\n" +
-                "Con[35] : - x3 >= -1\r\n" +
-                "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\r\n" +
-                "Con[37] : x2 >= 1\r\n" +
-                "Con[38] : x2 - x3 >= 0\r\n" +
-                "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\r\n" +
-                "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\r\n" +
-                "Con[41] : 2 x1 + 7 x2 + 3.5 x8 >= -1\r\n" +
-                "Con[42] : 2 x1 + 5 x2 + 3.5 x8 >= -1\r\n" +
-                "Con[43] : - x3 <= -1\r\n" +
-                "Con[44] : - 3 x1 - 7 x2 - 3.5 x8 <= 0\r\n" +
-                "Con[45] : x2 <= 1\r\n" +
-                "Con[46] : x2 - x3 <= 0\r\n" +
-                "Con[47] : - 3 x1 - 6 x2 - 3.5 x8 <= 1\r\n" +
-                "Con[48] : 3 x1 + 7 x2 + 3.5 x8 <= 0\r\n" +
-                "Con[49] : 2 x1 + 7 x2 + 3.5 x8 <= -1\r\n" +
-                "Con[50] : 2 x1 + 5 x2 + 3.5 x8 <= -1\r\n" +
-                "Con[51] : 2 x1 + 5 x2 + 3.5 x8 == -1\r\n" +
+                "Con_28 : - x1 == -1\r\n" +
+                "Con_29 : x1 == 1\r\n" +
+                "Con_30 : - x1 + x2 == 0\r\n" +
+                "Con_31 : - 2 x1 - 7 x2 - 3.5 x8 == 1\r\n" +
+                "Con_32 : 3 x1 + 7 x2 + 3.5 x8 == -1\r\n" +
+                "Con_33 : - 3 x1 - 7 x2 - 3.5 x8 == 0\r\n" +
+                "Con_34 : 3 x1 + 7 x2 + 3.5 x8 == 0\r\n" +
+                "Con_35 : - x3 >= -1\r\n" +
+                "Con_36 : - 3 x1 - 7 x2 - 3.5 x8 >= 0\r\n" +
+                "Con_37 : x2 >= 1\r\n" +
+                "Con_38 : x2 - x3 >= 0\r\n" +
+                "Con_39 : - 3 x1 - 6 x2 - 3.5 x8 >= 1\r\n" +
+                "Con_40 : 3 x1 + 7 x2 + 3.5 x8 >= 0\r\n" +
+                "Con_41 : 2 x1 + 7 x2 + 3.5 x8 >= -1\r\n" +
+                "Con_42 : 2 x1 + 5 x2 + 3.5 x8 >= -1\r\n" +
+                "Con_43 : - x3 <= -1\r\n" +
+                "Con_44 : - 3 x1 - 7 x2 - 3.5 x8 <= 0\r\n" +
+                "Con_45 : x2 <= 1\r\n" +
+                "Con_46 : x2 - x3 <= 0\r\n" +
+                "Con_47 : - 3 x1 - 6 x2 - 3.5 x8 <= 1\r\n" +
+                "Con_48 : 3 x1 + 7 x2 + 3.5 x8 <= 0\r\n" +
+                "Con_49 : 2 x1 + 7 x2 + 3.5 x8 <= -1\r\n" +
+                "Con_50 : 2 x1 + 5 x2 + 3.5 x8 <= -1\r\n" +
+                "Con_51 : 2 x1 + 5 x2 + 3.5 x8 == -1\r\n" +
                 "mycon : 0 == -1\r\n" +
-                "Con[53] : 0 == -1\r\n" +
+                "Con_53 : 0 == -1\r\n" +
                 "othercon : 0 == -1\r\n" +
-                "Con[55] : 0 >= 0\r\n" +
-                "Con[56] : 1.2 xNEW >= 0\r\n";
+                "Con_55 : 0 >= 0\r\n" +
+                "Con_56 : 1.2 xNEW >= 0\r\n";
 
             string modelString = solver.ToString();
             Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
@@ -1538,35 +1538,35 @@ namespace SonnetTest
                 " L Expr_con25\n" +
                 " L Expr_con26\n" +
                 " L Expr_con27\n" +
-                " E Con[28]\n" +
-                " E Con[29]\n" +
-                " E Con[30]\n" +
-                " E Con[31]\n" +
-                " E Con[32]\n" +
-                " E Con[33]\n" +
-                " E Con[34]\n" +
-                " G Con[35]\n" +
-                " G Con[36]\n" +
-                " G Con[37]\n" +
-                " G Con[38]\n" +
-                " G Con[39]\n" +
-                " G Con[40]\n" +
-                " G Con[41]\n" +
-                " G Con[42]\n" +
-                " L Con[43]\n" +
-                " L Con[44]\n" +
-                " L Con[45]\n" +
-                " L Con[46]\n" +
-                " L Con[47]\n" +
-                " L Con[48]\n" +
-                " L Con[49]\n" +
-                " L Con[50]\n" +
-                " E Con[51]\n" +
+                " E Con_28\n" +
+                " E Con_29\n" +
+                " E Con_30\n" +
+                " E Con_31\n" +
+                " E Con_32\n" +
+                " E Con_33\n" +
+                " E Con_34\n" +
+                " G Con_35\n" +
+                " G Con_36\n" +
+                " G Con_37\n" +
+                " G Con_38\n" +
+                " G Con_39\n" +
+                " G Con_40\n" +
+                " G Con_41\n" +
+                " G Con_42\n" +
+                " L Con_43\n" +
+                " L Con_44\n" +
+                " L Con_45\n" +
+                " L Con_46\n" +
+                " L Con_47\n" +
+                " L Con_48\n" +
+                " L Con_49\n" +
+                " L Con_50\n" +
+                " E Con_51\n" +
                 " E mycon\n" +
-                " E Con[53]\n" +
+                " E Con_53\n" +
                 " E othercon\n" +
-                " G Con[55]\n" +
-                " G Con[56]\n" +
+                " G Con_55\n" +
+                " G Con_56\n" +
                 "COLUMNS\n" +
                 " x1 Expr_con0 -2. Expr_con2 1. \n" +
                 " x1 Expr_con3 1. Expr_con8 1. \n" +
@@ -1578,16 +1578,16 @@ namespace SonnetTest
                 " x1 Expr_con19 -3. Expr_con20 3. \n" +
                 " x1 Expr_con23 2. Expr_con24 4. \n" +
                 " x1 Expr_con25 -2. Expr_con26 -0.5 \n" +
-                " x1 Expr_con27 0.5 Con[28] -1. \n" +
-                " x1 Con[29] 1. Con[30] -1. \n" +
-                " x1 Con[31] -2. Con[32] 3. \n" +
-                " x1 Con[33] -3. Con[34] 3. \n" +
-                " x1 Con[36] -3. Con[39] -3. \n" +
-                " x1 Con[40] 3. Con[41] 2. \n" +
-                " x1 Con[42] 2. Con[44] -3. \n" +
-                " x1 Con[47] -3. Con[48] 3. \n" +
-                " x1 Con[49] 2. Con[50] 2. \n" +
-                " x1 Con[51] 2. \n" +
+                " x1 Expr_con27 0.5 Con_28 -1. \n" +
+                " x1 Con_29 1. Con_30 -1. \n" +
+                " x1 Con_31 -2. Con_32 3. \n" +
+                " x1 Con_33 -3. Con_34 3. \n" +
+                " x1 Con_36 -3. Con_39 -3. \n" +
+                " x1 Con_40 3. Con_41 2. \n" +
+                " x1 Con_42 2. Con_44 -3. \n" +
+                " x1 Con_47 -3. Con_48 3. \n" +
+                " x1 Con_49 2. Con_50 2. \n" +
+                " x1 Con_51 2. \n" +
                 " x2 Expr_con0 -7. Expr_con1 -2. \n" +
                 " x2 Expr_con5 -5. Expr_con6 -5. \n" +
                 " x2 Expr_con8 -1. Expr_con15 -7. \n" +
@@ -1595,37 +1595,37 @@ namespace SonnetTest
                 " x2 Expr_con19 -7. Expr_con20 7. \n" +
                 " x2 Expr_con21 1. Expr_con24 7. \n" +
                 " x2 Expr_con25 -7. Expr_con26 -3.5 \n" +
-                " x2 Con[30] 1. Con[31] -7. \n" +
-                " x2 Con[32] 7. Con[33] -7. \n" +
-                " x2 Con[34] 7. Con[36] -7. \n" +
-                " x2 Con[37] 1. Con[38] 1. \n" +
-                " x2 Con[39] -6. Con[40] 7. \n" +
-                " x2 Con[41] 7. Con[42] 5. \n" +
-                " x2 Con[44] -7. Con[45] 1. \n" +
-                " x2 Con[46] 1. Con[47] -6. \n" +
-                " x2 Con[48] 7. Con[49] 7. \n" +
-                " x2 Con[50] 5. Con[51] 5. \n" +
+                " x2 Con_30 1. Con_31 -7. \n" +
+                " x2 Con_32 7. Con_33 -7. \n" +
+                " x2 Con_34 7. Con_36 -7. \n" +
+                " x2 Con_37 1. Con_38 1. \n" +
+                " x2 Con_39 -6. Con_40 7. \n" +
+                " x2 Con_41 7. Con_42 5. \n" +
+                " x2 Con_44 -7. Con_45 1. \n" +
+                " x2 Con_46 1. Con_47 -6. \n" +
+                " x2 Con_48 7. Con_49 7. \n" +
+                " x2 Con_50 5. Con_51 5. \n" +
                 " x8 Expr_con0 -3.5 Expr_con13 -0.5 \n" +
                 " x8 Expr_con15 -3.5 Expr_con16 3.5 \n" +
                 " x8 Expr_con18 -3.5 Expr_con19 -3.5 \n" +
                 " x8 Expr_con20 3.5 Expr_con24 3.5 \n" +
                 " x8 Expr_con25 -3.5 Expr_con26 -1.75 \n" +
-                " x8 Con[31] -3.5 Con[32] 3.5 \n" +
-                " x8 Con[33] -3.5 Con[34] 3.5 \n" +
-                " x8 Con[36] -3.5 Con[39] -3.5 \n" +
-                " x8 Con[40] 3.5 Con[41] 3.5 \n" +
-                " x8 Con[42] 3.5 Con[44] -3.5 \n" +
-                " x8 Con[47] -3.5 Con[48] 3.5 \n" +
-                " x8 Con[49] 3.5 Con[50] 3.5 \n" +
-                " x8 Con[51] 3.5 \n" +
-                " x3 Expr_con8 -1. Con[35] -1. \n" +
-                " x3 Con[38] -1. Con[43] -1. \n" +
-                " x3 Con[46] -1. \n" +
+                " x8 Con_31 -3.5 Con_32 3.5 \n" +
+                " x8 Con_33 -3.5 Con_34 3.5 \n" +
+                " x8 Con_36 -3.5 Con_39 -3.5 \n" +
+                " x8 Con_40 3.5 Con_41 3.5 \n" +
+                " x8 Con_42 3.5 Con_44 -3.5 \n" +
+                " x8 Con_47 -3.5 Con_48 3.5 \n" +
+                " x8 Con_49 3.5 Con_50 3.5 \n" +
+                " x8 Con_51 3.5 \n" +
+                " x3 Expr_con8 -1. Con_35 -1. \n" +
+                " x3 Con_38 -1. Con_43 -1. \n" +
+                " x3 Con_46 -1. \n" +
                 " x4 Expr_con9 -1. \n" +
                 " x5 Expr_con10 -1. \n" +
                 " x6 Expr_con11 -1. \n" +
                 " x7 Expr_con12 -2. \n" +
-                " xNEW Con[56] 1.2 \n" +
+                " xNEW Con_56 1.2 \n" +
                 "RHS\n" +
                 " RHS Expr_con0 1. Expr_con2 1. \n" +
                 " RHS Expr_con6 5. Expr_con9 1. \n" +
@@ -1634,15 +1634,15 @@ namespace SonnetTest
                 " RHS Expr_con18 1. Expr_con19 1. \n" +
                 " RHS Expr_con20 -1. Expr_con22 -1. \n" +
                 " RHS Expr_con23 1. Expr_con25 2. \n" +
-                " RHS Expr_con26 0.5 Con[28] -1. \n" +
-                " RHS Con[29] 1. Con[31] 1. \n" +
-                " RHS Con[32] -1. Con[35] -1. \n" +
-                " RHS Con[37] 1. Con[39] 1. \n" +
-                " RHS Con[41] -1. Con[42] -1. \n" +
-                " RHS Con[43] -1. Con[45] 1. \n" +
-                " RHS Con[47] 1. Con[49] -1. \n" +
-                " RHS Con[50] -1. Con[51] -1. \n" +
-                " RHS mycon -1. Con[53] -1. \n" +
+                " RHS Expr_con26 0.5 Con_28 -1. \n" +
+                " RHS Con_29 1. Con_31 1. \n" +
+                " RHS Con_32 -1. Con_35 -1. \n" +
+                " RHS Con_37 1. Con_39 1. \n" +
+                " RHS Con_41 -1. Con_42 -1. \n" +
+                " RHS Con_43 -1. Con_45 1. \n" +
+                " RHS Con_47 1. Con_49 -1. \n" +
+                " RHS Con_50 -1. Con_51 -1. \n" +
+                " RHS mycon -1. Con_53 -1. \n" +
                 " RHS othercon -1. \n" +
                 "BOUNDS\n" +
                 " LO BOUND x8 -1. \n" +
@@ -1720,35 +1720,35 @@ namespace SonnetTest
                     "Expr_con25 : - 2 x1 - 7 x2 - 3.5 x8 <= 2\n" +
                     "Expr_con26 : - 0.5 x1 - 3.5 x2 - 1.75 x8 <= 0.5\n" +
                     "Expr_con27 : 0.5 x1 <= 0\n" +
-                    "Con[28] : - x1 == -1\n" +
-                    "Con[29] : x1 == 1\n" +
-                    "Con[30] : - x1 + x2 == 0\n" +
-                    "Con[31] : - 2 x1 - 7 x2 - 3.5 x8 == 1\n" +
-                    "Con[32] : 3 x1 + 7 x2 + 3.5 x8 == -1\n" +
-                    "Con[33] : - 3 x1 - 7 x2 - 3.5 x8 == 0\n" +
-                    "Con[34] : 3 x1 + 7 x2 + 3.5 x8 == 0\n" +
-                    "Con[35] : - x3 >= -1\n" +
-                    "Con[36] : - 3 x1 - 7 x2 - 3.5 x8 >= 0\n" +
-                    "Con[37] : x2 >= 1\n" +
-                    "Con[38] : x2 - x3 >= 0\n" +
-                    "Con[39] : - 3 x1 - 6 x2 - 3.5 x8 >= 1\n" +
-                    "Con[40] : 3 x1 + 7 x2 + 3.5 x8 >= 0\n" +
-                    "Con[41] : 2 x1 + 7 x2 + 3.5 x8 >= -1\n" +
-                    "Con[42] : 2 x1 + 5 x2 + 3.5 x8 >= -1\n" +
-                    "Con[43] : - x3 <= -1\n" +
-                    "Con[44] : - 3 x1 - 7 x2 - 3.5 x8 <= 0\n" +
-                    "Con[45] : x2 <= 1\n" +
-                    "Con[46] : x2 - x3 <= 0\n" +
-                    "Con[47] : - 3 x1 - 6 x2 - 3.5 x8 <= 1\n" +
-                    "Con[48] : 3 x1 + 7 x2 + 3.5 x8 <= 0\n" +
-                    "Con[49] : 2 x1 + 7 x2 + 3.5 x8 <= -1\n" +
-                    "Con[50] : 2 x1 + 5 x2 + 3.5 x8 <= -1\n" +
-                    "Con[51] : 2 x1 + 5 x2 + 3.5 x8 == -1\n" +
+                    "Con_28 : - x1 == -1\n" +
+                    "Con_29 : x1 == 1\n" +
+                    "Con_30 : - x1 + x2 == 0\n" +
+                    "Con_31 : - 2 x1 - 7 x2 - 3.5 x8 == 1\n" +
+                    "Con_32 : 3 x1 + 7 x2 + 3.5 x8 == -1\n" +
+                    "Con_33 : - 3 x1 - 7 x2 - 3.5 x8 == 0\n" +
+                    "Con_34 : 3 x1 + 7 x2 + 3.5 x8 == 0\n" +
+                    "Con_35 : - x3 >= -1\n" +
+                    "Con_36 : - 3 x1 - 7 x2 - 3.5 x8 >= 0\n" +
+                    "Con_37 : x2 >= 1\n" +
+                    "Con_38 : x2 - x3 >= 0\n" +
+                    "Con_39 : - 3 x1 - 6 x2 - 3.5 x8 >= 1\n" +
+                    "Con_40 : 3 x1 + 7 x2 + 3.5 x8 >= 0\n" +
+                    "Con_41 : 2 x1 + 7 x2 + 3.5 x8 >= -1\n" +
+                    "Con_42 : 2 x1 + 5 x2 + 3.5 x8 >= -1\n" +
+                    "Con_43 : - x3 <= -1\n" +
+                    "Con_44 : - 3 x1 - 7 x2 - 3.5 x8 <= 0\n" +
+                    "Con_45 : x2 <= 1\n" +
+                    "Con_46 : x2 - x3 <= 0\n" +
+                    "Con_47 : - 3 x1 - 6 x2 - 3.5 x8 <= 1\n" +
+                    "Con_48 : 3 x1 + 7 x2 + 3.5 x8 <= 0\n" +
+                    "Con_49 : 2 x1 + 7 x2 + 3.5 x8 <= -1\n" +
+                    "Con_50 : 2 x1 + 5 x2 + 3.5 x8 <= -1\n" +
+                    "Con_51 : 2 x1 + 5 x2 + 3.5 x8 == -1\n" +
                     "mycon : 0 == -1\n" +
-                    "Con[53] : 0 == -1\n" +
+                    "Con_53 : 0 == -1\n" +
                     "othercon : 0 == -1\n" +
-                    "Con[55] : 0 >= 0\n" +
-                    "Con[56] : 1.2 xNEW >= 0\n";
+                    "Con_55 : 0 >= 0\n" +
+                    "Con_56 : 1.2 xNEW >= 0\n";
 
 
             referenceGeneratedModel = referenceGeneratedModel.Replace("\r\n", "\n");

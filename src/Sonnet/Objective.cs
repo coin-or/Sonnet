@@ -227,7 +227,7 @@ namespace Sonnet
             //this.expression.Subtract(this.expression.constant);
 
             if (name != null) Name = name;
-            else Name = string.Format("Obj[{0}]", id);
+            else Name = string.Format("Obj_{0}", id);
         }
 
         private static int numberOfObjectives = 0;

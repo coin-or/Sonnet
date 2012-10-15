@@ -395,7 +395,7 @@ namespace Sonnet
             this.enabled = true;
 
             if (name != null) Name = name;
-            else Name = string.Format("Con[{0}]", id);
+            else Name = string.Format("Con_{0}", id);
         }
 
         /// <summary>
