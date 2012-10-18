@@ -6,10 +6,8 @@
 
 #include <OsiClpSolverInterface.hpp>		// check via ClpSimplex_H (?)
 #include <OsiCbcSolverInterface.hpp>		// check via ClpSimplex_H (?)
-//#include <OsiVolSolverInterface.hpp>	
-#ifdef USE_CPLEX
-#include <OsiCpxSolverInterface.hpp>		// check via CPX_VERSION
-#endif
+
+//#include <OsiCpxSolverInterface.hpp>		// Uncomment to USE_CPLEX
 
 #include "OsiSolverInterface.h"
 #include "CbcModel.h"
@@ -77,24 +75,14 @@ namespace COIN
 		}
 	};
 
-	////////////////////////////////////////////////////////
-	/////// OsiVolSolverInterface
-	////////////////////////////////////////////////////////
-	//public ref class OsiVolSolverInterface : public OsiSolverInterface
-	//{
-	//public:
-	//	OsiVolSolverInterface();
-	//};
-
-#ifdef USE_CPLEX
-
+/*	Uncomment to USE_CPLEX
 	//////////////////////////////////////////////////////
 	///// OsiCpxSolverInterface
 	//////////////////////////////////////////////////////
 	public ref class OsiCpxSolverInterface : public OsiSolverInterfaceGeneric<::OsiCpxSolverInterface>
 	{
 	public:
-		OsiCpxSolverInterface();
+		OsiCpxSolverInterface()	{ }
 	};
-#endif
+*/
 }

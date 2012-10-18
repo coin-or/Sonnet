@@ -482,17 +482,35 @@ namespace COIN
 
 	CoinMessageHandler ^ OsiSolverInterface::messageHandler()
 	{
-		CoinMessageHandlerProxy *handler = dynamic_cast<CoinMessageHandlerProxy *>(Base->messageHandler());
+		// this will return the base messagehandler IF it is the .net class wrapped.
+		// so, of the coin class had a default handler,but we didnt wrap that,
+		// then here we wont get a wrapped handler.
+		// What if the base Has a handler that is Not our .net class?
+		// we wrap it here, but don't pass it in (that would delete the original)
+		// This only works if our CoinMessageHandler DOESNT have an overriden print functionality, because that wont be called.
+		// In case we implement specific print(), we must 'passIn' that message handler explicitly.
+		// Don't replace an existing handler at the construction of osisolver by a wrapper handler!
+
+		::CoinMessageHandler *handler = Base->messageHandler();
 		if (handler != nullptr)
 		{
-			return handler->wrapper;
+			CoinMessageHandlerProxy *proxy = dynamic_cast<CoinMessageHandlerProxy *>(handler);
+			if (proxy != nullptr)
+			{
+				return proxy->wrapper;
+			}
+			else
+			{
+				// there is a COIN message handler, but it isnt a Proxy.
+				return gcnew CoinMessageHandler(handler);
+    		}
 		}
 		return nullptr;
 	}
 
 	void OsiSolverInterface::passInMessageHandler(CoinMessageHandler ^wrapper)
 	{
-		Base->passInMessageHandler(wrapper->proxy);
+		Base->passInMessageHandler(wrapper->Base);
 	}
 
 	int OsiSolverInterface::getNumCols()

@@ -71,7 +71,7 @@ namespace COIN
 
 				char* charValue = (char*)Marshal::StringToHGlobalAnsi(value).ToPointer();
 			
-				strcpy(Base->source_, charValue); // warning to use strcpy_s
+				strcpy_s(Base->source_, charValue); 
 
 				Marshal::FreeHGlobal((IntPtr)charValue);
 			}
@@ -91,46 +91,63 @@ namespace COIN
 	public class CoinMessageHandlerProxy : public ::CoinMessageHandler
 	{
 		friend ref class OsiSolverInterface;
+		friend ref class CoinMessageHandler;
+
 	public:
 		CoinMessageHandlerProxy(gcroot<COIN::CoinMessageHandler ^> wrapper);
 
 		virtual int print();
 
 	private:
+		CoinMessageHandlerProxy(const ::CoinMessageHandler &rhs, gcroot<COIN::CoinMessageHandler ^> wrapper)
+			: ::CoinMessageHandler(rhs)
+		{
+			this->wrapper = wrapper;
+		}
+
+		int printBase()
+		{
+			return ::CoinMessageHandler::print();
+		}
+
 		gcroot<COIN::CoinMessageHandler ^> wrapper;
 	};
 
 	public ref class CoinMessageHandler : public IDisposable
 	{
 	public: 
+		// Use this constructor to use a proxy class to PassIn to native Coin classes
 		CoinMessageHandler()
 		{
-			proxy = new CoinMessageHandlerProxy(this);
+			base = new CoinMessageHandlerProxy(this);
 		}
 
 		virtual int logLevel()
 		{
-			return proxy->logLevel();
+			return base->logLevel();
 		}
 
 		virtual void setLogLevel(int value)
 		{
-			proxy->setLogLevel(value);
+			base->setLogLevel(value);
 		}
 
 		virtual int print()
 		{
-			return 0;
+			// don't call proxy->print() since that will call *this* method again (wrapper->print())
+			CoinMessageHandlerProxy *proxy = dynamic_cast<CoinMessageHandlerProxy *>(base);
+			if (proxy != nullptr) return proxy->printBase();
+			else return base->print();
 		}
 
 		String ^ messageBuffer()
 		{
-			return gcnew String(proxy->messageBuffer());
+			return gcnew String(base->messageBuffer());
 		}
 
 		CoinMessageHandler ^ message(int messageNumber, CoinMessages ^ m,  ... array<Object^>^ variableArgs )
 		{
-			::CoinMessageHandler &h = proxy->message(messageNumber, *(m->Base));
+			::CoinMessageHandler &h = base->message(messageNumber, *(m->Base));
 
 			int n = variableArgs->Length;
 			for (int i = 0; i < n; i++)
@@ -157,8 +174,31 @@ namespace COIN
 		}
 
 	internal:
-		CoinMessageHandlerProxy *proxy;
+		// Use this Constructor to create a wrapper around the given native CoinMessageHandler.
+		CoinMessageHandler(::CoinMessageHandler* rhs)
+		{
+			base = rhs;
+		}
+
+		property bool HasProxy 
+		{ 
+			bool get() 
+			{ 
+				return nullptr != dynamic_cast<CoinMessageHandlerProxy *>(base); 
+			}
+		}
+
+		property ::CoinMessageHandler * Base 
+		{
+			::CoinMessageHandler * get()
+			{
+				return base;
+			}
+		}
+
 	private:
+		::CoinMessageHandler *base;
+
 		int disposed;
 		~CoinMessageHandler()
 		{
@@ -179,8 +219,13 @@ namespace COIN
 		!CoinMessageHandler()
 		{
 			// delete NATIVE stuff here
-			delete proxy; 
-			proxy = nullptr;
+
+			CoinMessageHandlerProxy *proxy = dynamic_cast<CoinMessageHandlerProxy *>(base);
+			if (proxy != nullptr)
+			{
+				delete base; 
+				base = nullptr;
+			}
 		}
 
 	};

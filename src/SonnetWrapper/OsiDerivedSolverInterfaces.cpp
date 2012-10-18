@@ -93,19 +93,4 @@ namespace COIN
 		::OsiCbcSolverInterface *osiCbc = dynamic_cast<::OsiCbcSolverInterface *> (Base);
 		osiCbc->getModelPtr()->saveReferenceSolver();
 	}
-
-	////////////////////////////////////////////////////////
-	/////// OsiVolSolverInterface
-	////////////////////////////////////////////////////////
-	//OsiVolSolverInterface::OsiVolSolverInterface()
-	//	:OsiSolverInterface(new ::OsiVolSolverInterface())
-	//{
-	//}
-
-	//////////////////////////////////////////////////////
-	///// OsiCpxSolverInterface
-	//////////////////////////////////////////////////////
-#ifdef USE_CPLEX
-	// implementation here
-#endif
 }

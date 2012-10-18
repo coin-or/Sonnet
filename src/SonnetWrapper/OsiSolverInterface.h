@@ -22,6 +22,10 @@ using namespace System::Runtime::InteropServices;
 
 namespace COIN
 {
+	/// <summary>
+	/// Abstract Base Class for describing an interface to a solver.
+	/// The .NET OsiSolverInterface class.
+	/// </summary>
 	public ref class OsiSolverInterface : WrapperAbstractBase<::OsiSolverInterface>
 	{
 	public:
@@ -248,7 +252,15 @@ namespace COIN
 	public:
 		OsiSolverInterfaceGeneric()
 		{
-			Base = new T();
+			try
+			{
+				// Create the COIN object (OsiClpSolverInterface, etc) that will be Base.
+				Base = new T();
+			}
+			catch (::CoinError err)
+			{
+				throw gcnew CoinError(err);
+			}
 		}
 
 	protected:

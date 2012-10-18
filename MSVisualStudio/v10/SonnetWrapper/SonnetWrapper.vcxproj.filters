@@ -55,7 +55,7 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinLpIO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CbcSolver.cpp">
+    <ClCompile Include="..\..\..\src\SonnetWrapper\CbcSolver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,7 +111,7 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinLpIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CbcSolver.h">
+    <ClInclude Include="..\..\..\src\SonnetWrapper\CbcSolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

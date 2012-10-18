@@ -197,7 +197,7 @@ namespace COIN
 		*/
 		void passInMessageHandler(CoinMessageHandler ^ handler)
 		{
-			Base->passInMessageHandler(handler->proxy);
+			Base->passInMessageHandler(handler->Base);
 		}
 	};
 }

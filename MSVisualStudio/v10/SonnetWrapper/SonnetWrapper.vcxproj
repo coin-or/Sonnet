@@ -103,7 +103,11 @@
     </PreBuildEvent>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)\.
+IF EXIST $(OutDir)$(TargetName).xml ( 
+   COPY /Y $(OutDir)$(TargetName).xml $(ProjectDir)\.
+) ELSE ECHO XML Docs file $(TargetName).xml not found
+</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy target to project directory</Message>
@@ -134,7 +138,11 @@
     </PreBuildEvent>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)\.
+IF EXIST $(OutDir)$(TargetName).xml ( 
+   COPY /Y $(OutDir)$(TargetName).xml $(ProjectDir)\.
+) ELSE ECHO XML Docs file $(TargetName).xml not found
+</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy target to project directory</Message>
@@ -159,7 +167,11 @@
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)\.
+IF EXIST $(OutDir)$(TargetName).xml ( 
+   COPY /Y $(OutDir)$(TargetName).xml $(ProjectDir)\.
+) ELSE ECHO XML Docs file $(TargetName).xml not found
+</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy target to project directory</Message>
@@ -183,7 +195,11 @@
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>COPY /Y $(TargetPath) $(ProjectDir)$(TargetFileName)</Command>
+      <Command>COPY /Y $(TargetPath) $(ProjectDir)\.
+IF EXIST $(OutDir)$(TargetName).xml ( 
+   COPY /Y $(OutDir)$(TargetName).xml $(ProjectDir)\.
+) ELSE ECHO XML Docs file $(TargetName).xml not found
+</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy target to project directory</Message>
