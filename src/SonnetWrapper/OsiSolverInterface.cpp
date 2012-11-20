@@ -543,6 +543,8 @@ namespace COIN
 	array<double> ^ OsiSolverInterface::getColSolution()
 	{
 		int n = Base->getNumCols();
+		if (n == 0) return nullptr;
+
 		double *input = (double *) Base->getColSolution();
 		array<double> ^result = gcnew array<double>(n);
 		System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
@@ -574,6 +576,8 @@ namespace COIN
 	array<double> ^ OsiSolverInterface::getReducedCost()
 	{
 		int n = Base->getNumCols();
+		if (n == 0) return nullptr;
+
 		double *input = (double *)Base->getReducedCost();
 		array<double> ^result = gcnew array<double>(n);
 		System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
@@ -586,6 +590,8 @@ namespace COIN
 	array<double> ^ OsiSolverInterface::getRowPrice()
 	{
 		int n = Base->getNumRows();
+		if (n == 0) return nullptr;
+
 		double *input = (double *)Base->getRowPrice();
 		array<double> ^result = gcnew array<double>(n);
 		System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
@@ -616,6 +622,8 @@ namespace COIN
 	array<double> ^ OsiSolverInterface::getRowActivity()
 	{
 		int n = Base->getNumRows();
+		if (n == 0) return nullptr;
+
 		double *input = (double *)Base->getRowActivity();
 		array<double> ^result = gcnew array<double>(n);
 		System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);

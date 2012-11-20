@@ -352,7 +352,7 @@ namespace Sonnet
                     }
 
 
-                    AssignSolution();
+                    AssignSolution(true);
                     if (AutoResetMIPSolve) ResetAfterMIPSolveInternal(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
                 }
                 else
@@ -360,7 +360,7 @@ namespace Sonnet
                     isSolving = true;
                     if (doResolve) solver.resolve();
                     else solver.initialSolve();
-                    AssignSolution();
+                    AssignSolution(false);
                 }
             }
             catch (Exception e)
@@ -1489,21 +1489,23 @@ namespace Sonnet
         #endregion
 
         #region Assign Solution methods
+
         /// <summary>
         /// Get and store the solution status (optimal, etc), and the solution values for the variables and constraints from the solver.
         /// These values are subsequently stored at the variables and constraints for later retrieval via variable.Value etc.
         /// </summary>
-        public void AssignSolution()
+        /// <param name="mipSolve">Latest solve was mip solve</param>
+        private void AssignSolution(bool mipSolve)
         {
-            AssignSolutionStatus();
-            AssignVariableSolution();
-            AssignConstraintSolution();
+            AssignSolutionStatus(mipSolve);
+            AssignVariableSolution(mipSolve);
+            AssignConstraintSolution(mipSolve);
         }
 
         /// <summary>
         /// Get and store the solution status values (isProvenOptimal etc)
         /// </summary>
-        private void AssignSolutionStatus()
+        private void AssignSolutionStatus(bool mipSolve)
         {
             isAbandoned = solver.isAbandoned();
             isProvenOptimal = solver.isProvenOptimal();
@@ -1512,14 +1514,15 @@ namespace Sonnet
             isPrimalObjectiveLimitReached = solver.isPrimalObjectiveLimitReached();
             isDualObjectiveLimitReached = solver.isDualObjectiveLimitReached();
             isIterationLimitReached = solver.isIterationLimitReached();
-            iterationCount = solver.getIterationCount();
+            if (mipSolve) iterationCount = 0; // doesnt work for OsiCpx
+            else iterationCount = solver.getIterationCount();
         }
 
 
         /// <summary>
         /// Get and store the primal solution values to the variables and reduced cost
         /// </summary>
-        private void AssignVariableSolution()
+        private void AssignVariableSolution(bool mipSolve)
         {
 #if (DEBUG)
             int n_variables = variables.Count;
@@ -1533,13 +1536,14 @@ namespace Sonnet
             unsafe
             {
                 double* values = solver.getColSolutionUnsafe();
-                double* reducedCost = solver.getReducedCostUnsafe();
+                double* reducedCost = null;
+                if (!mipSolve) reducedCost = solver.getReducedCostUnsafe();
 
                 for (int col = 0; col < variables.Count; col++)
                 {
                     Variable var = variables[col];
 
-                    var.Assign(this, col, values[col], reducedCost[col]);
+                    var.Assign(this, col, values[col], mipSolve?0.0:reducedCost[col]);
 #if (DEBUG)
                     if (IsProvenOptimal)
                     {
@@ -1570,7 +1574,7 @@ namespace Sonnet
         /// get and propagate the values of the primal constraints in the dual solution
         /// and the total LHS( or "middle") value of the constraints in the current (primal) solution, with all var. moved left
         /// </summary>
-        private void AssignConstraintSolution()
+        private void AssignConstraintSolution(bool mipSolve)
         {
 #if (DEBUG)
             int m_constraints = constraints.Count;
@@ -1583,12 +1587,14 @@ namespace Sonnet
 
             unsafe
             {
-                double* prices = solver.getRowPriceUnsafe();
                 double* values = solver.getRowActivityUnsafe();
+                double* prices = null;
+                if (!mipSolve) prices = solver.getRowPriceUnsafe();
+
                 for (int row = 0; row < constraints.Count; row++)
                 {
                     Constraint con = constraints[row];
-                    con.Assign(this, row, prices[row], values[row]);
+                    con.Assign(this, row, mipSolve?0.0:prices[row], values[row]);
                 }
             }
         }

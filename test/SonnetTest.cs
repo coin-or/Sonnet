@@ -942,18 +942,19 @@ namespace SonnetTest
 
             solver.Solve();
 
-
+            //this problem is primal infeasible and dual infeasible, but depending on the algorithm, at least one
+            // of these two should be proven.
             Assert(!solver.IsProvenOptimal);
-            Assert(solver.IsProvenPrimalInfeasible);
-            Assert(!solver.IsProvenDualInfeasible);
+            Assert(solver.IsProvenPrimalInfeasible || solver.IsProvenDualInfeasible);
 
             r1.Enabled = false;
             solver.Solve();
 
-
+            // now, the problem is primal feasible but unbounded. 
+            // The dual is infeasible because of the first dual constraint -> because of the first primal variable.
             Assert(!solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
-            Assert(solver.IsProvenDualInfeasible);		// because of the first dual constraint -> because of the first primal variable.
+            Assert(solver.IsProvenDualInfeasible);
         }
 
         /// <summary>
@@ -1256,9 +1257,8 @@ namespace SonnetTest
             GetNumberOfVariablesOfVariableClass().SetValue(null, 0);
             GetNumberOfConstraintsOfConstraintClass().SetValue(null, 0);
             GetNumberOfObjectivesOfObjectiveClass().SetValue(null, 0);
-
-            if (solverType.FullName != "COIN.OsiCpxSolverInterface") solver.OsiSolver.setIntParam(OsiIntParam.OsiNameDiscipline, 2);
-
+            solver.NameDiscipline = 2;
+            
             Variable x1 = new Variable();
             x1.Name = "x1";
             Variable x2 = new Variable("x2");
@@ -1661,7 +1661,11 @@ namespace SonnetTest
                 testMps = testMps.Replace("  ", " ");
             }
 
-            if (solverType.FullName != "COIN.OsiCpxSolverInterface") Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
+            // OsiCpx writeMps is unreliable
+            if (!solver.OsiSolverFullName.Contains("OsiCpx"))
+            {
+                Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
+            }
         }
 
         public void SonnetTest0b()
@@ -1754,7 +1758,11 @@ namespace SonnetTest
             referenceGeneratedModel = referenceGeneratedModel.Replace("\r\n", "\n");
             string modelString = solver.ToString().Replace("\r\n", "\n");
 
-            if (solverType.FullName != "COIN.OsiCpxSolverInterface") Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
+            // OsiCpx writeMps is unreliable
+            if (!solver.OsiSolverFullName.Contains("OsiCpx"))
+            {
+                Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
+            }
         }
 
         public void SonnetTest20()
@@ -1838,18 +1846,19 @@ namespace SonnetTest
 
             solver.Solve();
 
-
+            //this problem is primal infeasible and dual infeasible, but depending on the algorithm, at least one
+            // of these two should be proven.
             Assert(!solver.IsProvenOptimal);
-            Assert(solver.IsProvenPrimalInfeasible);
-            Assert(!solver.IsProvenDualInfeasible);
+            Assert(solver.IsProvenPrimalInfeasible || solver.IsProvenDualInfeasible);
 
             r1.Enabled = false;
             solver.Solve();
 
-
+            // now, the problem is primal feasible but unbounded. 
+            // The dual is infeasible because of the first dual constraint -> because of the first primal variable.
             Assert(!solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
-            Assert(solver.IsProvenDualInfeasible);		// because of the first dual constraint -> because of the first primal variable.
+            Assert(solver.IsProvenDualInfeasible);		
         }
 
         /// <summary>
@@ -2327,8 +2336,6 @@ namespace SonnetTest
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
 
-            WarmStart emptyWarmStart = solver.GetEmptyWarmStart();
-
             Variable x0 = new Variable("x0", 0, model.Infinity);
             Variable x1 = new Variable("x1", 0, model.Infinity);
 
@@ -2343,19 +2350,30 @@ namespace SonnetTest
             model.Add("r2", r2);
             model.Objective = (obj);
 
-            solver.Maximise();
+            solver.Maximise(true);
             int iterationCount = solver.IterationCount;
-
             WarmStart warmStart = solver.GetWarmStart();
 
-            // With Empty WarmStart, should have same number of iterations
-            solver.SetWarmStart(emptyWarmStart);
-            solver.Maximise();
+            // Now reset solver, and use warmStart
+            if (solver.OsiSolverFullName.Contains("OsiCpx"))
+            {
+                // OsiCpx emptyWarmStart doesnt work as expected
+                solver.Dispose();
+                solver = new Solver(model, solverType);
+            }
+            else
+            {
+                // With Empty WarmStart, should have same number of iterations
+                WarmStart emptyWarmStart = solver.GetEmptyWarmStart();
+                solver.SetWarmStart(emptyWarmStart);
+            }
+
+            solver.Maximise(true);
             Assert(iterationCount == solver.IterationCount);
 
             // With WARM warmstart, should have zero iterations to optimality!
             solver.SetWarmStart(warmStart);
-            solver.Maximise();
+            solver.Maximise(true);
             Assert(solver.IterationCount == 0);
         }
 
@@ -2419,41 +2437,68 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest33 : WarmStart test 3");
 
-            Variable[] variables;
-            Model model = Model.New("brandy.mps", out variables);
-            Solver solver = new Solver(model, solverType);
-            WarmStart emptyWarmStart = solver.GetEmptyWarmStart();
-
-            Assert(model != null);
-
-            solver.Generate();
-            foreach (Variable variable in variables)
+            string filename = "brandy.mps";
+            //first,use coin wrapper directly
             {
-                variable.Type = VariableType.Continuous;
+                object rawSolver = Activator.CreateInstance(solverType);
+                COIN.OsiSolverInterface solver = (COIN.OsiSolverInterface)rawSolver;
+                solver.readMps(filename);
+
+                solver.initialSolve();
+                var warmStart = solver.getWarmStart();
+
+                //now, restart but with limited iter max.
+                solver = (COIN.OsiSolverInterface)Activator.CreateInstance(solverType);
+                solver.readMps(filename);
+
+                int maxNumIteration;
+                solver.getIntParam(OsiIntParam.OsiMaxNumIteration, out maxNumIteration);
+                solver.setIntParam(OsiIntParam.OsiMaxNumIteration, 2);
+                solver.initialSolve();
+
+                solver.setIntParam(OsiIntParam.OsiMaxNumIteration, maxNumIteration);
+                solver.setWarmStart(warmStart);
+                solver.resolve();
+                int iterationCount = solver.getIterationCount();
+                Assert(iterationCount == 0);
             }
 
-            model.ObjectiveSense = (ObjectiveSense.Minimise);
-            solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInInitial, false, OsiHintStrength.OsiHintTry);
-            solver.OsiSolver.setHintParam(OsiHintParam.OsiDoPresolveInInitial, true, OsiHintStrength.OsiHintTry);
-            solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInResolve, false, OsiHintStrength.OsiHintTry);
-            solver.OsiSolver.setHintParam(OsiHintParam.OsiDoPresolveInResolve, true, OsiHintStrength.OsiHintTry);
-            solver.Solve();
+            // now with sonnet
+            {
+                Model model = Model.New(filename);
+                Solver solver = new Solver(model, solverType);
 
-            WarmStart warmStart = solver.GetWarmStart();
+                Assert(model != null);
+                solver.Solve(true);
 
-            // With Empty WarmStart
-            solver.SetWarmStart(emptyWarmStart);
-            int maxNumIteration;
-            solver.OsiSolver.getIntParam(OsiIntParam.OsiMaxNumIteration, out maxNumIteration);
-            solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, 2);
-            solver.Solve();
+                WarmStart warmStart = solver.GetWarmStart();
 
-            solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, maxNumIteration);
+                // Now reset solver, and use warmStart
+                if (solver.OsiSolverFullName.Contains("OsiCpx"))
+                {
+                    // OsiCpx emptyWarmStart doesnt work as expected
+                    solver.Dispose();
+                    solver = new Solver(model, solverType);
+                }
+                else
+                {
+                    // With Empty WarmStart, should have same number of iterations
+                    WarmStart emptyWarmStart = solver.GetEmptyWarmStart();
+                    solver.SetWarmStart(emptyWarmStart);
+                }
 
-            // With WARM warmstart, should have zero iterations to optimality!
-            solver.SetWarmStart(warmStart);
-            solver.Resolve();
-            Assert(solver.IterationCount == 0);
+                int maxNumIteration;
+                solver.OsiSolver.getIntParam(OsiIntParam.OsiMaxNumIteration, out maxNumIteration);
+                solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, 2);
+                solver.Solve(true);
+
+                solver.OsiSolver.setIntParam(OsiIntParam.OsiMaxNumIteration, maxNumIteration);
+
+                // With WARM warmstart, should have zero iterations to optimality!
+                solver.SetWarmStart(warmStart);
+                solver.Resolve(true);
+                Assert(solver.IterationCount == 0);
+            }
         }
 
         public void SonnetTest34()
@@ -2638,17 +2683,21 @@ namespace SonnetTest
             Model modelOrig = Model.New("MIP-124725.mps");
 
             string stringOrig = modelOrig.ToString();
-            Solver solver = new Solver(modelOrig, solverType);          
+            Solver solver = new Solver(modelOrig, solverType);
             solver.NameDiscipline = 2;
             solver.Export("export-test.lp"); // export LP has strict rules about valid row&col names!! Check log for warnings!
             solver.Export("export-test.mps");
 
-            // Check that the original and re-imported .mps model are identical
-            Model modelMps = Model.New("export-test.mps");
-            modelMps.Name = modelOrig.Name;
-            string stringMps = modelMps.ToString();
-            Assert(SonnetTest.EqualsString(stringOrig, stringMps));
-            //File.Delete("export-test.mps");
+            // OsiCpx writeMps is unreliable
+            if (!solver.OsiSolverFullName.Contains("OsiCpx"))            
+            {
+                // Check that the original and re-imported .mps model are identical
+                Model modelMps = Model.New("export-test.mps");
+                modelMps.Name = modelOrig.Name;
+                string stringMps = modelMps.ToString();
+                Assert(SonnetTest.EqualsString(stringOrig, stringMps));
+                //File.Delete("export-test.mps");
+            }
 
             // Check that the original and re-imported .lp model are identical
             Model modelLp = Model.New("export-test.lp");

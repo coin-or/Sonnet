@@ -6,8 +6,8 @@
 
 #include <OsiClpSolverInterface.hpp>		// check via ClpSimplex_H (?)
 #include <OsiCbcSolverInterface.hpp>		// check via ClpSimplex_H (?)
-
-//#include <OsiCpxSolverInterface.hpp>		// Uncomment to USE_CPLEX
+//#include <OsiCpxSolverInterface.hpp>		// Uncomment for CPLEX support
+//#include <OsiGrbSolverInterface.hpp>		// Uncomment for Gurobi support
 
 #include "OsiSolverInterface.h"
 #include "CbcModel.h"
@@ -75,7 +75,7 @@ namespace COIN
 		}
 	};
 
-/*	Uncomment to USE_CPLEX
+/*	// Uncomment for CPLEX support
 	//////////////////////////////////////////////////////
 	///// OsiCpxSolverInterface
 	//////////////////////////////////////////////////////
@@ -83,6 +83,16 @@ namespace COIN
 	{
 	public:
 		OsiCpxSolverInterface()	{ }
+	};
+*/
+/*	// Uncomment for Gurobi support
+	////////////////////////////////////////////////////
+	/// OsiGrbSolverInterface
+	////////////////////////////////////////////////////
+	public ref class OsiGrbSolverInterface : public OsiSolverInterfaceGeneric<::OsiGrbSolverInterface>
+	{
+	public:
+		OsiGrbSolverInterface()	{ }
 	};
 */
 }
