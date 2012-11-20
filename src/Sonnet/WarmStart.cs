@@ -45,9 +45,6 @@ namespace Sonnet
         {
             Ensure.NotNull(solver, "solver");
 
-            // set the warmstart object
-            solver.setWarmStart(coinWarmStart);
-
             unsafe
             {
                 // set the primal solution
@@ -103,6 +100,9 @@ namespace Sonnet
         		if (numberRows > 0 || rowPrice != null) throw new NotSupportedException();
 #endif
             }
+
+            // set the warmstart object
+            solver.setWarmStart(coinWarmStart);
         }
 
         private WarmStart() { throw new System.NotSupportedException(); }
