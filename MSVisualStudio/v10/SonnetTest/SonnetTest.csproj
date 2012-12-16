@@ -90,13 +90,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\test\AssemblyInfo.cs">
+    <Compile Include="..\..\..\test\SonnetTest\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\test\Program.cs">
+    <Compile Include="..\..\..\test\SonnetTest\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\test\SonnetTest.cs">
+    <Compile Include="..\..\..\test\SonnetTest\SonnetTest.cs">
       <Link>SonnetTest.cs</Link>
     </Compile>
   </ItemGroup>
@@ -121,7 +121,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\test\ReadMe.txt">
+    <Content Include="..\..\..\test\SonnetTest\ReadMe.txt">
       <Link>ReadMe.txt</Link>
     </Content>
   </ItemGroup>
