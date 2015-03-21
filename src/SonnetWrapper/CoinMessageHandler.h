@@ -96,6 +96,30 @@ namespace COIN
 	public:
 		CoinMessageHandlerProxy(gcroot<COIN::CoinMessageHandler ^> wrapper);
 
+		/** The copy constructor */
+		CoinMessageHandlerProxy(const CoinMessageHandlerProxy& rhs)
+			: ::CoinMessageHandler(rhs)
+		{
+			this->wrapper = rhs.wrapper;
+		}
+		
+		/** Assignment operator. */
+		CoinMessageHandlerProxy& operator=(const CoinMessageHandlerProxy&rhs)
+		{
+			if (this != &rhs)
+			{
+				CoinMessageHandler::operator=(rhs);
+				this->wrapper = rhs.wrapper;
+			}
+			return *this;
+		}
+
+		/// Clone
+		virtual CoinMessageHandler * clone() const
+		{
+			return new CoinMessageHandlerProxy(*this);
+		}
+
 		virtual int print();
 
 	private:
@@ -126,10 +150,23 @@ namespace COIN
 		{
 			return base->logLevel();
 		}
-
 		virtual void setLogLevel(int value)
 		{
 			base->setLogLevel(value);
+		}
+
+		/** Get alternative log level. */
+		virtual int logLevel(int which)
+		{
+			return base->logLevel(which);
+		}
+		/*! \brief Set alternative log level value.
+
+			Can be used to store alternative log level information within the handler.
+		*/
+		virtual void setLogLevel(int which, int value)
+		{
+			base->setLogLevel(which, value);
 		}
 
 		virtual int print()
@@ -197,6 +234,7 @@ namespace COIN
 		}
 
 	private:
+		bool freezeLogLevel;
 		::CoinMessageHandler *base;
 
 		int disposed;

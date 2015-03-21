@@ -269,6 +269,7 @@ namespace COIN
 		{
 		}
 
+	internal:
 		property T * Base 
 		{
 			T * get() 

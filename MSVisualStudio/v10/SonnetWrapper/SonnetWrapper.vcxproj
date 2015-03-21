@@ -227,6 +227,7 @@ IF EXIST $(OutDir)$(TargetName).xml (
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\SonnetWrapper\AssemblyInfo.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcModel.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcStrategy.h" />

@@ -5,6 +5,7 @@
 #ifndef Variable_H
 #define Variable_H
 
+#include <map>
 #include <string>
 #include "ModelEntity.h"
 #include "Utils.h"
@@ -123,7 +124,7 @@ namespace Sonnet
 			for (int i = 0; i < n; i++)
 			{
 				string name = "";
-				if (!varname.empty()) name = string_ormat("%s_%i", varname, i);
+				if (!varname.empty()) name = string_format("%s_%i", varname, i);
 
 				tmp[i] = new Variable(name, lower, upper, type);
 			}
@@ -146,20 +147,19 @@ namespace Sonnet
 		/// <param name="upper">The upper bound of the new variables.</param>
 		/// <param name="type">The type of the new variables.</param>
 		/// <returns>Array of variables of the given size.</returns>
-		public static Dictionary<T, Variable> New<T>(IEnumerable<T> set, string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+		template<class T>
+		static map<T, Variable*>* New(const list<T> &set, const string &varname = "", double lower = 0.0, double upper = MathUtils::getInfinity(), VariableType type = Continuous)
 		{
-			Dictionary<T, Variable> tmp = new Dictionary<T,Variable>();
-			foreach(T i in set) 
+			map<T, Variable*>* tmp = new map<T,Variable*>();
+			for (auto i = set.begin(); i < set.end(); i++)
 			{
-				string name = null;
-				if (varname != null) name = string.Format("{0}_{1}", varname, i.ToString());
+				string name = "";
+				if (!varname.empty()) name = string_format("%s_%i", varname, i);
 
-				tmp[i] = new Variable(name, lower, upper, type);
+				tmp[*i] = new Variable(name, lower, upper, type);
 			}
 			return tmp;
 		}
-
-#ifdef TODO
 
 		/// <summary>
 		/// Returns a dictionary of the given type filled with new Variables constructed with a name,
@@ -175,7 +175,8 @@ namespace Sonnet
 		/// <param name="upper">The upper bound of the new variables.</param>
 		/// <param name="type">The type of the new variables.</param>
 		/// <returns>Array of variables of the given size.</returns>
-		public static Dictionary<T, Variable> New<T>(string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
+		template<class T>
+		static map<T, Variable*>* New(const string &varname = "", double lower = 0.0, double upper = MathUtils::getInfinity(), VariableType type = Continuous)
 		where T : struct, IConvertible
 		{
 			if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
@@ -183,33 +184,12 @@ namespace Sonnet
 			Dictionary<T, Variable> tmp = new Dictionary<T, Variable>();
 			foreach (T i in Enum.GetValues(typeof(T)))
 			{
-				string name = null;
-				if (varname != null) name = string.Format("{0}_{1}", varname, i.ToString());
+				string name = "";
+				if (!varname.empty()) name = string_format("%s_%i", varname, i);
 
 				tmp[i] = new Variable(name, lower, upper, type);
 			}
 			return tmp;
-		}
-
-		/// <summary>
-		/// Returns a value indicating whether this instance is equal to a specified object.
-		/// </summary>
-		/// <param name="obj">The System.Object to compare with the current variable.</param>
-		/// <returns>true if obj has the same value as this instance; otherwise, false.</returns>
-		public override bool Equals(object obj)
-		{
-			// to prevent warning CS0660
-			return base.Equals(obj);
-		}
-
-		/// <summary>
-		/// Serves as a hash function for this variable, based only on the id.
-		/// </summary>
-		/// <returns>A hash code for the current variable.</returns>
-		public override int GetHashCode()
-		{
-			// to prevent warning CS0661
-			return base.GetHashCode();
 		}
 
 		/// <summary>
@@ -220,9 +200,9 @@ namespace Sonnet
 		/// {2} is the lower bound and {3} is the upper bound
 		/// </summary>
 		/// <returns>A string that represents the current variable.</returns>
-		public override string ToString()
+		string ToString()
 		{
-			return string.Format("{0} : {1} : [{2}, {3}]", Name, type, lower.ToDoubleString(), upper.ToDoubleString());
+			return string_format("%s : %i : [%lf, %lf]", Name, type, lower.ToDoubleString(), upper.ToDoubleString());
 		}
 
 		/// <summary>
@@ -234,24 +214,25 @@ namespace Sonnet
 		/// {2} is the reduced cost.
 		/// </summary>
 		/// <returns>A string representation of this instance using its value and reduced cost.</returns>
-		public string ToLevelString()
+		string ToLevelString()
 		{
-			return string.Format("{0} = {1}   ( {2} )", this, value, reducedCost);
+			return string_format("%s = %lf   ( %lf )", ToString(), value, reducedCost);
 		}
 
 		/// <summary>
 		/// Get or set the upper bound of this variable.
 		/// </summary>
-		public double Upper
+		double getUpper()
 		{
-			get { return upper; }
-			set
+			return upper;
+		}
+
+		void setUpper(double value)
+		{
+			if (upper.CompareToEps(value) != 0)
 			{
-				if (upper.CompareToEps(value) != 0)
-				{
-					upper = value;
-					foreach(Solver solver in solvers) solver.SetVariableUpper(this, upper);
-				}
+				upper = value;
+				foreach(Solver solver in solvers) solver.SetVariableUpper(this, upper);
 			}
 		}
 

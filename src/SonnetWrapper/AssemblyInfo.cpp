@@ -1,6 +1,7 @@
 // Copyright (C) 2011, Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
+#include "AssemblyInfo.h"
 
 using namespace System;
 using namespace System::Reflection;
@@ -13,13 +14,13 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("SonnetWrapper")];
-[assembly:AssemblyDescriptionAttribute("SonnetWrapper is a managed DLL with wrapper classes around existing C++ COIN classes")];
+[assembly:AssemblyTitleAttribute(VER_FILENAME)];
+[assembly:AssemblyDescriptionAttribute(VER_FILECOMMENTS)];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
 [assembly:AssemblyProductAttribute("SONNET")];
-[assembly:AssemblyCopyrightAttribute("Copyright © 2012")];
-[assembly:AssemblyTrademarkAttribute("This code is licensed under the terms of the Eclipse Public License (EPL)")];
+[assembly:AssemblyCopyrightAttribute(VER_COPYRIGHT)];
+[assembly:AssemblyTrademarkAttribute(VER_TRADEMARK)];
 [assembly:AssemblyCultureAttribute("")];
 //
 // Version information for an assembly consists of the following four values:
@@ -32,8 +33,8 @@ using namespace System::Security::Permissions;
 // You can specify all the value or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 
-[assembly:AssemblyVersionAttribute("1.1.1.*")];
-//[assembly:AssemblyFileVersionAttribute("1.1.1.0")];
+[assembly:AssemblyVersionAttribute(VER_ASSEMBLYVERSION_STR)];
+[assembly:AssemblyFileVersionAttribute(VER_FILEVERSION_STR)];
 [assembly:ComVisible(false)];
 
 [assembly:CLSCompliantAttribute(true)];

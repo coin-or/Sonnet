@@ -7,6 +7,9 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <limits>
+#include <cmath>
+#include <algorithm>
 #include <string>
 
 using namespace std;
@@ -29,7 +32,7 @@ namespace Sonnet
 	// %i or %d for int
 	// %c for char
 	// %f for float
-	// %lf for ouble
+	// %lf for double
 	// %s for string
 	string string_format(const string &fmt, ...) 
 	{
@@ -52,17 +55,123 @@ namespace Sonnet
 		}
 	}
 
-	class MathUtils
-	{
+
+	/// <summary>
+    /// This class implements various static methods
+    /// </summary>
+    class MathUtils
+    {
 	public:
-		static const double getInfinity()
-		{
-			return 10000000.0;// TODO
-		}
+        static const double Infinity;
+        static const double Epsilon;
+        static bool UseAbsoluteComparisonOnly;
+        /// <summary>
+        /// Compares this double to the given value.
+        /// Returns -1 if b is larger, 1 if b is smaller, and 0 otherwise.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <param name="b">The given double.</param>
+        /// <returns>-1 if this double is smaller than b - eps,
+        /// 1 if a is larget than b + eps, and 0 otherwise.
+        /// </returns>
+        static int CompareToEps(double a, double b)
+        {
+            double eps = Epsilon;
+            // if either a or b is close to zero, then do absolute difference
+            // otherwise (the 'if' here) do a relative comparison (relative to the absolute value of the highest of a and b)
+            if (!UseAbsoluteComparisonOnly &&
+                fabs(a) >= Epsilon && fabs(b) >= Epsilon)
+                eps *= fabs(max(a, b));
+
+            if (a < b - eps)
+                return -1;
+            if (a > b + eps)
+                return 1;
+            return 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is positive.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>True iff this double is larger than zero.</returns>
+        static bool IsPositive(double a)
+        {
+            return CompareToEps(a, 0.0) > 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is negative.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>True iff this double is smaller than zero.</returns>
+        static bool IsNegative(double a)
+        {
+            return CompareToEps(a, 0.0) < 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is equal to or between the given two bounds.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="x">This double.</param>
+        /// <param name="l">the lowwer bound.</param>
+        /// <param name="u">The upper bound.</param>
+        /// <returns>True iff this double is equal to or between the two bounds.</returns>
+        static bool IsBetween(double l, double x, double u)
+        {
+            if (CompareToEps(x, l) >= 0 && CompareToEps(x, u) <= 0) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether this double is equal to zero.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <returns>True iff this double is equal to zero.</returns>
+        static bool IsZero(double a)
+        {
+            return CompareToEps(a, 0.0) == 0;
+        }
+
+        /// <summary>
+        /// Determines whether this double is integer.
+        /// This method uses Utils.Epsilon.
+        /// </summary>
+        /// <param name="a">This double</param>
+        /// <returns>true if this double is integer, and false otherwise.</returns>
+        static bool IsInteger(double a)
+        {
+			int intpart = (int)(( a < 0 ) ? a - 0.5 : a + 0.5);
+            return IsZero(intpart - a);
+        }
+
+        /// <summary>
+        /// Creates a string representation of this double.
+        /// Uses "-Inf" and "Inf" whenever applicatable.
+        /// </summary>
+        /// <param name="a">This double.</param>
+        /// <returns>"-Inf" if a is less than or equal to Utils.Infinity, "Inf" is larger or equal, and 
+        /// regular a.ToString() otherwise.</returns>
+        static string ToDoubleString(double a)
+        {
+            if (a <= -Infinity) return "-Inf";
+            if (a >= Infinity) return "Inf";
+
+            return string_format("%lf", a);
+        }
 
 	private:
 		MathUtils() {} // DONT USE
 	};
+
+	const double MathUtils::Infinity = numeric_limits<double>::max();
+    const double MathUtils::Epsilon = 1e-5;
+    bool MathUtils::UseAbsoluteComparisonOnly = false;
 }
 
 #endif

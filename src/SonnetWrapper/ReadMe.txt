@@ -30,3 +30,6 @@ From http://msdn.microsoft.com/en-us/library/9yb4317s(v=VS.100).aspxc
 To enable 64-bit tools on Visual C++ Express, 
 install the Windows Software Development Kit (SDK) 
 in addition to Visual C++ Express."
+
+The SonnetWrapper.sln solution is prepared to build Win32 and x64 builds, if your 
+Visual Studio editions support it.

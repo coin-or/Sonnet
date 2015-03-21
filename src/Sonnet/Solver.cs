@@ -1493,6 +1493,7 @@ namespace Sonnet
         /// <summary>
         /// Get and store the solution status (optimal, etc), and the solution values for the variables and constraints from the solver.
         /// These values are subsequently stored at the variables and constraints for later retrieval via variable.Value etc.
+        /// Some values, like row prices, are not available for MIP.
         /// </summary>
         /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignSolution(bool mipSolve)
@@ -1504,7 +1505,9 @@ namespace Sonnet
 
         /// <summary>
         /// Get and store the solution status values (isProvenOptimal etc)
+        /// Iteration Count is not available for MIP.
         /// </summary>
+        /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignSolutionStatus(bool mipSolve)
         {
             isAbandoned = solver.isAbandoned();
@@ -1521,7 +1524,9 @@ namespace Sonnet
 
         /// <summary>
         /// Get and store the primal solution values to the variables and reduced cost
-        /// </summary>
+        /// Reduced Cost of columns not available for MIP.
+        /// /// </summary>
+        /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignVariableSolution(bool mipSolve)
         {
 #if (DEBUG)
@@ -1573,7 +1578,9 @@ namespace Sonnet
         /// get and store the values of the primal constraints in the dual solution
         /// get and propagate the values of the primal constraints in the dual solution
         /// and the total LHS( or "middle") value of the constraints in the current (primal) solution, with all var. moved left
+        /// Prices or rows not available for MIP.
         /// </summary>
+        /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignConstraintSolution(bool mipSolve)
         {
 #if (DEBUG)

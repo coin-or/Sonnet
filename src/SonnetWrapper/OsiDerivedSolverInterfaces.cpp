@@ -49,21 +49,24 @@ namespace COIN
 	}
 
 	// JWG: added to enable lean loading of model (via resize & assignmatrix)
-	// This code is for the native C++ OsiClp (not in SonnetWrapper)
 	// See other loadProblem implementations above, but without the actual loading..
+	// Add this code (uncommented) to the native C++ OsiClp (not in SonnetWrapper)
+	/*
 	void OsiClpSolverInterface::loadCurrentProblem()
 	{
-	  // Get rid of integer information (modelPtr will get rid of its copy)
-	  delete [] integerInformation_;
-	  integerInformation_=NULL;
-	  linearObjective_ = modelPtr_->objective();
-	  freeCachedResults();
-	  basis_=CoinWarmStartBasis();
-	  if (ws_) {
-		 delete ws_;
-		 ws_ = 0;
-	  }
+		// Get rid of integer information (modelPtr will get rid of its copy)
+		delete [] integerInformation_;
+		integerInformation_=NULL;
+		linearObjective_ = modelPtr_->objective();
+		freeCachedResults();
+		basis_=CoinWarmStartBasis();
+		if (ws_) 
+		{
+			delete ws_;
+			ws_ = 0;
+	  	}
 	}
+	*/
 #endif
 
 	//////////////////////////////////////////////////////

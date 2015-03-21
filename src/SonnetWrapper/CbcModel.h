@@ -140,6 +140,17 @@ namespace COIN
 			else Base->setStrategy(nullptr);
 		}
 
+		bool isProvenOptimal()
+		{
+			return Base->isProvenOptimal();
+		}
+		
+		/// Final status of problem - 0 finished, 1 stopped, 2 difficulties
+		int status()
+		{ 
+			return Base->status();
+		}
+
 		/// Get the number of cut generators
 		int numberCutGenerators() 
 		{

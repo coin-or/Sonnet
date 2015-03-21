@@ -17,19 +17,18 @@ In contrast, the Sonnet library is writen in C#. This library uses a reference t
 Code is provided to perform various tests on the Sonnet library.
 
 All projects and solutions are provided for Visual Studio 2010 only.
-Since Visual Studio 2010 Express (see "MSVisualStudio\v10e") cannot mix projects of different languages, 
 
+Since Visual Studio 2010 Express (see "MSVisualStudio\v10") cannot mix projects of different languages, 
 the C++/CLI projects (SonnetWrapper and COIN libraries) are put into one solution, 
 and the C# projects (Sonnet and SonnetTest) are put into another solution.
 Note that both Visual C++ Express and Visual C# Express are required.
 The downside of this split is that the Sonnet library has an outside dependency on the SonnetWrapper library, 
 which must be manually built first.
 
-To build SonnetWrapper with 64-bit support in VS Express, see the Readme.txt there.
+To build SonnetWrapper with 64-bit support in VS Express, see "src\SonnetWrapper\Readme.txt",
+because VS Express does not ship with x64 support by default. See also "src\Sonnet\Readme.txt".
 
-For use within (non-Express) Visual Studio 2010 (see "MSVisualStudio\v10"), 
-one single solution is also provided that contains all projects.
-
+If you use (non-Express) Visual Studio 2010 then you can create one single solution that contains all projects.
 See http://www.microsoft.com/visualstudio/en-us/products/2010-editions/express 
 
 To strongly name (sign) the Sonnet.dll and SonnetWrapper.dll there are two options:
