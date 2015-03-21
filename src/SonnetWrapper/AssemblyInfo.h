@@ -4,8 +4,8 @@
 
 #pragma once
 
-#define VER_FILEVERSION			1,1,1,293
-#define VER_FILEVERSION_STR		"1.1.1.293"
+#define VER_FILEVERSION			1,1,2,293
+#define VER_FILEVERSION_STR		"1.1.2.293"
 
 // About Production & Assembly version:
 // Did the interface change? 
@@ -13,9 +13,9 @@
 //         -> No: Then change the version number
 //         -> Yes: Keep same version. 
 // -> No: Keep same version.
-#define VER_PRODUCTVERSION		1,1,1,0
-#define VER_PRODUCTVERSION_STR	"1.1.1.0"
-#define VER_ASSEMBLYVERSION_STR	"1.1.1.0" // Can use *
+#define VER_PRODUCTVERSION		1,1,2,0
+#define VER_PRODUCTVERSION_STR	"1.1.2.0"
+#define VER_ASSEMBLYVERSION_STR	"1.1.2.0" // Can use *
 
 #ifdef _DEBUG
 #ifdef WIN64

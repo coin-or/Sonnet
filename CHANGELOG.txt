@@ -4,10 +4,10 @@ Note that Sonnet and SonnetWrapper have different version numbers.
 Below are mentioned "[File Version] Product  Assembly Version".
 The File Version numbers change with every release. In contrast, the Assembly Version numbers are more stable.
 
-[1.1.1.1] Sonnet  1.1.1.0:
+[1.1.2.0] Sonnet  1.1.2.0:
 - For MIP solves, some solution values are not available such as reduced cost, row price, etc.
 
-[1.1.1.293] SonnetWrapper  1.1.1.0:
+[1.1.2.293] SonnetWrapper  1.1.2.0:
 - Updated to Cbc 2.9.3 of 8 Mar 201 from http://www.coin-or.org/download/source/Cbc/
 - Updated dll properties to reflect Cbc version used.
 
