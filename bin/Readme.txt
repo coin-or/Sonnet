@@ -1,7 +1,7 @@
 Sonnet-1.1.2-bin.zip 
 ---------------------
 Alternative download location:
-http://sonnet-project.svn.sourceforge.net/viewvc/sonnet-project/Sonnet/bin/releases/
+http://sourceforge.net/p/sonnet-project/code/HEAD/tree/Sonnet/bin/
 
 This file contains the complete assemblies to use SONNET (.NET Framework 4). 
 Built-in are the necessary COIN libraries based on Cbc 2.9.3 (8 Mar 2015).
@@ -12,10 +12,10 @@ Getting the source code
 ---------------------
 The latest SONNET sources can be downloaded from the Subversion repository from this link:
 
-http://sonnet-project.svn.sourceforge.net/viewvc/sonnet-project/
--> Download GNU tarball
+http://sourceforge.net/p/sonnet-project/code/HEAD/tree/
+-> Download Snapshot
 
-The downloaded gzipped tar archive containt the SONNET source code 
+The downloaded zip file contains the Sonnet source code 
 and MS Visual Studio 2010 solutions. It also includes several examples.
 
 Building SONNET
