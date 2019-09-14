@@ -2283,7 +2283,11 @@ namespace SonnetTest
             int n = Math.Min(3, Environment.ProcessorCount + 1);
             var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
             double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
-            if (memoryGB < 6) Console.WriteLine("SonnetTest30 - Stress test skipped because less than 6GB memory.");
+            if (memoryGB < 6)
+            {
+                Console.WriteLine("SonnetTest30 - Stress test skipped because less than 6GB memory.");
+                return;
+            }
 
            Console.WriteLine("Number of threads: " + n);
             System.Threading.Thread[] threads = new System.Threading.Thread[n];

@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SonnetWrapper">
-      <HintPath>..\SonnetWrapper\SonnetWrapper.dll</HintPath>
+      <HintPath>..\Debug\SonnetWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

@@ -11,8 +11,8 @@ namespace SonnetExamples.Example6
         // t w o
         // e a n
         // n b e
-        static string[] Words = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"};
-        //static string[] Words = { "one", "two", "ten", "ean", "nbe" };
+        //static string[] Words = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"};
+        static string[] Words = { "one", "two", "ten", "ean", "nbe" };
         static string Alfabet = GetAlfabet(Words);
         
         public void Run()
@@ -105,11 +105,7 @@ namespace SonnetExamples.Example6
 
             m.Objective = obj;
             m.ObjectiveSense = ObjectiveSense.Minimise;
-            COIN.OsiCbcSolverInterface cbc = new COIN.OsiCbcSolverInterface();
-            //cbc.SetCbcSolverArgs("-logLevel=0");
-            Solver s = new Solver(m, cbc);
-            //s.Export("alfa6.mps");
-            s.LogLevel = 4;
+            Solver s = new Solver(m, typeof(COIN.OsiCbcSolverInterface));
             s.Solve();
             
             Console.WriteLine(s.ToSolutionString());
