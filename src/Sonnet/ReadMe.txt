@@ -15,10 +15,6 @@ Eventhough Sonnet _can_ be built to target "Any CPU", this will fail at run time
 SonnetWrapper library is called.
 Therefore, the Sonnet assembly doesn't have an Any CPU solution platform.
 
-Note, using dynamic assembly loading, it is possible to implement rudimentary "Any CPU" support.
-See http://scottbilas.com/blog/automatically-choose-32-or-64-bit-mixed-mode-dlls/
-and some code in the Model.cs.
-
 
 About Debug vs Release
 -------------------------
@@ -27,13 +23,14 @@ At runtime, is it OK to mix Release and Debug mode Sonnet and SonnetWrapper buil
 
 About additional functionality
 -------------------------
-Several parts of the source code have been disabled because they require, e.g., non-standard 
-COIN code.
+Several parts of the source code have been disabled because they require, e.g., non-standard COIN-OR code.
 
-SONNET_CONSTRAINT_SET_COEF (Constraint.cs and Solver.cs)
-  Support for setting individual variable coefficients of constraints
-SONNET_DYNAMIC_LOADING (Model.cs)
-  Dynamic loading of 32-bit or 64-bit. This is not supported.
-SONNET_LEANLOADPROBLEM (Solver.cs)
+SONNET_LEANLOADPROBLEM (Solver.cs, See also SonnetWrapper)
   Especially for CLP, this functionality loads problems more efficiently but requires 
   non-standard osiClp code. This is really only interesting for large problems (>100K var/con)
+SONNET_USE_SEMICONTVAR (Solver.cs)
+  Unfinished code for adding a variable type of SemiContinuousVariable, and automatically generate
+  helper variable (binary) and constraint.
+SONNET_SETWARMROWPRICE (WarmStart.cs)
+  Whether or not to include row price information in WarmStart
+  

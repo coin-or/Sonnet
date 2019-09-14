@@ -1,4 +1,4 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -12,6 +12,7 @@
 #include "OsiSolverInterface.h"
 #include "CbcModel.h"
 #include "CbcStrategy.h"
+#include "ClpModel.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -33,6 +34,11 @@ namespace COIN
 			int*&Cst, int *&Clg, int *&Rnr, double *&Elm, 
 			double*&l, double*&u, double *& c, double*&bl, double*&bu);
 #endif
+
+		ClpSimplex^ getModelPtr()
+		{
+			return gcnew ClpSimplex(Base->getModelPtr());
+		}
 	};
 
 	//////////////////////////////////////////////////////
@@ -61,6 +67,11 @@ namespace COIN
 			return gcnew CbcModel(Base->getModelPtr());
 		}
 
+		/// Get pointer to underlying solver
+		inline OsiSolverInterface ^ getRealSolverPtr()
+		{
+			return getModelPtr()->solver();
+		}
 
 		void resetModelToReferenceSolver();
 		void saveModelReferenceSolver();

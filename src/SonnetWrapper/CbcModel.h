@@ -1,4 +1,4 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -9,6 +9,7 @@
 #include "CbcStrategy.h"
 #include "CglCutGenerator.h"
 #include "CbcCutGenerator.h"
+#include "OsiSolverInterface.h"
 #include "Helpers.h"
 
 using namespace System;
@@ -26,6 +27,10 @@ namespace COIN
 
 	public:
 		CbcModel() { }
+
+		OsiSolverInterface^ solver() {
+			return OsiSolverInterface::CreateDerived(Base->solver());
+		}
 
 		#pragma region void addCutGenerator
 		/** Add one generator - up to user to delete generators.

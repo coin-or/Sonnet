@@ -1,4 +1,4 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -126,9 +126,7 @@ namespace COIN
 		void setObjCoeff(int index, double value);
 		void setObjSense(double sense);
 		void setObjective(array<double> ^coefs);
-#ifdef SONNET_CONSTRAINT_SET_COEF
-		void setCoef(int conIndex, int varIndex, double value);
-#endif
+
 		virtual CoinWarmStart ^ getEmptyWarmStart();
 		virtual CoinWarmStart ^ getWarmStart();
 		virtual bool setWarmStart(CoinWarmStart ^ warmstart);
@@ -244,6 +242,9 @@ namespace COIN
 			      const double* collb, const double* colub,   
 			      const double* obj,
 			      const double* rowlb, const double* rowub);
+
+
+		static OsiSolverInterface^ CreateDerived(::OsiSolverInterface* derived);
 	};
 
 	template <class T> 

@@ -1,4 +1,4 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -23,32 +23,6 @@ namespace Sonnet
     /// </summary>
     public class Model : Named
     {
-#if (DYNAMIC_LOADING)
-        static Model()
-        {
-            // Addapted after http://scottbilas.com/blog/automatically-choose-32-or-64-bit-mixed-mode-dlls/
-
-            string assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.proxy.dll"))
-                || !File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.x86.dll"))
-                || !File.Exists(Path.Combine(assemblyDir, "SonnetWrapper.x64.dll")))
-            {
-                throw new InvalidOperationException("Found SonnetWrapper.proxy.dll which cannot exist. "
-                    + "Must instead have SonnetWrapper.x86.dll and SonnetWrapper.x64.dll. Check your build settings.");
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += (_, e) =>
-            {
-                if (e.Name.StartsWith("SonnetWrapper.proxy,", StringComparison.OrdinalIgnoreCase))
-                {
-                    string fileName = Path.Combine(assemblyDir,
-                        string.Format("SonnetWrapper.{0}.dll", (IntPtr.Size == 4) ? "x86" : "x64"));
-                    return Assembly.LoadFile(fileName);
-                }
-                return null;
-            };
-        }
-#endif
         #region Constructors
         /// <summary>
         /// Initializes a new instance of the Model class with the given name.
@@ -339,9 +313,9 @@ namespace Sonnet
                 log.PassToCoinLpIO(m);
 
                 m.setInfinity(MathUtils.Infinity);
-                /// If the original problem is
-                /// a maximization problem, the objective function is immediadtly 
-                /// flipped to get a minimization problem.  
+                // If the original problem is
+                // a maximization problem, the objective function is immediadtly 
+                // flipped to get a minimization problem.  
                 m.readLp(fileName);
                 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName, 

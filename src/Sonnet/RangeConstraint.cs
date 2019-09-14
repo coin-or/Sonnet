@@ -1,4 +1,4 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -143,8 +143,12 @@ namespace Sonnet
             return expr.GetCoefficient(var);
         }
 
-#if (CONSTRAINT_SET_COEF)
-        // Change the coefficient of variable var to value. Returns the old coefficient of this variable.
+        /// <summary>
+        /// Change the coefficient of variable var to value. Returns the old coefficient of this variable.
+        /// </summary>
+        /// <param name="var">The variable for which to set the coefficient.</param>
+        /// <param name="value">The new value</param>
+        /// <returns>The old value</returns>
         public double SetCoefficient(Variable var, double value)
         {
             Ensure.NotNull(var, "variable");
@@ -154,7 +158,7 @@ namespace Sonnet
 
             return oldValue;
         }
-#endif
+
         /// <summary>
         /// Determines the slack compared to the upper bound (only) of this range constraint in the current solution. 
         /// The slack should be non-negative in a feasible solution.

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2011, Jan-Willem Goossens 
+﻿// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
@@ -992,6 +992,16 @@ namespace Sonnet
 #endif
                 {
                     solver.loadProblemUnsafe(n, m, Cst, Rnr, Elm, l, u, c, bl, bu);
+
+                    CoinUtils.DeleteArray(Elm);
+                    CoinUtils.DeleteArray(Rnr);
+                    CoinUtils.DeleteArray(Cst);
+                    CoinUtils.DeleteArray(Clg);
+                    CoinUtils.DeleteArray(c);
+                    CoinUtils.DeleteArray(l);
+                    CoinUtils.DeleteArray(u);
+                    CoinUtils.DeleteArray(bl);
+                    CoinUtils.DeleteArray(bu);
                 }
 
                 // Skip this: doesnt work as expected with max/min problems
@@ -1706,7 +1716,6 @@ namespace Sonnet
             solver.setObjCoeff(offset, value);
         }
         
-#if (CONSTRAINT_SET_COEF)
         // methods for changing Range Constraints
         internal void SetCoefficient(RangeConstraint con, Variable var, double value)
         {
@@ -1716,9 +1725,34 @@ namespace Sonnet
             int conOffset = Offset(con);
             int varOffset = Offset(var);
 
-            solver.setCoef(conOffset, varOffset, value);
+            //solver.setCoef(conOffset, varOffset, value);
+            if (solver is OsiClpSolverInterface)
+            {
+                OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
+                osiClp.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
+                return;
+            }
+
+            if (solver is OsiCbcSolverInterface)
+            {
+                OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
+                OsiSolverInterface osiReal = osiCbc.getRealSolverPtr();
+                if (osiReal is OsiClpSolverInterface)
+                {
+                    OsiClpSolverInterface osiClp = (OsiClpSolverInterface)osiReal;
+                    osiClp.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
+                    return;
+                }
+                else
+                {
+                    //.. nothing really..
+                    throw new NotImplementedException("SetCoefficient is not implemented for '" + solver.GetType().Name + "' type of solver with real solver '" + osiReal.GetType().Name + "'.");
+                }
+            }
+
+            throw new NotImplementedException("SetCoefficient is not implemented for '" + solver.GetType().Name + "' type of solver.");
         }
-#endif
+
         internal virtual void SetConstraintUpper(RangeConstraint con, double upper)
         {
             Ensure.NotNull(con, "range constraint");

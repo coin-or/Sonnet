@@ -1,10 +1,12 @@
-// Copyright (C) 2011, Jan-Willem Goossens 
+// Copyright (C) Jan-Willem Goossens 
 // All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 #include "CoinUtils.h"
 #include "OsiSolverInterface.h"
 #include "CoinError.h"
+
+#include "OsiDerivedSolverInterfaces.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -451,20 +453,6 @@ namespace COIN
 		}
 	}
 
-#ifdef SONNET_CONSTRAINT_SET_COEF
-	void OsiSolverInterface::setCoef(int conIndex, int varIndex, double value)
-	{
-		try
-		{
-			Base->setCoef(conIndex, varIndex, value);
-		}
-		catch (::CoinError err)
-		{
-			throw gcnew CoinError(err);
-		}
-	}
-#endif
-
 	CoinWarmStart ^ OsiSolverInterface::getEmptyWarmStart()
 	{
 		return gcnew CoinWarmStart(Base->getEmptyWarmStart());
@@ -742,4 +730,24 @@ namespace COIN
 			throw gcnew CoinError(err);
 		}
 	}	
+
+	OsiSolverInterface^ OsiSolverInterface::CreateDerived(::OsiSolverInterface* derived)
+	{
+		if (dynamic_cast<::OsiClpSolverInterface*>(derived))
+		{
+			OsiSolverInterface^ result = gcnew OsiClpSolverInterface();
+			result->Base = dynamic_cast<::OsiClpSolverInterface*>(derived);
+			result->TransferBase();
+			return result;
+		}
+		else if (dynamic_cast<::OsiCbcSolverInterface*>(derived))
+		{
+			OsiSolverInterface^ result = gcnew OsiCbcSolverInterface();
+			result->Base = dynamic_cast<::OsiCbcSolverInterface*>(derived);
+			result->TransferBase();
+			return result;
+		}
+
+		throw gcnew ArgumentException(L"CreateDerived is not implemented for this type", gcnew String(typeid(derived).name()));
+	}
 }

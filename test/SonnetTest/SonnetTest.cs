@@ -105,11 +105,9 @@ namespace SonnetTest
                     SonnetTest8();
                     SonnetTest9();
                     SonnetTest10();
-#if (CONSTRAINT_SET_COEF)
                     SonnetTest11();
                     SonnetTest12();
                     SonnetTest13();
-#endif
                     SonnetTest14();
                     SonnetTest15();
                     SonnetTest16();
@@ -155,8 +153,7 @@ namespace SonnetTest
             Console.WriteLine("\n\nUnit Test finished. Press enter to finish.");
             Console.ReadLine();
         }
-
-
+        
         public void SonnetTest1()
         {
             Console.WriteLine("SonnetTest1");
@@ -649,7 +646,6 @@ namespace SonnetTest
                 MathExtension.CompareDouble(r1.Value, 15.0) == 0);
         }
 
-#if (CONSTRAINT_SET_COEF)
         public void SonnetTest11()
         {
             Console.WriteLine("SonnetTest11");
@@ -857,7 +853,6 @@ namespace SonnetTest
             Assert(MathExtension.CompareDouble(r0.Value, 20.0) == 0 &&
                 MathExtension.CompareDouble(r1.Value, 5.0) == 0);
         }
-#endif // CONSTRAINT_SET_COEF
 
         public void SonnetTest14()
         {
@@ -2286,7 +2281,11 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest30 - min(3,(n+1)) multi-processor stress test");
             int n = Math.Min(3, Environment.ProcessorCount + 1);
-            Console.WriteLine("Number of threads: " + n);
+            var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+            double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
+            if (memoryGB < 6) Console.WriteLine("SonnetTest30 - Stress test skipped because less than 6GB memory.");
+
+           Console.WriteLine("Number of threads: " + n);
             System.Threading.Thread[] threads = new System.Threading.Thread[n];
             for (int i = 0; i < n; i++)
             {
