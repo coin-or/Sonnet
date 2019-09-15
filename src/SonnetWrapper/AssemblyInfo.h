@@ -18,13 +18,13 @@
 #define VER_ASSEMBLYVERSION_STR	"1.2.0.0" // Can use *
 
 #ifdef _DEBUG
-#ifdef WIN64
+#ifndef WIN32
 #define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (Debug), based on Cbc 2.10.3"
 #else
 #define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (Debug), based on Cbc 2.10.3"
 #endif
 #else
-#ifdef WIN64
+#ifndef WIN32
 #define VER_FILEDESCRIPTION "SonnetWrapper 64-bit, based on Cbc 2.10.3"
 #else
 #define VER_FILEDESCRIPTION "SonnetWrapper 32-bit, based on Cbc 2.10.3"

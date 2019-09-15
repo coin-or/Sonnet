@@ -34,6 +34,19 @@ namespace SonnetTest
     {
         public Type solverType;
 
+        public double availableMemoryGb;
+
+        public double AvailableMemoryGbNow
+        {
+            get
+            {
+                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much
+                double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
+                return memoryGB;
+            }
+        }
+
         public string FindBinParent(string directory)
         {
             if (directory == null || directory.Length == 0) return string.Empty;
@@ -63,6 +76,7 @@ namespace SonnetTest
             //
             // TODO: Add constructor logic here
             //
+            this.availableMemoryGb = AvailableMemoryGbNow;
         }
 
         private static System.Reflection.FieldInfo GetNumberOfVariablesOfVariableClass()
@@ -2222,10 +2236,10 @@ namespace SonnetTest
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
 
-            var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
-            double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
+            double memoryGB = this.availableMemoryGb;
             int n = Math.Min(3, Environment.ProcessorCount + 1);
-
+            Console.WriteLine("Available Memory (GB) at the start of all testing: " + memoryGB);
+            Console.WriteLine("Available Memory (GB) Now: " + AvailableMemoryGbNow);
             // N = 3K, M = 30K, Z=100 requires works with about 1.5GB per thread (n).
             // Let's scale accordingly
             // Note: Arguably only M and Z matter, but we scall also N
@@ -2281,15 +2295,10 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest30 - min(3,(n+1)) multi-processor stress test");
             int n = Math.Min(3, Environment.ProcessorCount + 1);
-            var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
-            double memoryGB = (pc.TotalPhysicalMemory + pc.TotalVirtualMemory) / 1073741824.0;
-            if (memoryGB < 6)
-            {
-                Console.WriteLine("SonnetTest30 - Stress test skipped because less than 6GB memory.");
-                return;
-            }
-
-           Console.WriteLine("Number of threads: " + n);
+            double memoryGB = this.availableMemoryGb;
+            Console.WriteLine("Available Memory (GB) at the start of all testing: " + memoryGB);
+            Console.WriteLine("Available Memory (GB) Now: " + AvailableMemoryGbNow);
+            Console.WriteLine("Number of threads: " + n);
             System.Threading.Thread[] threads = new System.Threading.Thread[n];
             for (int i = 0; i < n; i++)
             {
@@ -2326,6 +2335,7 @@ namespace SonnetTest
             catch (Exception exception)
             {
                 Console.WriteLine(exception.ToString());
+                Console.WriteLine(exception.StackTrace.ToString());
                 if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
                 throw;
                 // could be out-of-memory... Can we examine the SEHException?
@@ -2684,16 +2694,18 @@ namespace SonnetTest
             Console.WriteLine("SonnetTest40 - Test create new model from export files");
 
             Model modelOrig = Model.New("MIP-124725.mps");
+            Assert(modelOrig.Objective.Name.Equals("OBJROW"));
 
             string stringOrig = modelOrig.ToString();
             Solver solver = new Solver(modelOrig, solverType);
             solver.NameDiscipline = 2;
-            solver.Export("export-test.lp"); // export LP has strict rules about valid row&col names!! Check log for warnings!
-            solver.Export("export-test.mps");
 
+            // Check exporting MPS
             // OsiCpx writeMps is unreliable
             if (!solver.OsiSolverFullName.Contains("OsiCpx"))            
             {
+                solver.Export("export-test.mps");
+
                 // Check that the original and re-imported .mps model are identical
                 Model modelMps = Model.New("export-test.mps");
                 modelMps.Name = modelOrig.Name;
@@ -2701,13 +2713,22 @@ namespace SonnetTest
                 Assert(SonnetTest.EqualsString(stringOrig, stringMps));
                 //File.Delete("export-test.mps");
             }
+            else { Console.WriteLine("Skipping test for export/import MPS"); }
 
-            // Check that the original and re-imported .lp model are identical
-            Model modelLp = Model.New("export-test.lp");
-            modelLp.Name = modelOrig.Name;
-            string stringLp = modelLp.ToString();
-            Assert(SonnetTest.EqualsString(stringOrig, stringLp));
-            //File.Delete("export-test.lp");
+            // Check LP export
+            // For OsiCbc, the lp export determines there's a problem with the Names, and reverts back to default.
+            if (!solver.OsiSolverFullName.Contains("OsiCbc"))
+            {
+                solver.Export("export-test.lp"); // export LP has strict rules about valid row&col names!! Check log for warnings!
+
+                // Check that the original and re-imported .lp model are identical
+                Model modelLp = Model.New("export-test.lp");
+                modelLp.Name = modelOrig.Name;
+                string stringLp = modelLp.ToString();
+                Assert(SonnetTest.EqualsString(stringOrig, stringLp));
+                //File.Delete("export-test.lp");
+            }
+            else { Console.WriteLine("Skipping test for export/import LP"); }
         }
 
         public static bool EqualsString(string string1, string string2)

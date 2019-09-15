@@ -24,18 +24,11 @@ then becomes
 Because of such simple implementations, the implementation is often 
 done within the header file.
 
-About 64-bit support in Visual Studio Express:
-From http://msdn.microsoft.com/en-us/library/9yb4317s(v=VS.100).aspxc
-"64-bit tools are not available on Visual C++ Express by default. 
-To enable 64-bit tools on Visual C++ Express, 
-install the Windows Software Development Kit (SDK) 
-in addition to Visual C++ Express."
+About x64 or Win32/x86
+-------------------------
+Specific builds are required for x86 or x64, in particular for SonnetWrapper.dll.
 
-The SonnetWrapper.sln solution is prepared to build Win32 and x64 builds, if your 
-Visual Studio editions support it.
 
-About additional functionality / "ifdefs"
-----------------------------
 About additional functionality
 -------------------------
 Several parts of the source code have been disabled because they require, e.g., non-standard COIN-OR code.

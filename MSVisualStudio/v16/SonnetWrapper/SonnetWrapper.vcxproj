@@ -114,7 +114,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -129,7 +129,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -152,15 +152,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,7 +177,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,7 +205,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
