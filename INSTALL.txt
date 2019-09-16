@@ -7,11 +7,11 @@ The SonnetWrapper is writen in C++/CLI
 The SonnetWrapper library is built using the COIN-OR libraries BuildTools, Cbc, Cgl, Clp, CoinUtils, Osi and their dependencies.
 
 Note that all these projects are also included as part of the Cbc tarball.
-The SonnetWrapper solution refers to and builds all COIN dependencies and the SonnetWrapper project itself.
-The COIN libraries are statically linked into the SonnetWrapper library.
+The SonnetWrapper library refers to and builds all COIN-OR dependencies and the SonnetWrapper project itself.
+The COIN-OR libraries are statically linked into the SonnetWrapper library.
 
 Within SONNET, the main purpose of the SonnetWrapper library is to be use by the Sonnet library.
-The SonnetWrapper can also be used as a stand-alone library to provide classic COIN functionality in .NET.
+The SonnetWrapper can also be used as a stand-alone library to provide classic COIN-OR functionality in .NET.
 
 In contrast, the Sonnet library is writen in C#. This library uses a reference to the SonnetWrapper library.
 Code is provided to perform various tests on the Sonnet library.
@@ -23,8 +23,8 @@ The latest SONNET sources can be downloaded from the Subversion repository from 
 http://sourceforge.et/p/sonnet-project/code/HEAD/tree/
 -> Download Snapshot (top right)
 
-The downloaded zip file contains the Sonnet source code 
-and MS Visual Studio 2010 solutions. It also includes several examples.
+The downloaded zip file contains the Sonnet source code and MS Visual Studio 2019 solution. 
+It also includes several examples.
 
 For SVN access, use
 https://svn.code.sf.net/p/sonnet-project/code/Sonnet
@@ -34,22 +34,43 @@ Before you can build SONNET, the sources of the used COIN-OR libraries are also 
 Since the Cbc project has the same dependencies, you can download a Cbc source archive from
 http://www.coin-or.org/download/source/Cbc/
 
-SONNET has been tested to work with Cbc 2.9.3 sources.
+SONNET has been tested to work with Cbc 2.10.3 sources (September 2019).
 From the archive, copy the folders BuildTools, Cbc, Cgl, Clp, CoinUtils and Osi
 such that the Sonnet root directory is at the same level as Cbc, Clp etc.
 
 Building SONNET
 ---------------------
 The projects and solutions are provided for Visual Studio 2019 (MSVisualStudio\v16).
-Older versions of projects and solutions files are available for Visual Studio 2010 (v10), but these are not maintained..
+Older versions of projects and solutions files are available for Visual Studio 2010 (v10), but these are not maintained.
 
-Visual Studio 2019
+About x64 or Win32/x86
+-------------------------
+Specific builds are required for x86 or x64, in particular for SonnetWrapper.dll.
+Sonnet.dll could be built in AnyCPU mode, but the accompanying SonnetWrapper.dll would have to match architecture at runtime. 
+Since that is difficult to match, the AnyCPU configuration was removed from Sonnet.
 
-
-Signing assemblies
+Strongly naming / Signing assemblies
 ---------------------
 To strongly name (sign) the Sonnet.dll and SonnetWrapper.dll there are two options:
 1) Build the source code using your own key, or
 2) Use ILMERGE 
 ilmerge Weak.dll /keyfile:key.snk /out:Strong.dll
 See http://www.microsoft.com/download/en/details.aspx?id=17630
+
+About additional functionality
+-------------------------
+Several parts of the source code have been disabled because they require, e.g., non-standard COIN-OR code.
+SONNET_LEANLOADPROBLEM (Solver.cs, See also SonnetWrapper)
+  Especially for CLP, this functionality loads problems more efficiently but requires 
+  non-standard osiClp code. This is really only interesting for large problems (>100K var/con)
+  If SONNET_LEANLOADPROBLEM is defined, then two additional member functions of SonnetWrapper's OsiClpSolverInterface are defined
+	- LeanLoadProblemInit
+	- LeanLoadProblem
+  and one extra member function must be added for normal OsiClpSolverInterface
+	- loadCurrentProblem
+SONNET_USE_SEMICONTVAR (Solver.cs)
+  Unfinished code for adding a variable type of SemiContinuousVariable, and automatically generate
+  helper variable (binary) and constraint.
+SONNET_SETWARMROWPRICE (WarmStart.cs)
+  Whether or not to include row price information in WarmStart
+
