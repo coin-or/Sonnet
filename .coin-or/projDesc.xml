@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type = "text/xsl" href = "http://www.coin-or.org/projects/autoGen.xsl"?>
+<projectData xmlns="coin-or.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="coin-or.org http://www.coin-or.org/projects/autoGen.xsd">
+  <projectBasics>
+    <projectName>SONNET</projectName>
+    <projectRepo>https://github.com/coin-or/SONNET</projectRepo>
+    <projectDescription>A wrapper for COIN-OR mixed integer linear programming via OSI to Microsoft .NET
+      </projectDescription>
+    <projectShortDescription>Microsoft .NET wrapper for COIN-OR Open Solver Interface
+      </projectShortDescription>
+    <projectManager>Jan-Willem Goossens</projectManager>
+    <projectHomePage>https://github.com/coin-or/SONNET</projectHomePage>
+    <projectLicense>Eclipse Public License 1.0</projectLicense>
+    <projectLicenseURL>https://opensource.org/licenses/eclipse-1.0</projectLicenseURL>
+    <coinLinkedProjects>
+      <coinProject>
+        <repoName>Osi</repoName>
+      </coinProject>
+    </coinLinkedProjects>
+    <otherLinkedPackages>
+      </otherLinkedPackages>
+    <projectLanguage>C#</projectLanguage>
+    <developmentStatus>
+      <activityStatus>Active</activityStatus>
+      <maturityLevel>2</maturityLevel>
+      <stableVersionNumber>1.2</stableVersionNumber>
+      <releaseNumber>1.1.2</releaseNumber>
+    </developmentStatus>
+    <testedPlatforms>
+      <platform>
+        <operatingSystem>Microsoft Windows</operatingSystem>
+        <compiler>MSVS/.NET</compiler>
+      </platform>
+    </testedPlatforms>
+    <projectCategories>
+      <category>Interfaces</category>
+      <category>Modeling systems</category>
+      <category>Optimization deterministic linear continuous</category>
+      <category>Optimization deterministic linear discrete</category>
+    </projectCategories>
+  </projectBasics>
+  <leftMenuLinks>
+    <!--documentation> </documentation-->
+    <sourceCodeDownload>https://github.com/coin-or/SONNET </sourceCodeDownload>
+    <binaryDownload>https://github.com/coin-or/SONNET/tree/master/bin </binaryDownload>
+    <!--mailingList> </mailingList-->
+  </leftMenuLinks>
+</projectData>
