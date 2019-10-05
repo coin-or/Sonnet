@@ -18,8 +18,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCbc", "..\..\..\Cbc\M
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbcSolver", "..\..\..\Cbc\MSVisualStudio\v10\libCbcSolver\libCbcSolver.vcxproj", "{71DA4595-E8A7-4B21-A00A-D96D29D11E3E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cbc", "..\..\..\Cbc\MSVisualStudio\v10\cbc\cbc.vcxproj", "{E2294708-C5BA-460A-B0A7-060A4023684A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "COIN-OR v10", "COIN-OR v10", "{63989493-55CA-4BB9-AFE6-C36378570985}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonnet", "Sonnet\Sonnet.csproj", "{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}"
@@ -29,6 +27,15 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SonnetWrapper", "SonnetWrapper\SonnetWrapper.vcxproj", "{A703591E-08AB-4F79-A74A-42F418EF2A2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetExamples", "SonnetExamples\SonnetExamples.csproj", "{FBCB8A0D-BC0C-406E-B5FC-CA260C195056}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F48F0304-01B7-4EF7-93B3-85F297B15C44}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\AUTHORS.txt = ..\..\AUTHORS.txt
+		..\..\CHANGELOG.txt = ..\..\CHANGELOG.txt
+		..\..\INSTALL.txt = ..\..\INSTALL.txt
+		..\..\LICENSE.txt = ..\..\LICENSE.txt
+		..\..\README.txt = ..\..\README.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,14 +109,6 @@ Global
 		{71DA4595-E8A7-4B21-A00A-D96D29D11E3E}.Release|x64.Build.0 = Release|x64
 		{71DA4595-E8A7-4B21-A00A-D96D29D11E3E}.Release|x86.ActiveCfg = Release|Win32
 		{71DA4595-E8A7-4B21-A00A-D96D29D11E3E}.Release|x86.Build.0 = Release|Win32
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Debug|x64.ActiveCfg = Debug|x64
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Debug|x64.Build.0 = Debug|x64
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Debug|x86.ActiveCfg = Debug|Win32
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Debug|x86.Build.0 = Debug|Win32
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Release|x64.ActiveCfg = Release|x64
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Release|x64.Build.0 = Release|x64
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Release|x86.ActiveCfg = Release|Win32
-		{E2294708-C5BA-460A-B0A7-060A4023684A}.Release|x86.Build.0 = Release|Win32
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Debug|x64.ActiveCfg = Debug|x64
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Debug|x64.Build.0 = Debug|x64
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.Debug|x86.ActiveCfg = Debug|x86
@@ -155,7 +154,6 @@ Global
 		{02D45875-A8CF-41B9-990B-3699C0ECFE10} = {63989493-55CA-4BB9-AFE6-C36378570985}
 		{431ED9C6-FDF6-4836-8B33-BE4EC5378640} = {63989493-55CA-4BB9-AFE6-C36378570985}
 		{71DA4595-E8A7-4B21-A00A-D96D29D11E3E} = {63989493-55CA-4BB9-AFE6-C36378570985}
-		{E2294708-C5BA-460A-B0A7-060A4023684A} = {63989493-55CA-4BB9-AFE6-C36378570985}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C418B8B-47F5-4DF0-B50B-4F5FBAEE968D}

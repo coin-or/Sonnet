@@ -9,13 +9,14 @@ This library is called Sonnet.
 
 The Sonnet library allows for code like
 
+// using Sonnet;
 Model model = new Model();
 Variable x = new Variable();
 Variable y = new Variable();
 model.Add(2 * x + 3 * y <= 10);
 model.Objective = 3 * x + y;
-Solver solver = new Solver(model, SolverType.ClpSolver);
-solver.Maximize();
+Solver solver = new Solver(model, typeof(COIN.OsiClpSolverInterface));
+solver.Maximise();
 
 (Actual C# code)
 
