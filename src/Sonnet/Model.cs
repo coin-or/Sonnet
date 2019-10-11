@@ -203,7 +203,7 @@ namespace Sonnet
         /// Adds references to the given constraints to this model.
         /// </summary>
         /// <param name="constraints">The constraints to be added.</param>
-        public void Add(System.Collections.IEnumerable constraints)
+        public void Add(IEnumerable<Constraint> constraints)
         {
             Ensure.NotNull(constraints, "constraints");
 

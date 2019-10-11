@@ -6,18 +6,21 @@ using Sonnet;
 
 namespace SonnetExamples.Example6
 {
+    /// <summary>
+    /// Find a way to fit several words into a squar of given size.
+    /// For example, the words ONE, TWO, TEN, EAN and NBE give solution
+    /// T W O 
+    /// E A N
+    /// N B E
+    /// </summary>
     public class Example
-    {   
-        // t w o
-        // e a n
-        // n b e
-        //static string[] Words = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"};
+    {
+        static int n = 3; // size of the nxn square (n = 3 -> 3x3)
         static string[] Words = { "one", "two", "ten", "ean", "nbe" };
         static string Alfabet = GetAlfabet(Words);
         
-        public void Run()
+        public Solver Run()
         {
-            int n = 6; //0,1,2, ..
             Model m = new Model();
 
             Dictionary<char, Variable[,]> x = CreateXVariables(n);
@@ -107,11 +110,18 @@ namespace SonnetExamples.Example6
             m.ObjectiveSense = ObjectiveSense.Minimise;
             Solver s = new Solver(m, typeof(COIN.OsiCbcSolverInterface));
             s.Solve();
-            
+
             Console.WriteLine(s.ToSolutionString());
 
             Console.WriteLine(s.IsFeasible());
 
+            ToSolutionString(n, x);
+
+            return s;
+        }
+
+        private static void ToSolutionString(int n, Dictionary<char, Variable[,]> x)
+        {
             for (int i = 0; i < n; i++)
             {
                 string line = "";

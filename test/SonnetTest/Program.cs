@@ -11,7 +11,6 @@ namespace SonnetTest
         {
             SonnetTest test = new SonnetTest();
 			test.TestMain(args);
-
         }
     }
 }

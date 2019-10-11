@@ -149,6 +149,7 @@ namespace SonnetTest
                     SonnetTest38();
                     SonnetTest39();
                     SonnetTest40();
+                    SonnetTest41();
 
                     // do these two stress tests last..
                     SonnetTest29();
@@ -1670,8 +1671,16 @@ namespace SonnetTest
                 testMps = testMps.Replace("  ", " ");
             }
 
-            // OsiCpx writeMps is unreliable
-            if (!solver.OsiSolverFullName.Contains("OsiCpx"))
+            if (solver.OsiSolverFullName.Contains("OsiClp"))
+            {
+                testMps = testMps.Replace("ClpDefau", "BLANK");
+                Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
+            }
+            else if (solver.OsiSolverFullName.Contains("OsiCpx"))
+            {
+                Assert(true); // skip
+            }
+            else
             {
                 Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
             }
@@ -2729,6 +2738,86 @@ namespace SonnetTest
                 //File.Delete("export-test.lp");
             }
             else { Console.WriteLine("Skipping test for export/import LP"); }
+        }
+
+        public void SonnetTest41()
+        {
+            Console.WriteLine("SonnetTest41 - Test ForAll extensions for constraint sets");
+
+            string[] toys = { "truck", "airplane", "ball" };
+            int[] colors = { 1, 2, 3 };
+
+            int N = 5;
+            Dictionary<string, Variable> y = toys.ToMap(t => new Variable("y_" + t));
+            var x = toys.ToMap(t => colors.ToMap(c => new Variable("x_(" + t + "_" + c + ")")));
+            // It is not _required_ to construct variables and constraints using such expressions
+
+            string constraintsTest = "Limit_truck : y_truck <= 5\r\nLimit_airplane : y_airplane <= 5\r\nLimit_ball : y_ball <= 5\r\n";
+            // for each type of toy, the total number produced must be less or equal to N
+            // forall t in toys: y_t <= N
+            var cons1 = toys.ForAll("Limit", t => y[t] <= N);
+            Console.WriteLine(" - Testing ForAll (simple)");
+            Assert(SonnetTest.EqualsString(cons1.ToItemString(), constraintsTest));
+            // m.Add(cons1);
+
+            var cons1b = toys.ForAll(t => new Constraint(y[t] <= N) { Name = "Limit_" + t }) ;
+            Console.WriteLine(" - Testing ForAll with names");
+            Assert(SonnetTest.EqualsString(cons1b.ToItemString(), constraintsTest));
+
+            var cons1c = toys.ForAll(t => (y[t] <= N).WithName("Limit_" + t));
+            Console.WriteLine(" - Testing ForAll with using .WithName");
+            Assert(SonnetTest.EqualsString(cons1c.ToItemString(), constraintsTest));
+
+            // ForAll is not much more than native .NET Select 
+            // Note we use new Constraint copy constructor to allow immedate initialization
+            // Also, note that the constraint is not actually created until the cons2 set is used, since below merely defines the projection
+            var cons2 = toys.Select(t => new Constraint(y[t] <= N) { Name = "Limit_" + t });
+            // m.Add(cons2);
+            Console.WriteLine(" - Testing Select vs ForAll");
+            Assert(SonnetTest.EqualsString(cons2.ToItemString(), constraintsTest));
+
+            List<Constraint> cons3 = new List<Constraint>();
+            foreach (string t in toys)
+            {
+                Expression expr = new Expression();
+                expr.Add(1.0, y[t]);
+                Constraint con = expr <= N;
+                con.Name = "Limit_" + t;
+                cons3.Add(con);
+            }
+            Console.WriteLine(" - Testing using foreach to create constraints");
+            Assert(SonnetTest.EqualsString(cons3.ToItemString(), constraintsTest));
+
+
+            //  for each type of toy, the total number of that type has to be less or equal to y_t
+            // forall t in toys: sum_{c in colors} x_{t, c} <= y_t    ( "SumOverColors_t" )
+            string cons4Test = "SumOverColors_truck : x_(truck_1) + x_(truck_2) + x_(truck_3) <= y_truck\r\nSumOverColors_airplane : x_(airplane_1) + x_(airplane_2) + x_(airplane_3) <= y_airplane\r\nSumOverColors_ball : x_(ball_1) + x_(ball_2) + x_(ball_3) <= y_ball\r\n";
+            var cons4 = toys.ForAll("SumOverColors", t => colors.Sum(c => x[t][c]) <= y[t]);
+            Console.WriteLine(" - Testing using ForAll with Sum");
+            Assert(SonnetTest.EqualsString(cons4.ToItemString(), cons4Test));
+
+            // For each type of toy and each color, at most 2 can be made
+            // forall t in toys, forall c in colors : x[t][c] <= 2  ( "AtMostTwo_t_c")
+
+            string constraintsTest2 = "AtMostTwo_truck_1 : x_(truck_1) <= 2\r\nAtMostTwo_truck_2 : x_(truck_2) <= 2\r\nAtMostTwo_truck_3 : x_(truck_3) <= 2\r\nAtMostTwo_airplane_1 : x_(airplane_1) <= 2\r\nAtMostTwo_airplane_2 : x_(airplane_2) <= 2\r\nAtMostTwo_airplane_3 : x_(airplane_3) <= 2\r\nAtMostTwo_ball_1 : x_(ball_1) <= 2\r\nAtMostTwo_ball_2 : x_(ball_2) <= 2\r\nAtMostTwo_ball_3 : x_(ball_3) <= 2\r\n";
+
+            var cons5 = toys.ForAll("AtMostTwo", t => colors.ForAll("", c => x[t][c] <= 2));
+            Console.WriteLine(" - Testing using multiple ForAll with names");
+            Assert(SonnetTest.EqualsString(cons5.ToItemString(), constraintsTest2));
+
+            var cons5b = toys.ForAll(t => colors.ForAll(c => new Constraint(x[t][c] <= 2) { Name = "AtMostTwo_" + t + "_" + c }));
+            Console.WriteLine(" - Testing using three ForAll nested with names");
+            Assert(SonnetTest.EqualsString(cons5b.ToItemString(), constraintsTest2));
+
+            // all loops use SelectMany except for the inner-most which uses Select
+            // In this way, the final collection is an enumerable of constraints.
+            var cons6 = toys.SelectMany(t => colors.Select(c => new Constraint(x[t][c] <= 2) { Name = "AtMostTwo_" + t + "_" + c }));
+            Console.WriteLine(" - Testing using SelectMany and Select instead of ForAll");
+            Assert(SonnetTest.EqualsString(cons6.ToItemString(), constraintsTest2));
+
+            // test the ForAllDo, which is merely a foreach(t in toys)..
+            Console.WriteLine(" - Testing ForAllDo and ToMap for variable names");
+            toys.ForAllDo(t => Assert(y[t].Name == "y_" + t));
         }
 
         public static bool EqualsString(string string1, string string2)

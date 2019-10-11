@@ -91,6 +91,7 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// DEPRECATED - Use ToMap: Dictionary &lt;string, Variable&gt; x = products.ToMap(p => new Variable() { Name = "x_" + p.ToString(); });")]
         /// Returns an array of the given size filled with new Variables constructed with a name,
         /// lower bound, upper bound and of the given type.
         /// About names: If a name is given, then this will be used as the main part of the name is the variables.
@@ -103,6 +104,7 @@ namespace Sonnet
         /// <param name="upper">The upper bound of the new variables.</param>
         /// <param name="type">The type of the new variables.</param>
         /// <returns>Array of variables of the given size.</returns>
+        [Obsolete("DEPRECATED. Use ToMap: Dictionary<string, Variable> x = products.ToMap(p => new Variable() { Name = \"x_\" + p.ToString(); });")]
         public static Variable[] New(int size, string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
         {
             Variable[] tmp = new Variable[size];
@@ -117,6 +119,7 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// DEPRECATED - Use ToMap: Dictionary &lt;string, Variable&gt; x = products.ToMap(p => new Variable() { Name = "x_" + p.ToString(); });")]
         /// Returns a dictionary of the given type filled with new Variables constructed with a name,
         /// lower bound, upper bound and of the given type.
         /// Example: var x = Variable.New&lt;Product&gt;(MyListOfProducts, "x");
@@ -131,6 +134,7 @@ namespace Sonnet
         /// <param name="upper">The upper bound of the new variables.</param>
         /// <param name="type">The type of the new variables.</param>
         /// <returns>Array of variables of the given size.</returns>
+        [Obsolete("DEPRECATED. Use ToMap: Dictionary<string, Variable> x = products.ToMap(p => new Variable() { Name = \"x_\" + p.ToString(); });")]
         public static Dictionary<T, Variable> New<T>(IEnumerable<T> set, string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
         {
             Dictionary<T, Variable> tmp = new Dictionary<T,Variable>();
@@ -145,6 +149,7 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// DEPRECATED - Use ToMap: Dictionary &lt;string, Variable&gt; x = products.ToMap(p => new Variable() { Name = "x_" + p.ToString(); });")]
         /// Returns a dictionary of the given type filled with new Variables constructed with a name,
         /// lower bound, upper bound and of the given type. 
         /// The type T must be an enum.
@@ -158,6 +163,7 @@ namespace Sonnet
         /// <param name="upper">The upper bound of the new variables.</param>
         /// <param name="type">The type of the new variables.</param>
         /// <returns>Array of variables of the given size.</returns>
+        [Obsolete("DEPRECATED. Use ToMap: Dictionary<string, Variable> x = products.ToMap(p => new Variable() { Name = \"x_\" + p.ToString(); });")]
         public static Dictionary<T, Variable> New<T>(string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
             where T : struct, IConvertible
         {
