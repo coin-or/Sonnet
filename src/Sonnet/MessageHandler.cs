@@ -42,7 +42,7 @@ namespace Sonnet
         public const int Error = 3;
 
         public SonnetMessages()
-            : base(2)
+            : base(4)
         {
             source = "SNNT";
             addMessage(Debug, new COIN.CoinOneMessage(0, 3, "%s"));
