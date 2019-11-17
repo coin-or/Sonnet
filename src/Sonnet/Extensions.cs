@@ -16,7 +16,7 @@ namespace Sonnet
     {
         // The following extension are all lazily executed, so only when the returned set is enumerated!
         // If the resulting set is not enumerated, then nothing is done!!
-        #region lAZY Sets of Constraints
+        #region Lazy Sets of Constraints -- Define ForAll projections from source set to constraints
         /// <summary>
         /// Returns a lazy enumerable full of constraints generated from the source set.
         /// Example: lengths.ForAll(i => x[i] >= -M * (1 - n[i]))
@@ -114,7 +114,7 @@ namespace Sonnet
         /// <summary>
         /// Returns a dictionary from the source elements to the keys.
         /// Example: Dictionary &lt;string, Variable&gt; x = products.ToMap(p => new Variable() { Name = "x_" + p.ToString(); });
-        /// Example: Dictionary &lt;string, Dictionary &lt;int, Variable&gt&gt; y = products.ToMap(p => colors.ToMap(c => new Variable() { Name = "y_" + p + "," + c})); }
+        /// Example: Dictionary &lt;string, Dictionary &lt;int, Variable&gt;&gt; y = products.ToMap(p => colors.ToMap(c => new Variable() { Name = "y_" + p + "," + c})); }
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of source.</typeparam>>
         /// <typeparam name="TKey">The type of the key returned by keySelector.</typeparam>
@@ -145,8 +145,6 @@ namespace Sonnet
 
             foreach (var s in source) action(s);
         }
-
-
 
         /// <summary>
         /// Return the source object but now with Name set.
@@ -200,6 +198,20 @@ namespace Sonnet
                 else builder.AppendLine(s.ToString());
             }
             return builder;
+        }
+
+        /// <summary>
+        /// Returns the first variable from the enumerable for which the Name strign Equals the given name. 
+        /// This is case sensitive.
+        /// </summary>
+        /// <param name="variables">The variables to search.</param>
+        /// <param name="name">The name of the variable to look for.</param>
+        /// <returns>The first variable from the enumerable for which the Name strign Equals the given name.</returns>
+        public static Variable GetVariable(this IEnumerable<Variable> variables, string name)
+        {
+            Ensure.NotNull(variables, "variables");
+            Ensure.NotNull(name, "name");
+            return variables.First(v => string.Equals(v.Name, name));
         }
 
         /// <summary>

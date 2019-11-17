@@ -123,20 +123,6 @@ namespace Sonnet
     /// </summary>
     public static class Utils
     {
-        /// <summary>
-        /// Returns the first variable from the enumerable for which the Name strign Equals the given name. 
-        /// This is case sensitive.
-        /// </summary>
-        /// <param name="variables">The variables to search.</param>
-        /// <param name="name">The name of the variable to look for.</param>
-        /// <returns>The first variable from the enumerable for which the Name strign Equals the given name.</returns>
-        public static Variable GetVariable(this IEnumerable<Variable> variables, string name)
-        {
-            Ensure.NotNull(variables, "variables");
-            Ensure.NotNull(name, "name");
-            return variables.First(v => string.Equals(v.Name, name));
-        }
-
         private static Dictionary<COIN.OsiCbcSolverInterface, string[]> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, string[]>();
         
         /// <summary>
@@ -248,18 +234,28 @@ namespace Sonnet
         /// Throws an ArgumentException if b is not true.
         /// </summary>
         /// <param name="b">The boolean value to be tested.</param>
-        public static void IsTrue(bool b)
+        /// <param name="message">The message.</param>
+        public static void IsTrue(bool b, string message = null)
         {
-            if (!b) throw new ArgumentException();
+            if (!b)
+            {
+                if (message != null) throw new ArgumentException(message);
+                else throw new ArgumentException("The value is not true");
+            }
         }
 
         /// <summary>
         /// Throws an ArgumentException if b is not false.
         /// </summary>
         /// <param name="b">The boolean value to be tested.</param>
-        public static void IsFalse(bool b)
+        /// <param name="message">The message.</param>
+        public static void IsFalse(bool b, string message = null)
         {
-            if (b) throw new ArgumentException();
+            if (b)
+            {
+                if (message != null) throw new ArgumentException(message);
+                else throw new ArgumentException("The value is not false");     
+            }
         }
 
         /// <summary>

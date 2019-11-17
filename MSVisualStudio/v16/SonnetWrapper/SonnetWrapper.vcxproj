@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\CglCutGenerator.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CglProbing.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\ClpModel.cpp" />
+    <ClCompile Include="..\..\..\src\SonnetWrapper\ClpObjective.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinError.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinLpIO.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinMessageHandler.cpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\CglCutGenerator.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CglProbing.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\ClpModel.h" />
+    <ClInclude Include="..\..\..\src\SonnetWrapper\ClpObjective.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinError.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinLpIO.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinMessageHandler.h" />
