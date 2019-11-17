@@ -204,11 +204,27 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Returns the quadratic coefficients of (the expression of) this objective
+        /// </summary>
+        internal QuadCoefVector QuadCoefficients
+        {
+            get { return expression.QuadCoefficients; }
+        }
+
+        /// <summary>
         /// Returns the constant of (the expression of) this objective.
         /// </summary>
         internal double Constant
         {
             get { return expression.Constant; }
+        }
+
+        /// <summary>
+        /// Returns whether or not (the expression of) this objective has a quadratic term.
+        /// </summary>
+        public bool IsQuadratic
+        {
+            get { return expression.IsQuadratic; }
         }
 
         /// <summary>

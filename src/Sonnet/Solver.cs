@@ -32,6 +32,8 @@ namespace Sonnet
         /// <summary>
         /// Initializes a new instance of the Solver class with the given name and model, 
         /// and using the given instance derived from OsiSolverInterface.
+        /// QP is supported for OsiClp and OsiCbc only.
+        /// MIQP is not supported for any solver type.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="solver">The instance of an OsiSolver, eg, OsiClpSolverInterface to be used.</param>
@@ -47,6 +49,8 @@ namespace Sonnet
         /// <summary>
         /// Initializes a new instance of the Solver class with the given name and model,
         /// and using a to be constructed instance of the given type derived from OsiSolverInterface.
+        /// QP is supported for OsiClp and OsiCbc only.
+        /// MIQP is not supported for any solver type.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="osiSolverInterfaceType">The type derived from OsiSolverInterface to be used.</param>
@@ -59,8 +63,9 @@ namespace Sonnet
             OsiSolverInterface solver = (OsiSolverInterface)osiSolverInterfaceType.GetConstructor(System.Type.EmptyTypes).Invoke(null);
             GutsOfConstructor(model, solver, name);
         }
-        
+
         /// <summary>
+        /// DEPRECATED. Use Solver(model, typeof(OsixxxSolverInterface), "SomeName");
         /// Initializes a new instance of the Solver class with the given name and model,
         /// for using a to be constructed instance of the given type derived from OsiSolverInterface.
         /// </summary>
@@ -68,6 +73,7 @@ namespace Sonnet
         /// <param name="model">The model used in this solver.</param>
         /// <param name="name">The name for this solver.</param>
         /// <returns>The new instance of the Solver class.</returns>
+        [Obsolete("DEPRECATED. Use Solver(model, typeof(OsixxxSolverInterface), \"My Name\");")]
         public static Solver New<T>(Model model, string name = null)
             where T : OsiSolverInterface
         {
@@ -140,6 +146,7 @@ namespace Sonnet
         { 
             get 
             {
+                // since constraints and variable can be added dynamically to the model, we check each time (below).
                 Generate();
                 foreach (Variable var in variables)
                 {
@@ -148,7 +155,6 @@ namespace Sonnet
                 return false;
             } 
         }
-
         #endregion
 
         #region Static Properties
@@ -323,6 +329,8 @@ namespace Sonnet
             {
                 if (forceRelaxation == false && IsMIP)
                 {
+                    if (objective.IsQuadratic) throw new NotSupportedException("MIQP not supported");
+
                     isSolving = true;
                     if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
 
@@ -612,7 +620,7 @@ namespace Sonnet
         /// Generate the given objective: Assemble the objective and register it to be part of this model. Also assign is to this model for quick reference.
         /// Then generate its (new) variables.
         /// If the model has _not_ been generated (yet), the objective is not loaded into the solver here. Instead, this is done in bulk in ::Generate()
-        /// If the model has been generated, the constraint is added into the solver here.
+        /// If the model has been generated, the objective is added into the solver here.
         /// </summary>
         /// <param name="obj">The objective to generate.</param>
         private void Generate(Objective obj)
@@ -628,6 +636,8 @@ namespace Sonnet
             obj.Assign(this, 0.0); // immediately also STORE!
 
             GenerateVariables(obj.Coefficients);
+
+            GenerateVariables(obj.QuadCoefficients);
 
             if (Generated)
             {
@@ -650,6 +660,8 @@ namespace Sonnet
 
                 // change all coefficients at the same time
                 solver.setObjective(c);
+
+                if (obj.IsQuadratic) throw new NotSupportedException("Updating the quadratic objective is not supported for already generated models.");
 
                 // Skip this: doesnt work as expected with max/min problems
                 // The constant part goes in via the ObjOffset
@@ -695,12 +707,25 @@ namespace Sonnet
 
         private void GenerateVariables(CoefVector av)
         {
-            Ensure.NotNull(av, "coefvector");
+            Ensure.NotNull(av, "CoefVector");
 
             for (int i = 0; i < av.Count; i++)
             {
                 Coef c = av[i];
                 if (!c.var.IsRegistered(this)) Generate(c.var);
+            }
+        }
+
+
+        private void GenerateVariables(QuadCoefVector av)
+        {
+            Ensure.NotNull(av, "QuadCoefVector");
+
+            for (int i = 0; i < av.Count; i++)
+            {
+                QuadCoef c = av[i];
+                if (!c.var1.IsRegistered(this)) Generate(c.var1);
+                if (!c.var2.IsRegistered(this)) Generate(c.var2);
             }
         }
 
@@ -833,6 +858,7 @@ namespace Sonnet
             {
                 int n = variables.Count;
                 int m = constraints.Count;
+                bool isMip = false; // Can't use IsMip here since it will try to generate the model..
 
                 double* Elm;	// The nonzero elements
                 int* Rnr;		// The constraint index number per nonzero element
@@ -966,6 +992,8 @@ namespace Sonnet
                     // This should be checked and handled at the solver side.
                     l[col] = var.Lower;
                     u[col] = var.Upper;
+
+                    if (var.Type == VariableType.Integer) isMip = true;
                 }
 
                 log.DebugFormat("Ready to load the problem after {0}", (CoinUtils.CoinCpuTime() - genStart));
@@ -1006,7 +1034,110 @@ namespace Sonnet
 
                 // Skip this: doesnt work as expected with max/min problems
                 // the constant part goes in via the ObjOffset
-                // solver.setDblParam(OsiObjOffset, cOffset);
+                // solver.setDblParam(Osi;ObjOffset, cOffset);
+
+                // try to add quadratic part of obj
+                if (objective.IsQuadratic)
+                {
+                    n = variables.Count;
+                    nz = objective.QuadCoefficients.Count;
+
+                    // note: The order of variables is according to Offset, not var.id
+                    int* startObj;      // [n+1] per variable, the starting position of its nonzero data
+                    int* nelementsObj;  // [n] per variable the number of nonzeros
+                    int* columnObj;     // [nz] The index of the second variable number per nonzero element
+                    double* elementObj; // [nz] The nonzero elements
+                    
+                    startObj = CoinUtils.NewIntArray(n + 1);
+                    nelementsObj = CoinUtils.NewIntArray(n);
+                    columnObj = CoinUtils.NewIntArray(nz);
+                    elementObj = CoinUtils.NewDoubleArray(nz);
+
+                    // set the number of nonzeros per variable to zero.
+                    for (int j = 0; j < n; j++)
+                    {
+                        nelementsObj[j] = 0;
+                    }
+
+                    QuadCoefVector objquadcoefs = objective.QuadCoefficients;
+                    foreach (QuadCoef quadcoef in objquadcoefs)
+                    {
+                        // ordered first by var1, and then by var2
+                        // note that the Offset is not the same as var.Id!
+                        // so it can happen that var1.id < var2.id, but offset(var1) > offset(var2)!
+                        // only, var1.id == var2.id iff offset(var1) == offset(var2) iff var1 == var2
+                        // how does this work for constraint matrix? don't worry for now
+                        int col1 = Offset(quadcoef.var1);
+                        
+                        if (quadcoef.var1.AssignedSolver != this) throw new SonnetException("Trying to use variable that is not part of this model!");
+                        if (col1 < 0 || col1 >= n) throw new SonnetException("Variable offset has error value.");
+
+                        nelementsObj[col1]++;
+                    }
+
+                    startObj[0] = 0;
+                    for (int j = 0; j < n; j++)
+                    {
+                        startObj[j + 1] = startObj[j] + nelementsObj[j];           // calculate the starting positions per variable
+                        nelementsObj[j] = 0;                     // reset the number of nonzeros per variable
+                    }
+
+                    // now start the real seting of the nonzero elements
+                    foreach (QuadCoef quadcoef in objquadcoefs)
+                    {
+                        int col1 = Offset(quadcoef.var1);
+                        int col2 = Offset(quadcoef.var2);
+
+                        if (col1 < 0 || col1 >= n) throw new SonnetException("Variable1 offset has error value.");
+                        if (col2 < 0 || col2 >= n) throw new SonnetException("Variable2 offset has error value.");
+
+                        // diagonal
+                        if (col1 == col2) elementObj[startObj[col1] + nelementsObj[col1]] = 2.0 * quadcoef.coef; // use double value
+                        else elementObj[startObj[col1] + nelementsObj[col1]] = quadcoef.coef; // use double value
+
+                        columnObj[startObj[col1] + nelementsObj[col1]] = col2;
+                        nelementsObj[col1]++;   // this is the running index of elements for variable col1
+                    }
+
+                    // only some solvers support quadratic terms in the objective for continuous variables (QP)
+                    if (solver is OsiClpSolverInterface)
+                    {
+                        log.Debug("Using CLP-specific quadratic objective loading.");
+
+                        if (isMip) log.Error("Solving MIQP with OsiClp is not supported.");
+
+                        OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
+                        ClpSimplex clpSimplex = osiClp.getModelPtr();
+                        
+                        clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);
+                        //clpSimplex.writeMps("testquad.mps", 0, 1);// for CPLEX compatibility, use formatType = 0, numberAcross = 1);
+                    }
+                    else if (solver is OsiCbcSolverInterface)
+                    {
+                        // TODO: does QP with Cbc work? Does MIQP with Cbc work?
+                        log.Debug("Using CBC-specific quadratic objective loading.");
+
+                        if (isMip) log.Error("Solving MIQP with OsiCbc is not supported.");
+
+                        OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
+                        OsiSolverInterface realSolver = osiCbc.getModelPtr().solver(); //usually the OsiClpSolver
+                        if (realSolver is OsiClpSolverInterface)
+                        {
+                            OsiClpSolverInterface osiClp = (OsiClpSolverInterface)realSolver;
+                            ClpSimplex clpSimplex = osiClp.getModelPtr();
+
+                            clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);
+                        }
+                        else throw new SonnetException("Cannot load quadratic objective to unexpected CBC solver--found not CLP");
+                    }
+                    else throw new NotSupportedException("Quadratic objective not supported for this solver type");
+
+                    // done! now clean up
+                    CoinUtils.DeleteArray(startObj);
+                    CoinUtils.DeleteArray(nelementsObj);
+                    CoinUtils.DeleteArray(columnObj);
+                    CoinUtils.DeleteArray(elementObj);
+                }
             } // end unsafe
 
             log.DebugFormat("Problem fully loaded after {0}", (CoinUtils.CoinCpuTime() - genStart));
@@ -1129,7 +1260,29 @@ namespace Sonnet
 
             if (extension.Equals(".mps"))
             {
-                solver.writeMps(fullPathWithoutExtension);//, solver.getObjValue());
+                if (objective.IsQuadratic) // Osi doesnt handle Quadratic obj, so custom export.
+                {
+                    bool success = false;
+                    if (solver is OsiClpSolverInterface)
+                    {
+                        OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
+                        osiClp.getModelPtr().writeMps(filename, 0, 1);
+                        success = true;
+                    }
+                    else if (solver is OsiCbcSolverInterface)
+                    {
+                        OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
+                        OsiSolverInterface osiReal = osiCbc.getRealSolverPtr();
+                        if (osiReal is OsiClpSolverInterface)
+                        {
+                            OsiClpSolverInterface osiClp = (OsiClpSolverInterface)osiReal;
+                            osiClp.getModelPtr().writeMps(filename, 0, 1);
+                            success = true;
+                        }
+                    }
+                    if (!success) solver.writeMps(fullPathWithoutExtension);
+                }
+                else solver.writeMps(fullPathWithoutExtension);                
             }
             else if (extension.Equals(".lp"))
             {
@@ -1716,6 +1869,17 @@ namespace Sonnet
             solver.setObjCoeff(offset, value);
         }
         
+        /// <summary>
+        /// Not Supported. Method for changing the quadratic part of objective function
+        /// </summary>
+        /// <param name="var1">The var1 to set the objective coefficient for.</param>
+        /// <param name="var2">The var2 to set the objective coefficient for.</param>
+        /// <param name="value">The new coefficient to set for this variable within the solver.</param>
+        internal void SetObjectiveQuadCoefficient(Variable var1, Variable var2, double value)
+        {
+             throw new NotSupportedException("No available solver supports setting quadratic coefs of objective.");
+        }
+
         // methods for changing Range Constraints
         internal void SetCoefficient(RangeConstraint con, Variable var, double value)
         {
@@ -1725,7 +1889,6 @@ namespace Sonnet
             int conOffset = Offset(con);
             int varOffset = Offset(var);
 
-            //solver.setCoef(conOffset, varOffset, value);
             if (solver is OsiClpSolverInterface)
             {
                 OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;

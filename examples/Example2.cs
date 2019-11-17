@@ -17,7 +17,7 @@ namespace SonnetExamples
 
         public void Run()
         {
-            Array DaysArray = Enum.GetValues(typeof(Days));
+            List<Days> DaysArray = Enum.GetValues(typeof(Days)).OfType<Days>().ToList();
 
             Dictionary<Days, double> demand = new Dictionary<Days, double>();
             demand[Days.sun] = 12;
@@ -30,13 +30,15 @@ namespace SonnetExamples
 
             double shift = 5;
 
-            var emp = Variable.New<Days>("emp", 0, 140, VariableType.Integer);
+            //Dictionary<Days, Variable> emp = Variable.New<Days>("emp", 0, 140, VariableType.Integer);
+            Dictionary<Days, Variable> emp = DaysArray.ToMap(d => new Variable(0, 140, VariableType.Integer) { Name = "emp_" + d.ToString() });
+               
             Variable totemp = new Variable("totemp");
 
             Model model = new Model("Personel_Planning");
             model.Add("objective", totemp == emp.Sum());
 
-            int card = DaysArray.Length;
+            int card = DaysArray.Count;
             foreach (Days d in DaysArray)
             {
                 Expression sum = new Expression();

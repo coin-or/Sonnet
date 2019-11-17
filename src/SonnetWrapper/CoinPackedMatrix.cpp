@@ -3,11 +3,3 @@
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 #include "CoinPackedMatrix.h"
-
-using namespace System;
-using namespace System::Runtime::InteropServices;
-
-namespace COIN
-{
-
-}

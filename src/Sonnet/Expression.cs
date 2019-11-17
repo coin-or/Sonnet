@@ -10,7 +10,8 @@ namespace Sonnet
 {
     /// <summary>
     /// The class Expression is an important building block in the building of a Model.
-    /// An Expression consists of a constant (double) and an array of variables with their coefficients.
+    /// An Expression consists of a constant (double), an array of variables with their coefficients (the linear part)
+    /// and an array of variable pairs and their coefficients (the quadratic part).
     /// Many overloaded operators exists for expressions. In principle, these operators 
     /// return *new* objects (Expressions or Constraints), with all coefficients copied.
     /// On the other hand, methods exist for manipulating the current expression.
@@ -27,6 +28,7 @@ namespace Sonnet
     /// </summary>
     public class Expression
     {
+        #region Constructors
         /// <summary>
         /// Constructor of empty expression (constant = 0)
         /// </summary>
@@ -43,6 +45,7 @@ namespace Sonnet
         {
             this.constant = constant;
             coefs = new CoefVector();
+            quadCoefs = new QuadCoefVector();
         }
 
         /// <summary>
@@ -50,11 +53,18 @@ namespace Sonnet
         /// </summary>
         /// <param name="variable">Variable to use</param>
         public Expression(Variable variable)
-            : this(0.0)
+            : this(1.0, variable)
         {
-            Ensure.NotNull(variable, "variable");
+        }
 
-            coefs.Add(new Coef(variable, 1.0));
+        /// <summary>
+        /// Constructor of new expression with one term: 1 * variable1 * variable2
+        /// </summary>
+        /// <param name="variable1">Variable1 to use</param>
+        /// <param name="variable2">Variable2 to use</param>
+        public Expression(Variable variable1, Variable variable2)
+            : this(1.0, variable1, variable2)
+        {
         }
 
         /// <summary>
@@ -74,25 +84,21 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Constructor copies the given expression and multiplies all coefficients and constant with the given multiplier.
+        /// Constructor of new quadratic expression with one term: coef * variable1 * variable2
         /// </summary>
-        /// <param name="multiplier">Multiplier to use</param>
-        /// <param name="expr">Expression to copy and multiply</param>
-        public Expression(double multiplier, Expression expr)
-            : this()
+        /// <param name="coef">Multiplication coefficient</param>
+        /// <param name="variable1">Variable1 to use</param>
+        /// <param name="variable2">Variable2 to use</param>
+        public Expression(double coef, Variable variable1, Variable variable2)
+            : this(0.0)
         {
-            Ensure.NotNull(expr, "expr");
+            Ensure.NotNull(variable1, "variable1");
+            Ensure.NotNull(variable2, "variable2");
 
-            if (multiplier == 0.0) return;
-
-            int n = expr.coefs.Count;
-            for (int i = 0; i < n; i++)
+            if (coef != 0.0)
             {
-                Coef c = expr.coefs[i]; // consider ref
-                coefs.Add(new Coef(c.var, c.coef * multiplier));
+                quadCoefs.Add(new QuadCoef(variable1, variable2, coef));
             }
-
-            constant = multiplier * expr.constant;
         }
 
         /// <summary>
@@ -104,9 +110,9 @@ namespace Sonnet
         {
             Ensure.NotNull(expr, "expr");
 
-            constant = expr.constant;
-            coefs.AddRange(expr.coefs);
+            this.Add(expr);
         }
+        #endregion // Constructors
 
         /// <summary>
         /// Removes all coefficients from this expression and set the constant to 0.
@@ -117,6 +123,9 @@ namespace Sonnet
             {
                 coefs.Clear();
                 coefs.TrimExcess();
+
+                quadCoefs.Clear();
+                quadCoefs.TrimExcess();
             }
             constant = 0.0;
         }
@@ -155,7 +164,13 @@ namespace Sonnet
 
             if (this.coefs.Count != expr.coefs.Count) return false;
 
-            return this.coefs.Equals(expr.coefs);
+            if (this.quadCoefs.Count != expr.quadCoefs.Count) return false;
+
+            if (!this.coefs.Equals(expr.coefs)) return false;
+
+            if (!this.quadCoefs.Equals(expr.quadCoefs)) return false;
+
+            return true;
         }
 
         /// <summary>
@@ -174,7 +189,7 @@ namespace Sonnet
         /// <returns>A hash code for the current Expression.</returns>
         public override int GetHashCode()
         {
-            return this.constant.GetHashCode() ^ this.coefs.GetHashCode();
+            return this.constant.GetHashCode() ^ this.coefs.GetHashCode() ^ this.quadCoefs.GetHashCode();
         }
 
         /// <summary>
@@ -186,6 +201,22 @@ namespace Sonnet
             StringBuilder tmp = new StringBuilder();
 
             tmp.Append(coefs.ToString());
+
+            if (IsQuadratic)
+            {
+                if (tmp.Length == 0) tmp.Append(quadCoefs.ToString());
+                else if (quadCoefs[0].coef > 0.0)
+                {
+                    tmp.Append(" + ");
+                    tmp.Append(quadCoefs.ToString());
+                }
+                else if (quadCoefs[0].coef < 0.0)
+                {
+                    tmp.Append(" ");
+                    tmp.Append(quadCoefs.ToString());
+                }
+            }
+
             // if there are coefs, but these are all 0.0, then coefs.size() will be > 0, but the string will still be empty
             //if (coefs.size() == 0) 
             if (tmp.Length == 0) tmp.Append(constant);
@@ -222,6 +253,26 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Adds the given quadratic term coef * var1 * var2 to the current Expression.
+        /// </summary>
+        /// <param name="coef">The coefficient to be used.</param>
+        /// <param name="var1">The var1 to be added with the coefficient.</param>
+        /// <param name="var2">The var2 to be added with the coefficient.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Add(double coef, Variable var1, Variable var2)
+        {
+            Ensure.NotNull(var1, "variable1");
+            Ensure.NotNull(var2, "variable2");
+
+            if (coef != 0.0)
+            {
+                quadCoefs.Add(new QuadCoef(var1, var2, coef));
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds the given constant to the constant of the current Expression.
         /// </summary>
         /// <param name="constant">The constant value to be added.</param>
@@ -239,10 +290,7 @@ namespace Sonnet
         /// <returns>The updated current Expression.</returns>
         public Expression Add(Variable variable)
         {
-            Ensure.NotNull(variable, "variable");
-
-            coefs.Add(new Coef(variable, 1.0));
-            return this;
+            return Add(1.0, variable);
         }
 
         /// <summary>
@@ -258,32 +306,75 @@ namespace Sonnet
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
 
             coefs.AddRange(expr.coefs);
+            quadCoefs.AddRange(expr.quadCoefs);
             constant += expr.constant;
             return this;
         }
 
         /// <summary>
-        /// Adds the constant and a copy of the coefficients and variables of the given Expression, multiplied by the given factor
-        /// to the current Expression.
+        /// Adds (multiplier * expr) to the current Expression.
         /// </summary>
-        /// <param name="factor">The multiplication factor for the given Expression.</param>
+        /// <param name="multiplier">The multiplier for the given Expression.</param>
         /// <param name="expr">The expression to be added.</param>
         /// <returns>The updated current Expression.</returns>
-        public Expression Add(double factor, Expression expr)
+        public Expression Add(double multiplier, Expression expr)
         {
             Ensure.NotNull(expr, "expr");
 
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
 
-            if (factor != 0.0)
+            if (multiplier != 0.0)
             {
                 int n = expr.coefs.Count;
                 for (int i = 0; i < n; i++)
                 {
                     Coef c = expr.coefs[i]; // consider ref
-                    coefs.Add(new Coef(c.var, factor * c.coef));
+                    coefs.Add(new Coef(c.var, multiplier * c.coef));
                 }
-                constant += factor * expr.constant;
+                int qn = expr.quadCoefs.Count;
+                for (int i = 0; i < qn; i++)
+                {
+                    QuadCoef c = expr.quadCoefs[i]; // consider ref
+                    quadCoefs.Add(new QuadCoef(c.var1, c.var2, multiplier * c.coef));
+                }
+                constant += multiplier * expr.constant;
+            }
+            return this;
+        }
+
+
+        /// <summary>
+        /// Adds to the current expresion the multiplication of coef * var * expr
+        /// The given expr cannot be quadratic, since then var * expr would not be quadratic.
+        /// </summary>
+        /// <param name="coef"></param>
+        /// <param name="var"></param>
+        /// <param name="expr"></param>
+        /// <returns></returns>
+        public Expression Add(double coef, Variable var, Expression expr)
+        {
+            Ensure.NotNull(var, "var");
+            Ensure.NotNull(expr, "expr");
+            Ensure.IsFalse(expr.IsQuadratic, "Cannot multiply expression because the result would not be quadratic");
+
+            if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive additions not allowed.");
+
+            if (coef != 0.0)
+            {
+                // c + b1x1 + b2x2 + q1x1x1 + q2x1x2 + coef * var * (b + a1x1 +a2x2)
+                // constant is unchanged
+
+                // linear coefs get added term coef * b * var
+                coefs.Add(new Coef(var, coef * expr.constant));
+                
+                // quad coefs get added terms (coef * a1) * var * x1 + (coef * a2) * var * x2
+                // loop over all linear coefs of expr 
+                int qn = expr.coefs.Count;
+                for (int i = 0; i < qn; i++)
+                {
+                    Coef c = expr.coefs[i];
+                    this.quadCoefs.Add(new QuadCoef(var, c.var, coef * c.coef));
+                }
             }
             return this;
         }
@@ -300,16 +391,28 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Subtracts the given expression multiplied by the given factor from the current Expression.
+        /// Subtracts the quadratic term variable1 times variable2 with the given coefficient from the current Expression.
         /// </summary>
-        /// <param name="factor">The multiplication factor for the given expression.</param>
+        /// <param name="coef">The coefficient of the variable to be subtracted.</param>
+        /// <param name="variable1">The variable1 to be subtracted with the coefficient</param>
+        /// <param name="variable2">The variable2 to be subtracted with the coefficient</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Subtract(double coef, Variable variable1, Variable variable2)
+        {
+            return this.Add(-coef, variable1, variable2);
+        }
+
+        /// <summary>
+        /// Subtracts the given expression multiplied by the given multiplier from the current Expression.
+        /// </summary>
+        /// <param name="multiplier">The multiplier for the given expression.</param>
         /// <param name="expr">The expression to be subtracted.</param>
         /// <returns>The updated current Expression.</returns>
-        public Expression Subtract(double factor, Expression expr)
+        public Expression Subtract(double multiplier, Expression expr)
         {
             if (object.ReferenceEquals(this, expr)) throw new SonnetException("Recursive subtractions not allowed.");
 
-            return this.Add(-factor, expr);
+            return this.Add(-multiplier, expr);
         }
 
         /// <summary>
@@ -333,6 +436,16 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Subtracts the given quadratic term (var1 * var2) from the current Expression.
+        /// </summary>
+        /// <param name="var1">The variable1 to subtract.</param>
+        /// <param name="var2">The variable2 to subtract.</param>
+        /// <returns>The updated current Expression.</returns>
+        public Expression Subtract(Variable var1, Variable var2)
+        {
+            return this.Add(-1.0, var1, var2);
+        }
+        /// <summary>
         /// Subtracts the given expression from the current Expression
         /// </summary>
         /// <param name="expr">The expression to subtract.</param>
@@ -352,15 +465,124 @@ namespace Sonnet
             if (multiplier == 0.0) Clear();
             else
             {
-                int n = coefs.Count;
-                for (int i = 0; i < n; i++)
+                for (int i = 0, n = coefs.Count; i < n; i++)
                 {
                     coefs[i] = coefs[i].Multiply(multiplier);
+                }
+
+                for (int i = 0, qn = quadCoefs.Count; i < qn; i++)
+                {
+                    quadCoefs[i] = quadCoefs[i].Multiply(multiplier);
                 }
                 constant *= multiplier;
             }
 
             return this;
+        }
+
+        /// <summary>
+        /// Multiplies the current expression with the given variable.
+        /// Same as Multiply(1.0, var)
+        /// The current expression cannot already be quadratic.
+        /// </summary>
+        /// <param name="var">The variable to multiply with</param>
+        /// <returns>The updated current Expression</returns>
+        public Expression Multiply(Variable var)
+        {
+            return this.Multiply(1.0, var);
+        }
+
+        /// <summary>
+        /// Multiplies the current expression with the given coef * variable.
+        /// This expression cannot already be quadratic.
+        /// The given expression cannot be the current expression.
+        /// </summary>
+        /// <param name="coef">The coefficient to multiply with</param>
+        /// <param name="var">The variable to multiply with</param>
+        /// <returns>The updated current Expression (this)</returns>
+        public Expression Multiply(double coef, Variable var)
+        {
+            Ensure.NotNull(var, "var");
+            Ensure.IsFalse(this.IsQuadratic, "Cannot multiply expression because the result would not be quadratic");
+
+            // All linear coefs become quad coefs
+            int n = this.coefs.Count;
+            for (int i = 0; i < n; i++)
+            {
+                Coef c = this.coefs[i]; // consider ref
+                quadCoefs.Add(new QuadCoef(var, c.var, coef * c.coef));
+            }
+
+            // then clear coefs and add as only coef the old constant * var
+            this.coefs.Clear();
+            if (this.constant != 0.0) coefs.Add(new Coef(var, coef * this.constant));
+            
+            // lastly, no remaining constant.
+            this.constant = 0.0;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Multiplies the current expression with the given expression
+        /// The resulting expression cannot be more than quadratic.
+        /// The expression can be the the same as current (for Squared)
+        /// </summary>
+        /// <param name="expr">The expression to be multiplied with</param>
+        /// <returns>The updated current Expression (this)</returns>
+        public Expression Multiply(Expression expr)
+        {
+            string message = "Cannot multiply expression because the result would not be quadratic";
+            if (this.NumberOfQuadCoefficients > 0)
+            {
+                // if the current expression is already quadratic, then the expr to multiply with has to be just a constant
+                Ensure.IsFalse(expr.NumberOfCoefficients > 0 || expr.NumberOfQuadCoefficients > 0, message);
+
+                this.Multiply(expr.constant);
+                return this;
+            }
+            else if (this.NumberOfCoefficients > 0)
+            {
+                // if the current expression is not quadratic but has linear terms, then the expression to multiply with cannot be quadratic
+                Ensure.IsFalse(expr.NumberOfQuadCoefficients > 0, message);
+
+                // this(c + a1x1 + a2x2)   *    (d + b1x1 + b2x2)
+                // 
+                // c * (d + b1x1 + b2x2) + a1x1 * (d + b1x1 + b2x2) + a2x2 * ( d + b1x1 + b2x2) 
+                Expression result = new Expression();
+                result.Add(this.constant, expr);
+
+                int n = this.coefs.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    Coef c = this.coefs[i];
+                    result.Add(c.coef, c.var, expr);
+                }
+
+                this.Clear();
+                this.Add(result);
+                return this;
+            }
+            else
+            {
+                // if the current expression is just a constant, then multiply by expression
+                // copy the current constant, clear the current expression and build using Add with multiplier
+                double multiplier = this.constant;
+                if (object.ReferenceEquals(this, expr))
+                {
+                    Expression result = new Expression();
+                    result.Add(multiplier, expr);
+
+                    this.Clear();
+                    this.Add(result);
+                }
+                else
+                {
+                    this.Clear();
+                    this.Add(multiplier, expr);
+                }
+                return this;
+            }
         }
 
         /// <summary>
@@ -374,9 +596,18 @@ namespace Sonnet
 
             return this.Multiply(1.0 / divider);
         }
+        /// <summary>
+        /// Returns the expression * expression for the current expression.
+        /// The resulting expression cannot be more than quadratic.
+        /// </summary>
+        /// <returns>The updated current expression (this).</returns>
+        public Expression Squared()
+        {
+            return this.Multiply(this);
+        }
 
         /// <summary>
-        /// Removes the given variable from the current Expression.
+        /// Removes all linear terms of the given variable from the current Expression.
         /// Note: This method reorders the coefficients.
         /// </summary>
         /// <param name="var">The variable to be removed.</param>
@@ -386,10 +617,9 @@ namespace Sonnet
             Ensure.NotNull(var, "var");
 
             int aID = var.id;
-            int n = coefs.Count;
             double coef = 0.0;
 
-            for (int i = 0; i < n; )
+            for (int i = 0, n = coefs.Count; i < n; )
             {
                 Coef c = coefs[i]; // consider ref
                 if (aID == c.id)
@@ -408,6 +638,38 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Removes all quadratic terms of the given variables from the current Expression.
+        /// Note: This method reorders the coefficients.
+        /// </summary>
+        /// <param name="var1">The variable1 to be removed.</param>
+        /// <param name="var2">The variable2 to be removed.</param>
+        /// <returns>The sum of all coefficients of the given variables terms before removing.</returns>
+        protected double Remove(Variable var1, Variable var2)
+        {
+            Ensure.NotNull(var1, "var1");
+            Ensure.NotNull(var2, "var2");
+
+            QuadCoef qc = new QuadCoef(var1, var2, 1.0);
+            double coef = 0.0;
+
+            for (int i = 0, qn = quadCoefs.Count; i < qn;)
+            {
+                QuadCoef c = quadCoefs[i]; // consider ref
+                if (qc.EqualsVariables(c))
+                {
+                    coef += c.coef;
+                    quadCoefs.Remove(i);
+                    qn = quadCoefs.Count; // needs to be updated!
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            return coef;
+        }
+
+        /// <summary>
         /// Determines the sum of all coefficients of the given variable.
         /// Same as Assemble(var);
         /// </summary>
@@ -416,6 +678,18 @@ namespace Sonnet
         public double GetCoefficient(Variable var)
         {
             return Assemble(var);
+        }
+
+        /// <summary>
+        /// Determines the sum of all coefficients of the given pair of variable.
+        /// Same as Assemble(var1, var2);
+        /// </summary>
+        /// <param name="var1">The variable1 involved.</param>
+        /// <param name="var2">The variable2 involved.</param>
+        /// <returns>The sum of all coefficients of the given variable.</returns>
+        public double GetCoefficient(Variable var1, Variable var2)
+        {
+            return Assemble(var1, var2);
         }
 
         /// <summary>
@@ -432,6 +706,20 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Sets the overall coefficient of the given pair of variables to the given value.
+        /// </summary>
+        /// <param name="var1">The variable1 to be used.</param>
+        /// <param name="var2">The variable2 to be used.</param>
+        /// <param name="value">The new coefficient for the given variables.</param>
+        /// <returns>The sum of all *old* coefficients of the given variables.</returns>
+        public double SetCoefficient(Variable var1, Variable var2, double value)
+        {
+            double oldValue = Remove(var1, var2);
+            this.Add(value, var1, var2);
+            return oldValue;
+        }
+
+        /// <summary>
         /// Determines the sum of all coefficients of the given variable.
         /// </summary>
         /// <param name="var">The variable to be used.</param>
@@ -442,8 +730,7 @@ namespace Sonnet
 
             int aID = var.id;
             double coef = 0.0;
-            int n = coefs.Count;
-            for (int i = 0; i < n; i++)
+            for (int i = 0, n = coefs.Count; i < n; i++)
             {
                 Coef c = coefs[i]; // consider ref
                 if (aID == c.id) coef += c.coef;
@@ -451,6 +738,27 @@ namespace Sonnet
             return coef;
         }
 
+        /// <summary>
+        /// Determines the sum of all coefficients of the given variables.
+        /// </summary>
+        /// <param name="var1">The variable1 to be used.</param>
+        /// <param name="var2">The variable2 to be used.</param>
+        /// <returns>The sum of all coefficients of the given variables.</returns>
+        public double Assemble(Variable var1, Variable var2)
+        {
+            Ensure.NotNull(var1, "var1");
+            Ensure.NotNull(var2, "var2");
+
+            QuadCoef qc = new QuadCoef(var1, var2);
+
+            double coef = 0.0;
+            for (int i = 0, qn = quadCoefs.Count; i < qn; i++)
+            {
+                QuadCoef c = quadCoefs[i]; // consider ref
+                if (qc.EqualsVariables(c)) coef += c.coef;
+            }
+            return coef;
+        }
         /// <summary>
         /// Assemble the current Expression.
         /// After Assembling, all variables will appear only once in the list of coefficients.
@@ -460,8 +768,7 @@ namespace Sonnet
             CoefVector assembled = new CoefVector();
             coefs.Sort();
 
-            int n = coefs.Count;
-            for (int i = 0; i < n; )
+            for (int i = 0, n = coefs.Count; i < n; )
             {
                 Coef newc = coefs[i]; // consider ref
                 i++;
@@ -480,6 +787,30 @@ namespace Sonnet
 
             coefs.Clear();
             coefs.AddRange(assembled);
+
+            QuadCoefVector quadAssembled = new QuadCoefVector();
+            quadCoefs.Sort();
+
+            for (int i = 0, qn = quadCoefs.Count; i < qn;)
+            {
+                QuadCoef newc = quadCoefs[i]; // consider ref
+                i++;
+
+                while (i < qn)
+                {
+                    QuadCoef c = quadCoefs[i];
+                    //if (newc.id != c.id) break;
+                    if (!newc.EqualsVariables(c)) break;
+
+                    newc.coef += c.coef;
+                    i++;
+                }
+
+                quadAssembled.Add(new QuadCoef(newc.var1, newc.var2, newc.coef));
+            }
+
+            quadCoefs.Clear();
+            quadCoefs.AddRange(quadAssembled);
         }
 
         /// <summary>
@@ -514,6 +845,14 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Gets the vector of coefficients and variables of the current Expression.
+        /// </summary>
+        internal QuadCoefVector QuadCoefficients
+        {
+            get { return quadCoefs; }
+        }
+
+        /// <summary>
         /// Gets the constant of the current Expression.
         /// </summary>
         public double Constant
@@ -522,13 +861,28 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Returns the number of coefficients of the current Expression.
+        /// Returns the number of linear coefficients of the current Expression.
         /// </summary>
         public int NumberOfCoefficients
         {
             get { return coefs.Count; }
         }
 
+        /// <summary>
+        /// Returns the number of quadratic coefficients of the current Expression.
+        /// </summary>
+        public int NumberOfQuadCoefficients
+        {
+            get { return quadCoefs.Count; }
+        }
+
+        /// <summary>
+        /// Returns true iff there are one or more quadritic terms in the current Expression.
+        /// </summary>
+        public bool IsQuadratic
+        {
+            get { return quadCoefs.Count > 0; }
+        }
         /// <summary>
         /// Calculates constant plus the product of all coefficients and the Value in the current solution of their variables.
         /// </summary>
@@ -540,6 +894,11 @@ namespace Sonnet
             foreach (Coef coef in coefs)
             {
                 level += coef.Level();
+            }
+
+            foreach (QuadCoef quadcoef in quadCoefs)
+            {
+                level += quadcoef.Level();
             }
 
             return level;
@@ -832,6 +1191,16 @@ namespace Sonnet
 
         #region Operator -
         /// <summary>
+        /// Creates a new Expression set to "- expr"
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(Expression expr)
+        {
+            return (new Expression()).Subtract(expr);
+        }
+
+        /// <summary>
         /// Creates a new Expression set to "c - expr"
         /// </summary>
         /// <param name="c">The constant to be used.</param>
@@ -890,26 +1259,62 @@ namespace Sonnet
         #region Operator * for constants
         /// <summary>
         /// Creates a new expression set to "f * expr".
-        /// The multiplication factor f is applied to the constant and coefficients in the expression.
+        /// The multiplier f is applied to the constant and coefficients in the expression.
         /// </summary>
-        /// <param name="f">The multiplication factor.</param>
+        /// <param name="f">The multiplier.</param>
         /// <param name="expr">The expression.</param>
         /// <returns>The new expression.</returns>
         public static Expression operator *(double f, Expression expr)
         {
-            return new Expression(f, expr);
+            return (new Expression()).Add(f, expr);
         }
 
         /// <summary>
         /// Creates a new expression set to "expr * f" ( = "f * expr").
-        /// The multiplication factor f is applied to the constant and coefficients in the expression.
+        /// The multiplier f is applied to the constant and coefficients in the expression.
         /// </summary>
         /// <param name="expr">The expression.</param>
-        /// <param name="f">The multiplication factor.</param>
+        /// <param name="f">The multiplier.</param>
         /// <returns>The new expression.</returns>
         public static Expression operator *(Expression expr, double f)
         {
-            return new Expression(f, expr);
+            return (new Expression()).Add(f, expr);
+        }
+
+        /// <summary>
+        /// Creates a new expression set to "expr * var" ( = "var * expr").
+        /// The given expression must not be quadratic.
+        /// </summary>
+        /// <param name="expr">The expression.</param>
+        /// <param name="var">The variable.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(Expression expr, Variable var)
+        {
+            return (new Expression(var)).Multiply(expr);
+        }
+
+        /// <summary>
+        /// Creates a new expression set to "expr * var" ( = "var * expr").
+        /// The given expression must not be quadratic.
+        /// </summary>
+        /// <param name="var">The variable.</param>
+        /// <param name="expr">The expression.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(Variable var, Expression expr)
+        {
+            return (new Expression(var)).Multiply(expr);
+        }
+
+        /// <summary>
+        /// Creates a new expression set to "expr1 * expr2".
+        /// The given expressions must not be quadratic.
+        /// </summary>
+        /// <param name="expr1">The expression1.</param>
+        /// <param name="expr2">The expression2.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(Expression expr1, Expression expr2)
+        {
+            return (new Expression(expr1)).Multiply(expr2);
         }
         #endregion
 
@@ -1010,6 +1415,7 @@ namespace Sonnet
         #endregion
 
         private CoefVector coefs;
+        private QuadCoefVector quadCoefs;
         private double constant;
     }
 }

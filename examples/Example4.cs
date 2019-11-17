@@ -241,7 +241,7 @@ namespace SonnetExamples.Example4
         public void Initialize(IEnumerable<Day> days)
         {
             string varname = string.Format("Clean[{0}]", Name);
-            Clean = Variable.New(days, varname);
+            Clean = days.ToMap(d => new Variable() { Name = varname + "_" + d });
         }
 
         public void Build(Model model)

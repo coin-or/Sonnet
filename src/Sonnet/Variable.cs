@@ -163,7 +163,7 @@ namespace Sonnet
         /// <param name="upper">The upper bound of the new variables.</param>
         /// <param name="type">The type of the new variables.</param>
         /// <returns>Array of variables of the given size.</returns>
-        [Obsolete("DEPRECATED. Use ToMap: Dictionary<string, Variable> x = products.ToMap(p => new Variable() { Name = \"x_\" + p.ToString(); });")]
+        [Obsolete("DEPRECATED. Use ToMap: Dictionary<string, Variable> x = products.ToMap(p => new Variable() { Name = \"x_\" + p.ToString() });")]
         public static Dictionary<T, Variable> New<T>(string varname = null, double lower = 0.0, double upper = MathUtils.Infinity, VariableType type = VariableType.Continuous)
             where T : struct, IConvertible
         {
@@ -584,6 +584,16 @@ namespace Sonnet
 
         #region Operator -
         /// <summary>
+        /// Creates a new expression "- x"
+        /// </summary>
+        /// <param name="x">The variable.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator -(Variable x)
+        {
+            return (new Expression()).Subtract(x);
+        }
+        
+        /// <summary>
         /// Creates a new expression "c - x"
         /// </summary>
         /// <param name="c">The constant.</param>
@@ -639,6 +649,17 @@ namespace Sonnet
             return new Expression(c, x);
         }
 
+        /// <summary>
+        /// Creates a new expression "x1 * x2"
+        /// </summary>
+        /// <param name="x1">The variable1.</param>
+        /// <param name="x2">The variable2.</param>
+        /// <returns>The new expression.</returns>
+        public static Expression operator *(Variable x1, Variable x2)
+        {
+            return new Expression(x1, x2);
+        }
+        
         /// <summary>
         /// Creates a new expression "(1/c) * x"
         /// </summary>

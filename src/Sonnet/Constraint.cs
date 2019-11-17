@@ -387,6 +387,9 @@ namespace Sonnet
 
         private void GutsOfConstructor(string name, Expression expr, ConstraintType type, Expression rhs)
         {
+            Ensure.IsFalse(expr.IsQuadratic, "Quadratic constraints lhs are not supported");
+            Ensure.IsFalse(rhs.IsQuadratic, "Quadratic constraints rhs are not supported");
+
             id = numberOfConstraints++;
 
             this.expr = new Expression(expr);

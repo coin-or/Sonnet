@@ -20,6 +20,9 @@ namespace SonnetExamples
         {
             Console.WriteLine("Example1 - Optimising investments");
 
+            var YearsList = Enum.GetValues(typeof(Years)).OfType<Years>().ToList();
+            var ProjectsList = Enum.GetValues(typeof(Projects)).OfType<Projects>().ToList();
+
             double interest_rate = 0.1;
             Dictionary<Years, double> budget = new Dictionary<Years, double>();
             budget[Years.year1] = 500;
@@ -68,9 +71,9 @@ namespace SonnetExamples
             cashflow[Projects.proj5][Years.year6] = 630;
             #endregion
 
-            Dictionary<Projects, Variable> invest = Variable.New<Projects>("invest", 0, 1, VariableType.Integer);
-            Dictionary<Years, Variable> cash = Variable.New<Years>("cash");
-            Dictionary<Projects, Variable> fraction = Variable.New<Projects>("fraction");
+            Dictionary<Projects, Variable> invest = ProjectsList.ToMap(p => new Variable(0, 1, VariableType.Integer) { Name = "invest_" + p });
+            Dictionary<Years, Variable> cash = YearsList.ToMap(y => new Variable() { Name = "case_" + y });
+            Dictionary<Projects, Variable> fraction = ProjectsList.ToMap(p => new Variable() { Name = "fraction_" + p }); ;
 
             Model model = new Model("Investement_Planning");
             foreach (Years y in Enum.GetValues(typeof(Years)))
@@ -100,7 +103,7 @@ namespace SonnetExamples
 
             model.Objective = cash[Years.year6];
 
-            Solver solver = Solver.New<OsiCbcSolverInterface>(model);
+            Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             solver.Maximise();
 
             Console.WriteLine(solver.ToSolutionString());
