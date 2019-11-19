@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type = "text/xsl" href = "http://www.coin-or.org/projects/autoGen.xsl"?>
-<projectData xmlns="coin-or.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="coin-or.org http://www.coin-or.org/projects/autoGen.xsd">
+<projectData xmlns="coin-or.org"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="coin-or.org http://www.coin-or.org/projects/autoGen.xsd">
   <projectBasics>
     <projectName>SONNET</projectName>
-    <projectRepo>https://github.com/coin-or/SONNET</projectRepo>
+    <projectRepo>SONNET</projectRepo>
     <projectDescription>A wrapper for COIN-OR mixed integer linear programming via OSI to Microsoft .NET
-      </projectDescription>
+    </projectDescription>
     <projectShortDescription>Microsoft .NET wrapper for COIN-OR Open Solver Interface
-      </projectShortDescription>
+    </projectShortDescription>
     <projectManager>Jan-Willem Goossens</projectManager>
     <projectHomePage>https://github.com/coin-or/SONNET</projectHomePage>
     <projectLicense>Eclipse Public License 1.0</projectLicense>
@@ -18,7 +20,7 @@
       </coinProject>
     </coinLinkedProjects>
     <otherLinkedPackages>
-      </otherLinkedPackages>
+    </otherLinkedPackages>
     <projectLanguage>C#</projectLanguage>
     <developmentStatus>
       <activityStatus>Active</activityStatus>
@@ -40,9 +42,9 @@
     </projectCategories>
   </projectBasics>
   <leftMenuLinks>
-    <!--documentation> </documentation-->
-    <sourceCodeDownload>https://github.com/coin-or/SONNET </sourceCodeDownload>
-    <binaryDownload>https://github.com/coin-or/SONNET/tree/master/bin </binaryDownload>
-    <!--mailingList> </mailingList-->
+    <documentation>https://github.com/coin-or/SONNET</documentation>
+    <sourceCodeDownload>https://github.com/coin-or/SONNET</sourceCodeDownload>
+    <binaryDownload>https://github.com/coin-or/SONNET/tree/master/bin</binaryDownload>
+    <mailingList>http://list.coin-or.org/mailman/listinfo/sonnet</mailingList>
   </leftMenuLinks>
 </projectData>
