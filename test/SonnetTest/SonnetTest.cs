@@ -1821,6 +1821,11 @@ namespace SonnetTest
                 testMps = testMps.Replace("ClpDefau", "BLANK");
                 Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
             }
+            else if (solver.OsiSolverFullName.Contains("OsiCbc"))
+            {
+                testMps = testMps.Replace("ClpDefau", "BLANK");
+                Assert(SonnetTest.EqualsString(testMps, referenceTestMps));
+            }
             else if (solver.OsiSolverFullName.Contains("OsiCpx"))
             {
                 Assert(true); // skip
