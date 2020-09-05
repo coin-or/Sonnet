@@ -34,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\CHANGELOG.txt = ..\..\CHANGELOG.txt
 		..\..\INSTALL.txt = ..\..\INSTALL.txt
 		..\..\LICENSE.txt = ..\..\LICENSE.txt
+		..\..\.coin-or\projDesc.xml = ..\..\.coin-or\projDesc.xml
 		..\..\README.txt = ..\..\README.txt
 	EndProjectSection
 EndProject
