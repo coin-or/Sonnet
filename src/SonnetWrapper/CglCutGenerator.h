@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <CglCutGenerator.hpp>
 
+#include <CglCutGenerator.hpp>
 #include "Helpers.h"
 
 using namespace System;
