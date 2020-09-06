@@ -109,7 +109,7 @@ namespace SonnetTest
                 {
                     SonnetTestQuad1();
                     SonnetTestQuad2();
-                    //SonnetTestQuad3(); // MIQP, which is not support
+                    SonnetTestQuad3(); // MIQP, experimental support
 
                     SonnetTest0();
                     SonnetTest0b();
@@ -159,8 +159,9 @@ namespace SonnetTest
                     SonnetTest29();
                     SonnetTest30(); 
                 }
-                catch
+                catch (Exception e)
                 {
+                    Console.WriteLine(e.Message);
                     if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
                     System.Diagnostics.Debugger.Break();
                 }
@@ -371,6 +372,8 @@ namespace SonnetTest
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
 
+           // the obj.level is ok, but not the value?!
+           //     what about changes to osicbc mps file ClpDefau?
             Assert(MathExtension.CompareDouble(obj.Value, -7.5) == 0);
             Assert(MathExtension.CompareDouble(x1.Value, 1.0) == 0 && MathExtension.CompareDouble(x2.Value, 1.0) == 0);
         }

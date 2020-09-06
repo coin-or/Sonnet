@@ -6,7 +6,13 @@ The File Version numbers change with every release. In contrast, the Assembly Ve
 
 [TODO]
  - Remove Osi Dependency. In particular OsiCbc is no longer maintained, but still used by Sonnet.
- - MIQP. Quadratic objective for MIP. Quadratic objective works with OsiClp (QP) but not 
+ - MIQP. Quadratic objective for MIP. Quadratic objective works with OsiClp (QP) but unstable results via Cbc.
+
+[1.4.0.0 EXPERIMENTAL BUILD]
+Sonnet: 
+ - Experimental addition of MIQP via CBC through CbcSolver.
+SonnetWrapper:
+ - Added more wrappers.
 
 [1.3.0.0]
 Sonnet:

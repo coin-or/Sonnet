@@ -28,6 +28,32 @@ namespace COIN
 	public:
 		CbcModel() { }
 
+		/// Solve the initial LP relaxation
+		void initialSolve()
+		{
+			Base->initialSolve();
+		}
+
+		/** \brief Invoke the branch \& cut algorithm
+
+	The method assumes that initialSolve() has been called to solve the
+	LP relaxation. It processes the root node, then proceeds to explore the
+	branch & cut search tree. The search ends when the tree is exhausted or
+	one of several execution limits is reached.
+	If doStatistics is 1 summary statistics are printed
+	if 2 then also the path to best solution (if found by branching)
+	if 3 then also one line per node
+  */
+		void branchAndBound(int doStatistics)
+		{
+			Base->branchAndBound(doStatistics);
+		}
+
+		void branchAndBound()
+		{
+			branchAndBound(0);
+		}
+
 		OsiSolverInterface^ solver() {
 			return OsiSolverInterface::CreateDerived(Base->solver());
 		}
@@ -149,7 +175,68 @@ namespace COIN
 		{
 			return Base->isProvenOptimal();
 		}
+
+		/// Get current objective function value
+		inline double getCurrentObjValue()
+		{
+			return Base->getCurrentObjValue();
+		}
+
+		/// Get current minimization objective function value
+		inline double getCurrentMinimizationObjValue()
+		{
+			return Base->getCurrentMinimizationObjValue();
+		}
+
+		/// Get best objective function value as minimization
+		inline double getMinimizationObjValue()
+		{
+			return Base->getMinimizationObjValue();
+		}
+
+		/// Set best objective function value as minimization
+		inline void setMinimizationObjValue(double value)
+		{
+			Base->setMinimizationObjValue(value);
+		}
+
+		/// Get best objective function value
+		inline double getObjValue()
+		{
+			return Base->getObjValue();
+		}
+		/** Get best possible objective function value.
+			  This is better of best possible left on tree
+			  and best solution found.
+			  If called from within branch and cut may be optimistic.
+		  */
+		double getBestPossibleObjValue()
+		{
+			return Base->getBestPossibleObjValue();
+		}
 		
+		/// Set best objective function value
+		inline void setObjValue(double value)
+		{
+			Base->setObjValue(value);
+		}
+
+		/// Get solver objective function value (as minimization)
+		inline double getSolverObjValue()
+		{
+			return Base->getSolverObjValue();
+		}
+
+		/** The best solution to the integer programming problem.
+
+			The best solution to the integer programming problem found during
+			the search. If no solution is found, the method returns null.
+		  */
+		inline double* bestSolution()
+		{
+			return Base->bestSolution();
+		}
+
 		/// Final status of problem - 0 finished, 1 stopped, 2 difficulties
 		int status()
 		{ 
