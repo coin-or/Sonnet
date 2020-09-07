@@ -83,9 +83,9 @@ namespace SonnetExamples.Example7
             int M = 300000; // param M := 300000;
             
             // var x[Lengths] integer >= 0 ;
-            var x = lengths.ToMap(l => new Variable("x_" + l, 0.0, double.MaxValue, VariableType.Continuous));
+            var x = lengths.ToMap(l => new Variable("x_" + l, 0.0, double.MaxValue, VariableType.Integer));
             // var n[Lengths] binary ;
-            var n = lengths.ToMap(l => new Variable("n_" + l, 0.0, 1.0, VariableType.Continuous));
+            var n = lengths.ToMap(l => new Variable("n_" + l, 0.0, 1.0, VariableType.Integer));
             // subto obj: delta_squares == sum<i> in Lengths :  (target_distribution[i] - storage[i] + x[i] * package_size[i]) ^2;
             Objective delta_squares = lengths.Sum(i => (target_distribution[i] - storage[i] + x[i] * package_size[i]).Squared());
             m.Objective = delta_squares;
@@ -157,8 +157,14 @@ namespace SonnetExamples.Example7
 
             Solver s = new Solver(m, typeof(COIN.OsiCbcSolverInterface));
             s.Export("newlengths.mps");
-            s.Solve();
-
+            try
+            {
+                s.Solve();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             Console.WriteLine(s.ToSolutionString());
         }
     }
