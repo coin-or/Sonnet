@@ -13,6 +13,7 @@ Sonnet:
  - Experimental addition of MIQP via CBC through CbcSolver.
 SonnetWrapper:
  - Added more wrappers.
+ - Included ClpModel code to increase char temp[] for row and column names. See Clp PR #160.
 
 [1.3.0.0]
 Sonnet:
