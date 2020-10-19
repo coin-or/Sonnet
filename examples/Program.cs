@@ -32,9 +32,6 @@ namespace SonnetExamples
 
             Example6b.Example ex6b = new Example6b.Example();
             ex6b.Run();
-
-            Example7.Example ex7 = new Example7.Example();
-            ex7.Run();
         }
     }
 }
