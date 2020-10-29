@@ -7,6 +7,7 @@ This package includes the Sonnet XML documentation and one example.
 Experimental: Sonnet-1.4-bin-EXPERIMENTAL.zip
 ---------------------
 This fils is build against latest 'unstable' master of Cbc and its dependencies
-from 6 SEP 2020.
+from 29 OCT 2020, with Osi proposed fix for namediscipline.
+Updated binary for Sonnet-1.4.
 
 
