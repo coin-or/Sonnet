@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <CbcSolver.hpp>
 #include <CbcModel.hpp>
 #include <msclr\marshal.h> // for string ^ to char * via marshal_context
 #include <msclr\marshal_cppstd.h> // for string ^ to std::string via marshal_as
@@ -60,8 +59,7 @@ namespace COIN
 		}
 		void static CbcMain0(CbcModel ^ cbcModel)
 		{
-			CbcSolverUsefulData cbcData;
-			::CbcMain0(*(cbcModel->Base), cbcData);
+			::CbcMain0(*(cbcModel->Base));
 		}
 
 		int static CbcMain1(array<System::String ^> ^args, CbcModel ^ cbcModel)
@@ -76,8 +74,8 @@ namespace COIN
 				argv[i] = context->marshal_as<const char *>(args[i]);
 				//argv[i] = (char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
 			}
-			CbcSolverUsefulData cbcData;
-			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), cbcData);
+
+			int result = ::CbcMain1(argc, argv, *(cbcModel->Base));
 			delete context;
 			delete []argv;
 
