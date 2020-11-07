@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetExamples", "SonnetExa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F48F0304-01B7-4EF7-93B3-85F297B15C44}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\appveyor-install.bat = ..\..\appveyor-install.bat
+		..\..\appveyor.yml = ..\..\appveyor.yml
 		..\..\AUTHORS.txt = ..\..\AUTHORS.txt
 		..\..\CHANGELOG.txt = ..\..\CHANGELOG.txt
 		..\..\INSTALL.txt = ..\..\INSTALL.txt
