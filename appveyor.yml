@@ -73,20 +73,21 @@ build:
 after_build:
   - mkdir bin
   - mkdir bin\x64
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll bin\x64\.
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml bin\x64\.
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll bin\x64\.
-  - mkdir x86
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll bin\x86\.
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml bin\x86\.
-  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\SonnetWrapper.dll bin\x86\.
-  - copy c:\projects\sonnet\AUTHORS.txt bin\.
-  - copy c:\projects\sonnet\CHANGELOG.txt bin\.
-  - copy c:\projects\sonnet\INSTALL.txt bin\.
-  - copy c:\projects\sonnet\LICENSE.txt bin\.
-  - copy c:\projects\sonnet\README.txt bin\.
-  - copy c:\projects\sonnet\examples\Example5.cs bin\.
-  - cd bin && 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll bin\x64\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml bin\x64\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll bin\x64\.
+  - mkdir bin\x86
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll bin\x86\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml bin\x86\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\SonnetWrapper.dll bin\x86\.
+  - copy AUTHORS.txt bin\.
+  - copy CHANGELOG.txt bin\.
+  - copy INSTALL.txt bin\.
+  - copy LICENSE.txt bin\.
+  - copy README.txt bin\.
+  - copy examples\Example5.cs bin\.
+  - cd bin
+  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
 
 artifacts:
   - path: %RELEASE_NAME%-bin.zip
