@@ -71,27 +71,25 @@ build:
   project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
 
 after_build:
-  - mkdir bin
-  - mkdir bin\x64
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll bin\x64\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml bin\x64\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll bin\x64\.
-  - mkdir bin\x86
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll bin\x86\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml bin\x86\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\SonnetWrapper.dll bin\x86\.
-  - copy AUTHORS.txt bin\.
-  - copy CHANGELOG.txt bin\.
-  - copy INSTALL.txt bin\.
-  - copy LICENSE.txt bin\.
-  - copy README.txt bin\.
-  - copy examples\Example5.cs bin\.
-  - cd bin
-  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
+  - mkdir package\%PLATFORM%
+  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\Sonnet.dll package\%PLATFORM%\.
+  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\Sonnet.xml package\%PLATFORM%\.
+  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\SonnetWrapper.dll package\%PLATFORM%\.
 
 artifacts:
   - path: $(RELEASE_NAME)-bin.zip
     name: Sonnet
+
+before_deploy:
+  - copy AUTHORS.txt package\.
+  - copy CHANGELOG.txt package\.
+  - copy INSTALL.txt package\.
+  - copy LICENSE.txt package\.
+  - copy README.txt package\.
+  - copy examples\Example5.cs package\.
+  - cd package
+  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
+  - cd ..
 
 deploy:
   - provider: GitHub
