@@ -96,6 +96,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -110,6 +111,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -123,6 +125,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -136,6 +139,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <RuntimeLibrary />
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -163,28 +167,28 @@
     <ClCompile Include="..\..\..\test\SonnetWrapperTest\SonnetWrapperTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Cbc\MSVisualStudio\v16\libCbcSolver\libCbcSolver.vcxproj">
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libCbcSolver\libCbcSolver.vcxproj">
       <Project>{5a9043a5-cb87-4e2b-807c-74830bffae39}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj">
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj">
       <Project>{0b054d74-6082-452f-9744-5fbe12c7d476}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Cbc\MSVisualStudio\v16\libOsiCbc\libOsiCbc.vcxproj">
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libOsiCbc\libOsiCbc.vcxproj">
       <Project>{22911998-fedd-44ac-902f-cfefa060c36a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Cgl\MSVisualStudio\v16\libCgl\libCgl.vcxproj">
+    <ProjectReference Include="..\..\..\..\Cgl\MSVisualStudio\v16\libCgl\libCgl.vcxproj">
       <Project>{1e645a44-00ef-4093-9f6a-1d082bd43bdb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Clp\MSVisualStudio\v16\libClp\libClp.vcxproj">
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v16\libClp\libClp.vcxproj">
       <Project>{768b67d6-e6d3-4a8f-aa61-511fdbce7937}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Clp\MSVisualStudio\v16\libOsiClp\libOsiClp.vcxproj">
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v16\libOsiClp\libOsiClp.vcxproj">
       <Project>{79433425-ec16-410f-9b91-8d31d2109c90}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\CoinUtils\MSVisualStudio\v16\libCoinUtils\libCoinUtils.vcxproj">
+    <ProjectReference Include="..\..\..\..\CoinUtils\MSVisualStudio\v16\libCoinUtils\libCoinUtils.vcxproj">
       <Project>{6d2ef92a-d693-47e3-a325-a686e78c5ffd}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\jhmgoossens - repos\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj">
+    <ProjectReference Include="..\..\..\..\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj">
       <Project>{bf5c7532-ee0a-479b-9993-72134087d530}</Project>
     </ProjectReference>
     <ProjectReference Include="..\SonnetWrapper\SonnetWrapper.vcxproj">

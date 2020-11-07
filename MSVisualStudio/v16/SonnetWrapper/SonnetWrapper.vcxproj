@@ -72,29 +72,29 @@
     <Text Include="..\..\..\src\SonnetWrapper\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v10\libCbcSolver\libCbcSolver.vcxproj">
-      <Project>{71da4595-e8a7-4b21-a00a-d96d29d11e3e}</Project>
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libCbcSolver\libCbcSolver.vcxproj">
+      <Project>{5a9043a5-cb87-4e2b-807c-74830bffae39}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v10\libCbc\libCbc.vcxproj">
-      <Project>{363ba154-fec9-4e1e-bc23-93cec58ab785}</Project>
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj">
+      <Project>{0b054d74-6082-452f-9744-5fbe12c7d476}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v10\libOsiCbc\libOsiCbc.vcxproj">
-      <Project>{431ed9c6-fdf6-4836-8b33-be4ec5378640}</Project>
+    <ProjectReference Include="..\..\..\..\Cbc\MSVisualStudio\v16\libOsiCbc\libOsiCbc.vcxproj">
+      <Project>{22911998-fedd-44ac-902f-cfefa060c36a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Cgl\MSVisualStudio\v10\libCgl\libCgl.vcxproj">
-      <Project>{dbea3904-f0b8-408a-9e1a-6497febe8c42}</Project>
+    <ProjectReference Include="..\..\..\..\Cgl\MSVisualStudio\v16\libCgl\libCgl.vcxproj">
+      <Project>{1e645a44-00ef-4093-9f6a-1d082bd43bdb}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v10\libClp\libClp.vcxproj">
-      <Project>{4f8f7d1c-3a9e-444d-8ee9-77f33fa05994}</Project>
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v16\libClp\libClp.vcxproj">
+      <Project>{768b67d6-e6d3-4a8f-aa61-511fdbce7937}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v10\libOsiClp\libOsiClp.vcxproj">
-      <Project>{02d45875-a8cf-41b9-990b-3699c0ecfe10}</Project>
+    <ProjectReference Include="..\..\..\..\Clp\MSVisualStudio\v16\libOsiClp\libOsiClp.vcxproj">
+      <Project>{79433425-ec16-410f-9b91-8d31d2109c90}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\CoinUtils\MSVisualStudio\v10\libCoinUtils\libCoinUtils.vcxproj">
-      <Project>{c4867f15-438d-4ff8-8388-62fbaaa9786c}</Project>
+    <ProjectReference Include="..\..\..\..\CoinUtils\MSVisualStudio\v16\libCoinUtils\libCoinUtils.vcxproj">
+      <Project>{6d2ef92a-d693-47e3-a325-a686e78c5ffd}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Osi\MSVisualStudio\v10\libOsi\libOsi.vcxproj">
-      <Project>{7d98e2cb-876e-4f75-9f71-77d3fe87e149}</Project>
+    <ProjectReference Include="..\..\..\..\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj">
+      <Project>{bf5c7532-ee0a-479b-9993-72134087d530}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -178,7 +178,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglCommon;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -191,7 +191,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglCommon;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -206,7 +206,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglCommon;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -223,7 +223,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglCommon;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
