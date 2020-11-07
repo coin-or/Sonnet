@@ -16,6 +16,6 @@ The SONNET libraries allow for code like this:
 You can find SONNET on 
   https://github.com/coin-or/SONNET
 In particular, the latest binary release:
-  https://github.com/coin-or/SONNET/tree/master/bin
+  https://github.com/coin-or/SONNET/releases
 Simply add the x86 or x64 libraries of Sonnet.dll and SonnetWrapper.dll to your References in Visual Studio.
-For SONNET 1.2 you'll need .NET Framework 4 or later.
+Requires .NET Framework 4 or later.
