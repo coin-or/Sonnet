@@ -90,7 +90,7 @@ after_build:
   - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
 
 artifacts:
-  - path: %RELEASE_NAME%-bin.zip
+  - path: $(RELEASE_NAME)-bin.zip
     name: Sonnet
 
 deploy:
