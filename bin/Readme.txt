@@ -7,4 +7,3 @@ See https://github.com/coin-or/SONNET/releases/tag/1.3
 Dev: Sonnet-1.4-dev.2
 ---------------------
 See https://github.com/coin-or/SONNET/releases/tag/v1.4-dev.2
-

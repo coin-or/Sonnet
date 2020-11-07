@@ -329,7 +329,12 @@ namespace Sonnet
             {
                 if (forceRelaxation == false && IsMIP)
                 {
-                    if (objective.IsQuadratic) throw new NotSupportedException("MIQP not supported");
+                    if (objective.IsQuadratic)
+                    {
+                        log.Warn("Only experimantal support for MIQP!");
+                        //throw new NotSupportedException("MIQP not supported");
+                    }
+
 
                     isSolving = true;
                     if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
@@ -337,17 +342,28 @@ namespace Sonnet
                     if (solver is OsiCbcSolverInterface)
                     {
                         OsiCbcSolverInterface cbcSolver = (OsiCbcSolverInterface)solver;
-                        if (cbcSolver.UseBranchAndBound())
+                        #warning "SONNET: Clean this code. Experimental only."
+                        if (!objective.IsQuadratic && cbcSolver.UseBranchAndBound())
                         {
-                            cbcSolver.branchAndBound();
+                            cbcSolver.getModelPtr().branchAndBound();
+                            //cbcSolver.branchAndBound(); // this somehow DOESNT work (wrong obj value) if Quadratic
                         }
                         else
                         {
                             string[] cbcMainArgs = cbcSolver.GetCbcSolverArgs();
                             List<string> args = new List<string>();
                             args.Add("Sonnet");
-                            args.AddRange(cbcMainArgs);
-                            args.Add("-solve");
+                            if (cbcSolver.UseBranchAndBound())
+                            {
+                                args.Add("-solve");
+                                //args.Add("-solution");
+                                //args.Add("out.txt");
+                            }
+                            else
+                            { 
+                                args.AddRange(cbcMainArgs);
+                                args.Add("-solve");
+                            }
                             args.Add("-quit");
 
                             CbcSolver.CbcMain0(cbcSolver.getModelPtr());
@@ -1104,7 +1120,8 @@ namespace Sonnet
                     {
                         log.Debug("Using CLP-specific quadratic objective loading.");
 
-                        if (isMip) log.Error("Solving MIQP with OsiClp is not supported.");
+                        if (isMip) log.Warn("Only experimantal support for MIQP!");
+                        //if (isMip) log.Error("Solving MIQP with OsiClp is not supported.");
 
                         OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
                         ClpSimplex clpSimplex = osiClp.getModelPtr();
@@ -1117,7 +1134,7 @@ namespace Sonnet
                         // TODO: does QP with Cbc work? Does MIQP with Cbc work?
                         log.Debug("Using CBC-specific quadratic objective loading.");
 
-                        if (isMip) log.Error("Solving MIQP with OsiCbc is not supported.");
+                        if (isMip) log.Warn("Only experimantal support for MIQP!"); 
 
                         OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
                         OsiSolverInterface realSolver = osiCbc.getModelPtr().solver(); //usually the OsiClpSolver
@@ -1692,15 +1709,21 @@ namespace Sonnet
         /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignVariableSolution(bool mipSolve)
         {
-#if (DEBUG)
             int n_variables = variables.Count;
             int n_solver = solver.getNumCols();
 
-            if (n_variables != n_solver)
+            if (n_variables > n_solver)
             {
-                throw new SonnetException(string.Format("Number of variables in the solution {0} is not equal to the number of registered variables {1}", n_variables, n_solver));
+                throw new SonnetException(string.Format("The number of registered variables {0} is higher than to the number of variables at the solver {1}", n_solver, n_variables));
+            }
+
+#if (DEBUG)
+            if (!objective.IsQuadratic && n_variables != n_solver)
+            {
+                throw new SonnetException(string.Format("Number of variables in the solution is {0} which is somehow not equal to the number of registered variables {1}", n_variables, n_solver));
             }
 #endif
+
             unsafe
             {
                 double* values = solver.getColSolutionUnsafe();
@@ -1746,12 +1769,17 @@ namespace Sonnet
         /// <param name="mipSolve">Latest solve was mip solve</param>
         private void AssignConstraintSolution(bool mipSolve)
         {
-#if (DEBUG)
             int m_constraints = constraints.Count;
             int m_solver = solver.getNumRows();
-            if (m_constraints != m_solver)
+            if (m_constraints > m_solver)
             {
-                throw new SonnetException(string.Format("Number of constraints in the solution {0} is not equal to the number of registered variables {1}", m_constraints, m_solver));
+                throw new SonnetException(string.Format("The number of registered constraints {0} is higher than to the number of constraints at the solver {1}", m_constraints, m_solver));
+            }
+
+#if (DEBUG)
+            if (!objective.IsQuadratic && m_constraints != m_solver)
+            {
+                throw new SonnetException(string.Format("Number of constraints in the solution {0} is not equal to the number of registered constraints {1}", m_constraints, m_solver));
             }
 #endif
 
