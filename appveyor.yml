@@ -14,6 +14,8 @@ branches:
   only:
     - master
 
+skip_tags: true
+
 # Maximum number of concurrent jobs for the project
 max_jobs: 1
 
@@ -28,7 +30,16 @@ init:
 # scripts that run after cloning repository
 install:
   # by default, all script lines are interpreted as batch
-  - CALL c:\projects\sonnet\appveyor-install.bat
+  # for clarity, don't use extra bat files
+  #- CALL c:\projects\sonnet\appveyor-install.bat
+  - git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools
+  - git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc
+  - git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp
+  - git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl
+  - git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils
+  - git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
+  - set RELEASE_NAME=Sonnet-1.4-dev
+
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
@@ -50,9 +61,43 @@ platform:
 
 # build Configuration, i.e. Debug, Release, etc.
 configuration:
-#  - Debug
   - Release
 
+before_build:
+  - echo "RELEASE_NAME:" %RELEASE_NAME%
+
 build:
-#  parallel: true                  # enable MSBuild parallel builds
+  parallel: true                  # enable MSBuild parallel builds
   project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
+
+after_build:
+  - mkdir bin
+  - mkdir bin\x64
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll bin\x64\.
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml bin\x64\.
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll bin\x64\.
+  - mkdir x86
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll bin\x86\.
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml bin\x86\.
+  - copy c:\projects\sonnet\MSVisualStudio\v16\Sonnet\bin\x86\Release\SonnetWrapper.dll bin\x86\.
+  - copy c:\projects\sonnet\AUTHORS.txt bin\.
+  - copy c:\projects\sonnet\CHANGELOG.txt bin\.
+  - copy c:\projects\sonnet\INSTALL.txt bin\.
+  - copy c:\projects\sonnet\LICENSE.txt bin\.
+  - copy c:\projects\sonnet\README.txt bin\.
+  - copy c:\projects\sonnet\examples\Example5.cs bin\.
+  - cd bin && 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
+
+artifacts:
+  - path: %RELEASE_NAME%-bin.zip
+    name: Sonnet
+
+deploy:
+  - provider: GitHub
+    tag: $(RELEASE_NAME)
+    release: $(RELEASE_NAME)
+    artifact: Sonnet
+    draft: false
+    prerelease: true
+    auth_token:
+      secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
