@@ -9,10 +9,9 @@ version: 1.0.{build}
 # version: 1.0.{build}-{branch}
 
 # branches to build
-branches:
-  # whitelist
-  #only:
-  #  - master
+#branches:
+#  only:
+#    - master
 
 # we dont need the full git history of Sonnet to be part of the clone.
 shallow_clone: true
