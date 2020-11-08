@@ -11,10 +11,11 @@ version: 1.0.{build}
 # branches to build
 branches:
   # whitelist
-  only:
-    - master
+  #only:
+  #  - master
 
-#shallow_clone: true
+# we dont need the full git history of Sonnet to be part of the clone.
+shallow_clone: true
 
 image: Visual Studio 2019
 
