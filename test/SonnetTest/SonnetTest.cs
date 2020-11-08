@@ -65,10 +65,8 @@ namespace SonnetTest
         {
             if (!test)
             {
-                if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
-
-                System.Diagnostics.Debugger.Break();
-                throw new ApplicationException("Assertion failed");
+                if (System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Break();
+                else throw new ApplicationException("Assertion failed");
             }
         }
         public SonnetTest()
@@ -2497,7 +2495,6 @@ namespace SonnetTest
             {
                 Console.WriteLine(exception.ToString());
                 Console.WriteLine(exception.StackTrace.ToString());
-                if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
                 throw;
                 // could be out-of-memory... Can we examine the SEHException?
             }
