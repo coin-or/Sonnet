@@ -162,16 +162,15 @@ namespace SonnetTest
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
-                    if (!System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Launch();
-                    System.Diagnostics.Debugger.Break();
+                    if (System.Diagnostics.Debugger.IsAttached) System.Diagnostics.Debugger.Break();
+                    else throw;
                 }
             }
             model.Clear();
             model = null;
             System.GC.Collect();
 
-            Console.WriteLine("\n\nUnit Test finished. Press enter to finish.");
-            Console.ReadLine();
+            Console.WriteLine("\n\nUnit Test finished successfully.");
         }
         
         public void SonnetTest1()

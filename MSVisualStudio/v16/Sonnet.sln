@@ -39,8 +39,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\..\..\Co
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\..\..\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SonnetWrapperTest", "SonnetWrapperTest\SonnetWrapperTest.vcxproj", "{14483695-D549-4E97-A4E5-70E98FF8FB4F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -195,18 +193,6 @@ Global
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x64.Build.0 = Release|x64
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x86.ActiveCfg = Release|Win32
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x86.Build.0 = Release|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Debug|x64.ActiveCfg = Debug|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Debug|x64.Build.0 = Debug|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Debug|x86.ActiveCfg = Debug|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Debug|x86.Build.0 = Debug|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Release|x64.ActiveCfg = Release|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Release|x64.Build.0 = Release|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Release|x86.ActiveCfg = Release|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.Release|x86.Build.0 = Release|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.ReleaseParallel|x64.ActiveCfg = Release|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.ReleaseParallel|x64.Build.0 = Release|x64
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.ReleaseParallel|x86.ActiveCfg = Release|Win32
-		{14483695-D549-4E97-A4E5-70E98FF8FB4F}.ReleaseParallel|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,11 +14,6 @@ branches:
   only:
     - master
 
-skip_tags: true
-
-# Maximum number of concurrent jobs for the project
-max_jobs: 1
-
 #shallow_clone: true
 
 image: Visual Studio 2019
@@ -52,35 +47,37 @@ install:
 #---------------------------------#
 #       build configuration       #
 #---------------------------------#
+# We do this manually using msbuild, such that in one job we could do multiple Configurations
 
 # build platform, i.e. x86, x64, Any CPU. This setting is optional.
 # to add several platforms to build matrix:
-platform:
-  - x86
-  - x64
 
+#platform:
+#  - x86
+#  - x64
 # build Configuration, i.e. Debug, Release, etc.
-configuration:
-  - Release
+#configuration:
+#  - Release
+#build:
+#  parallel: true                  # enable MSBuild parallel builds
+#  project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
 
 before_build:
   - echo "RELEASE_NAME:" %RELEASE_NAME%
 
-build:
-  parallel: true                  # enable MSBuild parallel builds
-  project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
+build_script:
+#  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x64
+  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x86
 
 after_build:
-  - mkdir package\%PLATFORM%
-  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\Sonnet.dll package\%PLATFORM%\.
-  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\Sonnet.xml package\%PLATFORM%\.
-  - copy MSVisualStudio\v16\Sonnet\bin\%PLATFORM%\%CONFIGURATION%\SonnetWrapper.dll package\%PLATFORM%\.
-
-artifacts:
-  - path: $(RELEASE_NAME)-bin.zip
-    name: Sonnet
-
-before_deploy:
+#  - mkdir package\x64
+#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
+#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
+#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll package\x64\.
+  - mkdir package\x86
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll package\x86\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml package\x86\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\SonnetWrapper.dll package\x86\.
   - copy AUTHORS.txt package\.
   - copy CHANGELOG.txt package\.
   - copy INSTALL.txt package\.
@@ -88,15 +85,24 @@ before_deploy:
   - copy README.txt package\.
   - copy examples\Example5.cs package\.
   - cd package
-  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *.*
+  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *
   - cd ..
 
-deploy:
-  - provider: GitHub
-    tag: $(RELEASE_NAME)
-    release: $(RELEASE_NAME)
-    artifact: Sonnet
-    draft: false
-    prerelease: true
-    auth_token:
-      secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
+test_script:
+  - echo This is my custom test script
+  - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
+  - SonnetTest.exe
+
+artifacts:
+  - path: $(RELEASE_NAME)-bin.zip
+    name: Sonnet
+
+#deploy:
+#  - provider: GitHub
+#    tag: $(RELEASE_NAME)
+#    release: $(RELEASE_NAME)
+#    artifact: Sonnet
+#   draft: false
+#   prerelease: true
+#    auth_token:
+#      secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK

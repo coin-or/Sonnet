@@ -14,3 +14,5 @@
 /MSVisualStudio/**/Debug/
 /MSVisualStudio/**/x64*/
 /MSVisualStudio/**/Win32*/
+/test.mps
+/testmiqp.mps
