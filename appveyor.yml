@@ -33,8 +33,7 @@ install:
   - git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl
   - git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils
   - git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
-  - set RELEASE_NAME=Sonnet-1.4-dev
-
+  - if %APPVEYOR_REPO_TAG%=true ( set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% ) else set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
@@ -89,7 +88,6 @@ after_build:
   - cd ..
 
 test_script:
-  - echo This is my custom test script
   - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
   - SonnetTest.exe
 

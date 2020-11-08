@@ -207,7 +207,7 @@ namespace SonnetTest
 
             solver.Solve();
 
-            Assert(solver.IsProvenOptimal);
+            Assert(!solver.IsProvenOptimal); // appveyor test on failed assert
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
 
