@@ -65,14 +65,14 @@ before_build:
   - echo "RELEASE_NAME:" %RELEASE_NAME%
 
 build_script:
-#  - MSBuild MSVisualStudio\v16\Sonnet.sln -m /p:Configuration=Release;Platform=x64
+  - MSBuild MSVisualStudio\v16\Sonnet.sln -m /p:Configuration=Release;Platform=x64
   - MSBuild MSVisualStudio\v16\Sonnet.sln -m /p:Configuration=Release;Platform=x86
 
 after_build:
-#  - mkdir package\x64
-#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
-#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
-#  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll package\x64\.
+  - mkdir package\x64
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll package\x64\.
   - mkdir package\x86
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll package\x86\.
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml package\x86\.
