@@ -2027,7 +2027,8 @@ namespace Sonnet
             rawconstraints = new List<Constraint>(model.Constraints);
             constraints = new List<Constraint>();
 
-            log.PassToSolver(solver);
+            // Do not pass the messagehandler to the underlying solver to prevent unintended changes by the solver.
+            //log.PassToSolver(solver);
             ApplyObjectiveSense(model.ObjectiveSense);
 
             log.InfoFormat("Solver {0} created with model {1}", Name, model.Name);

@@ -490,6 +490,7 @@ namespace COIN
 			else
 			{
 				// there is a COIN message handler, but it isnt a Proxy.
+				// Don't return a proxy! The underlying native handler will be destructed elsewhere and cause issues here at !
 				return gcnew CoinMessageHandler(handler);
     		}
 		}

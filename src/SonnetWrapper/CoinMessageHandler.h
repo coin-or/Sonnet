@@ -88,6 +88,11 @@ namespace COIN
 		}
 	};
 
+	/// <summary>
+	/// This class is a native class derived from native CoinMessageHandler.
+	/// As such, proxy objects can be passed to native classes, as native CoinMessageHandlers.
+	/// Proxy objects are created for a wrapper CoinMessageHandler (not native).
+	/// </summary>
 	public class CoinMessageHandlerProxy : public ::CoinMessageHandler
 	{
 		friend ref class OsiSolverInterface;
@@ -144,6 +149,8 @@ namespace COIN
 		CoinMessageHandler()
 		{
 			base = new CoinMessageHandlerProxy(this);
+			baseIsProxy = true;
+			//callstack = gcnew String(Environment::StackTrace); // used to debug where this object was created.
 		}
 
 		virtual int logLevel()
@@ -212,16 +219,19 @@ namespace COIN
 
 	internal:
 		// Use this Constructor to create a wrapper around the given native CoinMessageHandler.
+		// In this case, no proxy is used, and also the rhs is expected to be deleted by the owning object, not here.
 		CoinMessageHandler(::CoinMessageHandler* rhs)
 		{
 			base = rhs;
+			baseIsProxy = false;
+			//callstack = gcnew String(Environment::StackTrace); // used to debug where this object was created.
 		}
 
 		property bool HasProxy 
 		{ 
 			bool get() 
 			{ 
-				return nullptr != dynamic_cast<CoinMessageHandlerProxy *>(base); 
+				return baseIsProxy && nullptr != dynamic_cast<CoinMessageHandlerProxy *>(base); 
 			}
 		}
 
@@ -236,6 +246,8 @@ namespace COIN
 	private:
 		bool freezeLogLevel;
 		::CoinMessageHandler *base;
+		bool baseIsProxy;
+		//String^ callstack;
 
 		int disposed;
 		~CoinMessageHandler()
@@ -256,13 +268,19 @@ namespace COIN
 
 		!CoinMessageHandler()
 		{
-			// delete NATIVE stuff here
+			// delete NATIVE stuff here: the proxy
 
-			CoinMessageHandlerProxy *proxy = dynamic_cast<CoinMessageHandlerProxy *>(base);
-			if (proxy != nullptr)
+			if (baseIsProxy)
 			{
-				delete base; 
-				base = nullptr;
+				// Note: If the base object is owned by a native object, then that native object is expected to delete it.
+				// In such a case, the base is not a Proxy. But if the base is already deleted, then the type check will fail.
+				// Therefore, the baseIsProxy was added.S
+				CoinMessageHandlerProxy* proxy = dynamic_cast<CoinMessageHandlerProxy*>(base);
+				if (proxy != nullptr)
+				{
+					delete base;
+					base = nullptr;
+				}
 			}
 		}
 

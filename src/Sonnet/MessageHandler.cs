@@ -83,6 +83,7 @@ namespace Sonnet
 
         /// <summary>
         /// Pass this message handler to the given solver.
+        /// Warning: The solver will use the handler for all components. This likely has unintended consequences.
         /// </summary>
         /// <param name="solver">The solver to pass this message handler to.</param>
         public void PassToSolver(COIN.OsiSolverInterface solver)

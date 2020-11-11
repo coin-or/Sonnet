@@ -172,6 +172,20 @@ void TestQuad3()
   bool optimal = cbcModel.isProvenOptimal(); // false
 }
 
+void TestCbcMainLogLevel()
+{
+	::OsiCbcSolverInterface osiCbc;
+	osiCbc.readMps("mip-124725.mps");
+
+	::CbcModel* model = osiCbc.getModelPtr();
+
+	::CbcSolverUsefulData cbcData;
+	::CbcMain0(*model, cbcData);
+	const char* argv[] = { "TestCbcMainLogLevel", "-solve", "-quit" };
+	::CbcMain1(3, argv, *model, cbcData);
+	// This should produce similar log level output as cbc.exe, using the default loglevel = 1
+}
+
 void TestQuadQMIP()
 {
 	OsiClpSolverInterface solver1;
@@ -211,6 +225,7 @@ void TestQuadQMIP()
 }
 int main(array< System::String ^ > ^ args)
 {
+  TestCbcMainLogLevel();
   TestQuadQMIP();
 
   Console::WriteLine(L"Hello World");

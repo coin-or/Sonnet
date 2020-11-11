@@ -152,6 +152,7 @@ namespace SonnetTest
                     SonnetTest39();
                     SonnetTest40();
                     SonnetTest41();
+                    SonnetTest42();
 
                     // do these two stress tests last..
                     SonnetTest29();
@@ -2967,6 +2968,27 @@ namespace SonnetTest
             // test the ForAllDo, which is merely a foreach(t in toys)..
             Console.WriteLine(" - Testing ForAllDo and ToMap for variable names");
             toys.ForAllDo(t => Assert(y[t].Name == "y_" + t));
+        }
+
+        public void SonnetTest42()
+        {
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest42 - Test log message handler vs CbcMain");
+
+            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always";
+            Assert(model != null);
+            Solver solver = new Solver(model, solverType);
+            SonnetLog.Default.LogLevel = 2;
+
+            OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
+            //SonnetLog.Default.PassToSolver(osisolver);
+            Assert(osisolver != null);
+
+            CbcModel cbcModel = osisolver.getModelPtr();
+            solver.Minimise();
+            Ensure.IsTrue(SonnetLog.Default.LogLevel==2, "Somehow the SonnetLog LogLevel changed!");
+
+            Assert(MathExtension.CompareDouble(model.Objective.Value, 124725) == 0);
         }
 
         public static bool EqualsString(string string1, string string2)
