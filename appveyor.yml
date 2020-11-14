@@ -45,7 +45,7 @@ install:
       git clone --depth 1 https://github.com/coin-or/Clp.git -b dev C:\projects\Clp &&
       git clone --depth 1 https://github.com/coin-or/Cgl.git -b dev C:\projects\Cgl &&
       git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b dev C:\projects\CoinUtils &&
-      git clone --depth 1 https://github.com/coin-or/Osi.git -b dev C:\projects\Osi &&
+      git clone --depth 1 https://github.com/coin-or/Osi.git -b dev C:\projects\Osi
     ) else (
       echo Building due to commit &&
       set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI &&
