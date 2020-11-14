@@ -28,6 +28,7 @@ install:
   # for clarity, don't use extra bat files
   #- CALL c:\projects\sonnet\appveyor-install.bat
   # Multi-line batch if ( ) does work, but works in ps
+  - echo -- Install
   - ps: |
       $env:GIT_REDIRECT_STDERR = '2>&1'
       if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -like '*use fork*' ) 
@@ -50,7 +51,8 @@ install:
       }
   - set RELEASE_TYPE=undefined
   - set RELEASE_NAME=undefined
-  - if "%APPVEYOR_REPO_TAG%"=="true" ( set RELEASE_TYPE=tag && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% ) else if "%APPVEYOR_FORCED_BUILD%"=="true" ( set RELEASE_TYPE=manual && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-manual ) else ( set RELEASE_TYPE=ci && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI )
+  # be careful of trailing white spaces in env values!
+  - if "%APPVEYOR_REPO_TAG%"=="true" ( set RELEASE_TYPE=tag&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%) else if "%APPVEYOR_FORCED_BUILD%"=="true" ( set RELEASE_TYPE=manual&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-manual) else ( set RELEASE_TYPE=ci&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI)
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
@@ -79,14 +81,17 @@ install:
 #  project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
 
 before_build:
-  - echo RELEASE_NAME: "%RELEASE_NAME%"
-  - echo RELEASE_TYPE: "%RELEASE_TYPE%"
+  - echo -- Before_build
+  - echo RELEASE_NAME "%RELEASE_NAME%"
+  - echo RELEASE_TYPE "%RELEASE_TYPE%"
 
 build_script:
-  - if not "%RELEASE_TYPE%"=="ci" MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x64
+  - echo -- Build_script
+  - if not "%RELEASE_TYPE%"=="ci" ( MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x64 )
   - MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x86
 
 after_build:
+  - echo -- After_build
   - mkdir package\x64
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
