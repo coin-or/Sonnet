@@ -27,35 +27,30 @@ install:
   # by default, all script lines are interpreted as batch
   # for clarity, don't use extra bat files
   #- CALL c:\projects\sonnet\appveyor-install.bat
-  - cmd: >
-      IF "%APPVEYOR_REPO_TAG%"=="true" ( 
-        echo Building due to repo tag %APPVEYOR_REPO_TAG_NAME% &&
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% &&
-        git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools &&
-        git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc &&
-        git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp &&
-        git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl &&
-        git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils &&
+  # Multi-line batch if ( ) does work, but works in ps
+  - ps: |
+      $env:GIT_REDIRECT_STDERR = '2>&1'
+      if ($env:APPVEYOR_REPO_COMMIT_MESSAGE -like '*use fork*' ) 
+      { 
+        Write-Host "For dependencies, use fork repo"
+        git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools
+        git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc
+        git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp
+        git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl
+        git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils
         git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
-      ) else if "%APPVEYOR_FORCED_BUILD%"=="true" (
-        echo Building due to forced New Build &&
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% &&
-        git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master C:\projects\BuildTools &&
-        git clone --depth 1 https://github.com/coin-or/Cbc.git -b dev C:\projects\Cbc &&
-        git clone --depth 1 https://github.com/coin-or/Clp.git -b dev C:\projects\Clp &&
-        git clone --depth 1 https://github.com/coin-or/Cgl.git -b dev C:\projects\Cgl &&
-        git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b dev C:\projects\CoinUtils &&
-        git clone --depth 1 https://github.com/coin-or/Osi.git -b dev C:\projects\Osi
-      ) else (
-        echo Building due to commit &&
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI &&
-        git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools &&
-        git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc &&
-        git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp &&
-        git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl &&
-        git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils &&
-        git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
-      )
+      } else {
+        Write-Host "For dependencies, use coin-or repo (default, unless use fork is mentioned in the commit message)"
+        git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master C:\projects\BuildTools
+        git clone --depth 1 https://github.com/coin-or/Cbc.git -b master C:\projects\Cbc
+        git clone --depth 1 https://github.com/coin-or/Clp.git -b master C:\projects\Clp
+        git clone --depth 1 https://github.com/coin-or/Cgl.git -b master C:\projects\Cgl
+        git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b master C:\projects\CoinUtils
+        git clone --depth 1 https://github.com/coin-or/Osi.git -b master C:\projects\Osi
+      }
+  - set RELEASE_TYPE=undefined
+  - set RELEASE_NAME=undefined
+  - if "%APPVEYOR_REPO_TAG%"=="true" ( set RELEASE_TYPE=tag && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% ) else if "%APPVEYOR_FORCED_BUILD%"=="true" ( set RELEASE_TYPE=manual && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-manual ) else ( set RELEASE_TYPE=ci && set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI )
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
@@ -84,17 +79,19 @@ install:
 #  project: c:\projects\sonnet\MSVisualStudio\v16\Sonnet.sln # path to Visual Studio solution or project
 
 before_build:
-  - echo "RELEASE_NAME:" %RELEASE_NAME%
+  - echo RELEASE_NAME: "%RELEASE_NAME%"
+  - echo RELEASE_TYPE: "%RELEASE_TYPE%"
 
 build_script:
-  - MSBuild MSVisualStudio\v16\Sonnet.sln -m /p:Configuration=Release;Platform=x64
-  - MSBuild MSVisualStudio\v16\Sonnet.sln -m /p:Configuration=Release;Platform=x86
+  - if not "%RELEASE_TYPE%"=="ci" MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x64
+  - MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x86
 
 after_build:
   - mkdir package\x64
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll package\x64\.
+  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
+  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
+  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\SonnetWrapper.dll package\x64\.
+  - if "%RELEASE_TYPE%"=="ci" echo x64 is not included in %RELEASE_NAME% > package\x64\readme.txt
   - mkdir package\x86
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.dll package\x86\.
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\Sonnet.xml package\x86\.
