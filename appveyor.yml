@@ -27,35 +27,35 @@ install:
   # by default, all script lines are interpreted as batch
   # for clarity, don't use extra bat files
   #- CALL c:\projects\sonnet\appveyor-install.bat
-  - |-
-      IF "%APPVEYOR_REPO_TAG%"=="true" (
-        echo Building due to repo tag %APPVEYOR_REPO_TAG_NAME%
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%
-        git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools
-        git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc
-        git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp
-        git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl
-        git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils
-        git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
-      ) else if "%APPVEYOR_FORCED_BUILD%"=="true" (
-        echo Building due to forced New Build
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%
-        git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master C:\projects\BuildTools
-        git clone --depth 1 https://github.com/coin-or/Cbc.git -b dev C:\projects\Cbc
-        git clone --depth 1 https://github.com/coin-or/Clp.git -b dev C:\projects\Clp
-        git clone --depth 1 https://github.com/coin-or/Cgl.git -b dev C:\projects\Cgl
-        git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b dev C:\projects\CoinUtils
-        git clone --depth 1 https://github.com/coin-or/Osi.git -b dev C:\projects\Osi
-      ) else (
-        echo Building due to commit
-        set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI
-        git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools
-        git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc
-        git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp
-        git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl
-        git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils
-        git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
-      )
+  - cmd: >
+      IF "%APPVEYOR_REPO_TAG%"=="true" ( 
+      echo Building due to repo tag %APPVEYOR_REPO_TAG_NAME% &&
+      set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% &&
+      git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools &&
+      git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc &&
+      git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp &&
+      git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl &&
+      git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils &&
+      git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
+    ) else if "%APPVEYOR_FORCED_BUILD%"=="true" (
+      echo Building due to forced New Build &&
+      set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME% &&
+      git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master C:\projects\BuildTools &&
+      git clone --depth 1 https://github.com/coin-or/Cbc.git -b dev C:\projects\Cbc &&
+      git clone --depth 1 https://github.com/coin-or/Clp.git -b dev C:\projects\Clp &&
+      git clone --depth 1 https://github.com/coin-or/Cgl.git -b dev C:\projects\Cgl &&
+      git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b dev C:\projects\CoinUtils &&
+      git clone --depth 1 https://github.com/coin-or/Osi.git -b dev C:\projects\Osi &&
+    ) else (
+      echo Building due to commit &&
+      set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI &&
+      git clone --depth 1 https://github.com/jhmgoossens/BuildTools.git -b master C:\projects\BuildTools &&
+      git clone --depth 1 https://github.com/jhmgoossens/Cbc.git -b dev C:\projects\Cbc &&
+      git clone --depth 1 https://github.com/jhmgoossens/Clp.git -b dev C:\projects\Clp &&
+      git clone --depth 1 https://github.com/jhmgoossens/Cgl.git -b dev C:\projects\Cgl &&
+      git clone --depth 1 https://github.com/jhmgoossens/CoinUtils.git -b dev C:\projects\CoinUtils &&
+      git clone --depth 1 https://github.com/jhmgoossens/Osi.git -b dev C:\projects\Osi
+    )
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
