@@ -27,7 +27,7 @@ install:
   # by default, all script lines are interpreted as batch
   # for clarity, don't use extra bat files
   #- CALL c:\projects\sonnet\appveyor-install.bat
-  - cmd: >-
+  - |-
       IF "%APPVEYOR_REPO_TAG%"=="true" (
         echo Building due to repo tag %APPVEYOR_REPO_TAG_NAME%
         set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%
