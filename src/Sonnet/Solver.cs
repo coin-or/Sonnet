@@ -332,9 +332,7 @@ namespace Sonnet
                     if (objective.IsQuadratic)
                     {
                         log.Warn("Only experimantal support for MIQP!");
-                        //throw new NotSupportedException("MIQP not supported");
                     }
-
 
                     isSolving = true;
                     if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
@@ -1464,10 +1462,8 @@ namespace Sonnet
         private int Offset(Constraint con)
         {
             Ensure.NotNull(con, "constraint");
-
-#if (DEBUG)
             if (!con.IsRegistered(this)) throw new SonnetException("Constraint not registered with model.");
-#endif
+ 
             int offset = -1;
             if (this == con.AssignedSolver) offset = con.Offset;
             else offset = constraints.IndexOf(con);
@@ -1485,13 +1481,12 @@ namespace Sonnet
         {
             Ensure.NotNull(var, "variable");
 
-#if (DEBUG)
             if (!var.IsRegistered(this))
             {
                 if (Generated) throw new SonnetException("Variable not registered with model.");
                 else throw new SonnetException("Variable not registered with model, because the model is not generated.");
             }
-#endif
+
             int offset = -1;
             if (this == var.AssignedSolver) offset = var.Offset;
             else offset = variables.IndexOf(var);
@@ -1717,12 +1712,10 @@ namespace Sonnet
                 throw new SonnetException(string.Format("The number of registered variables {0} is higher than to the number of variables at the solver {1}", n_solver, n_variables));
             }
 
-#if (DEBUG)
             if (!objective.IsQuadratic && n_variables != n_solver)
             {
                 throw new SonnetException(string.Format("Number of variables in the solution is {0} which is somehow not equal to the number of registered variables {1}", n_variables, n_solver));
             }
-#endif
 
             unsafe
             {
@@ -1735,7 +1728,6 @@ namespace Sonnet
                     Variable var = variables[col];
 
                     var.Assign(this, col, values[col], mipSolve?0.0:reducedCost[col]);
-#if (DEBUG)
                     if (IsProvenOptimal)
                     {
                         if (!values[col].IsBetween(var.Lower, var.Upper))
@@ -1743,13 +1735,11 @@ namespace Sonnet
                             log.DebugFormat("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper);
                         }
                     }
-#endif
                 }
             } // unsafe
 
             objective.Assign(this, solver.getObjValue() + objective.Constant);
 
-#if (DEBUG)
             if (IsProvenOptimal)
             {
                 if (objective.Level().CompareToEps(objective.Value) != 0)
@@ -1757,7 +1747,6 @@ namespace Sonnet
                     log.DebugFormat("Solution is optimal, but objective value {0} is not corrected for constant term (offset) {1}", objective.Value, objective.Level());
                 }
             }
-#endif
         }
 
         /// <summary>
