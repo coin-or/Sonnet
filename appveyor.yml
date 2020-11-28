@@ -2,10 +2,15 @@
 #      general configuration      #
 #---------------------------------#
 
+environment:
+  sonar_token:
+    secure: eCh/77iS58Bemvt+AEb7gJO5PKHN+DfvYR4yRCC9Hcw+PXE1+81Nqi8JVIH6+gmc
+  github_auth_token:
+    secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
+
 # version format
 version: 1.0.{build}
 
-# update
 # you can use {branch} name in version format too
 # version: 1.0.{build}-{branch}
 
@@ -22,6 +27,7 @@ image: Visual Studio 2019
 # scripts that are called at very beginning, before repo cloning
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - choco install "sonarscanner-msbuild-net46" -y
 
 # scripts that run after cloning repository
 install:
@@ -54,6 +60,7 @@ install:
   - set RELEASE_NAME=undefined
   # be careful of trailing white spaces in env values!
   - if "%APPVEYOR_REPO_TAG%"=="true" ( set RELEASE_TYPE=tag&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%) else if "%APPVEYOR_FORCED_BUILD%"=="true" ( set RELEASE_TYPE=manual&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-manual) else ( set RELEASE_TYPE=ci&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI)
+  - echo https://sonarcloud.io/dashboard?id=%RELEASE_NAME%
 
 # enable patching of AssemblyInfo.* files
 #assembly_info:
@@ -85,6 +92,7 @@ before_build:
   - echo -- Before_build
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
+  - SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=-
 
 build_script:
   - echo -- Build_script
@@ -93,6 +101,13 @@ build_script:
 
 after_build:
   - echo -- After_build
+
+test_script:
+  - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
+  - SonnetTest.exe
+
+after_test:
+  - echo -- after_test
   - mkdir package\x64
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.dll package\x64\.
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\Sonnet.xml package\x64\.
@@ -111,10 +126,7 @@ after_build:
   - cd package
   - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *
   - cd ..
-
-test_script:
-  - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
-  - SonnetTest.exe
+  - SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%"
 
 artifacts:
   - path: $(RELEASE_NAME)-bin.zip
@@ -127,5 +139,4 @@ artifacts:
 #    artifact: Sonnet
 #   draft: false
 #   prerelease: true
-#    auth_token:
-#      secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
+#   auth_token  somethign
