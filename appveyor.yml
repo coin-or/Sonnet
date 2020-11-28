@@ -4,7 +4,8 @@
 
 environment:
   sonar_token:
-    secure: eCh/77iS58Bemvt+AEb7gJO5PKHN+DfvYR4yRCC9Hcw+PXE1+81Nqi8JVIH6+gmc
+    #secure: eCh/77iS58Bemvt+AEb7gJO5PKHN+DfvYR4yRCC9Hcw+PXE1+81Nqi8JVIH6+gmc
+    secure: GHaPt+XpyKpioRGIrDn/oDzDF/5F/tc4U7aA7H2sWAnDi37kkzGcPFKaKSY24kfm
   github_auth_token:
     secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
 
@@ -26,6 +27,7 @@ image: Visual Studio 2019
 
 # scripts that are called at very beginning, before repo cloning
 init:
+  - if "%sonar_token%"=="" echo Error decrypting token! Did you use the correct account to create it? && exit 1
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - choco install "sonarscanner-msbuild-net46" -y
 
