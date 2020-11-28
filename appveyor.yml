@@ -30,6 +30,8 @@ init:
   - if "%sonar_token%"=="" echo Error decrypting token! Did you use the correct account to create it? && exit 1
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - choco install "sonarscanner-msbuild-net46" -y
+  - set JAVA_HOME=C:\Program Files\Java\jdk11
+  - set PATH=%JAVA_HOME%\bin;%PATH%
   - set
 
 # scripts that run after cloning repository
