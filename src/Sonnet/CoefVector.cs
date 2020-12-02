@@ -55,9 +55,9 @@ namespace Sonnet
             return id;
         }
 
-        public int CompareTo(Coef coef)
+        public int CompareTo(Coef other)
         {
-            return id.CompareTo(coef.id);
+            return id.CompareTo(other.id);
         }
 
         public double Level()
@@ -77,7 +77,7 @@ namespace Sonnet
         }
 
         public Variable var;
-        public int id;
+        public readonly int id;
         public double coef;
     }
 
@@ -149,14 +149,13 @@ namespace Sonnet
         public override int GetHashCode()
         {
             return id1 ^ id2;
-            //return ((id1 + id2) * (id1 + id2 + 1)) / 2 + id2;
         }
 
-        public int CompareTo(QuadCoef coef)
+        public int CompareTo(QuadCoef other)
         {
-            int id1compare = id1.CompareTo(coef.id1);
+            int id1compare = id1.CompareTo(other.id1);
             if (id1compare != 0) return id1compare;
-            return id2.CompareTo(coef.id2);
+            return id2.CompareTo(other.id2);
         }
 
         public double Level()
@@ -176,9 +175,9 @@ namespace Sonnet
         }
 
         public Variable var1;
-        public int id1;
+        public readonly int id1;
         public Variable var2;
-        public int id2;
+        public readonly int id2;
         public double coef;
     }
 
@@ -189,33 +188,6 @@ namespace Sonnet
             InternalUtils.Remove<Coef>(this, index);
         }
 
-        //public override bool Equals(object obj)
-        //{
-        //    return base.Equals(obj as CoefVector);
-        //}
-        //public bool Equals(CoefVector obj)
-        //{
-        //    if (object.ReferenceEquals(null, obj)) return false;
-
-        //    if (coefs.Count != expr.coefs.Count) return false;
-
-        //    int n = coefs.Count;
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        if (!this[i].Equals(obj[i])) return false;
-        //    }
-        //    return true;
-        //}
-
-        //public override int GetHashCode()
-        //{
-        //    int hashCode = -int.MinValue;
-        //    foreach (Coef coef in this)
-        //    {
-        //        hashCode += coef.GetHashCode();
-        //    }
-        //    return hashCode;
-        //}
         public override string ToString()
         {
             StringBuilder tmp = new StringBuilder();
@@ -245,34 +217,7 @@ namespace Sonnet
         {
             InternalUtils.Remove<QuadCoef>(this, index);
         }
-
-        //public override bool Equals(object obj)
-        //{
-        //    return base.Equals(obj as CoefVector);
-        //}
-        //public bool Equals(CoefVector obj)
-        //{
-        //    if (object.ReferenceEquals(null, obj)) return false;
-
-        //    if (coefs.Count != expr.coefs.Count) return false;
-
-        //    int n = coefs.Count;
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        if (!this[i].Equals(obj[i])) return false;
-        //    }
-        //    return true;
-        //}
-
-        //public override int GetHashCode()
-        //{
-        //    int hashCode = -int.MinValue;
-        //    foreach (Coef coef in this)
-        //    {
-        //        hashCode += coef.GetHashCode();
-        //    }
-        //    return hashCode;
-        //}
+        
         public override string ToString()
         {
             StringBuilder tmp = new StringBuilder();

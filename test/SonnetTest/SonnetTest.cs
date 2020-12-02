@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +12,12 @@ using COIN;
 using System.IO;
 using System.Reflection;
 
+#pragma warning disable S125 // Sections of code should not be commented out
+#pragma warning disable S1481 // Unused local variables should be removed
+#pragma warning disable S1854 // Unused assignments should be removed
 namespace SonnetTest
 {
-    public class MathExtension
+    public static class MathExtension
     {
         public static double Epsilon
         {
@@ -71,9 +73,6 @@ namespace SonnetTest
         }
         public SonnetTest()
         {
-            //
-            // TODO: Add constructor logic here
-            //
             this.availableMemoryGb = AvailableMemoryGbNow;
         }
 
@@ -92,6 +91,7 @@ namespace SonnetTest
             return typeof(Objective).GetField("numberOfObjectives", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S1215:\"GC.Collect\" should not be called", Justification = "This code forces GC.Collect to test proper memory unallocation.")]
         public void TestMain(string[] args)
         {
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-GB");
@@ -166,8 +166,10 @@ namespace SonnetTest
                 }
             }
             model.Clear();
+
             model = null;
-            System.GC.Collect();
+
+            System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
 
             Console.WriteLine("\n\nUnit Test finished successfully.");
         }
@@ -184,7 +186,7 @@ namespace SonnetTest
 
             RangeConstraint con0 = -model.Infinity <= x0 * 2 + x1 * 1 <= 10;
             RangeConstraint con1 = -model.Infinity <= x0 * 1 + x1 * 3 <= 15;
-            model.Add("con0", con0); // same as con0.Name = "con0"; model.Add(con0);
+            model.Add("con0", con0); // same as con0.Name = "con0" model.Add(con0)
             model.Add("con1", con1);
 
             Objective obj = model.Objective = x0 * 3 + x1 * 1;
@@ -318,7 +320,6 @@ namespace SonnetTest
             model.ObjectiveSense = ObjectiveSense.Minimise;
 
             solver.Solve();
-            //solver.Export("testqp.mps");
 
             Assert(solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
@@ -350,8 +351,7 @@ namespace SonnetTest
             Model model = new Model();
             Solver solver = new Solver(model, typeof(COIN.OsiCbcSolverInterface));
             Objective obj = new Objective(0.5 * x1 * x1 + x2 * x2 - x1 * x2 - 2 * x1 - 6 * x2);
-            //Objective obj = new Objective( - 2 * x1 - 6 * x2);
-
+            
             Constraint con1 = x1 + x2 <= 2;
             Constraint con2 = -1 * x1 + 2 * x2 <= 2;
             Constraint con3 = 2 * x1 + x2 <= 3;
@@ -398,7 +398,6 @@ namespace SonnetTest
 
             solver.Solve();
 
-            //Console.WriteLine(model);
             Assert(solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
@@ -812,7 +811,8 @@ namespace SonnetTest
             Console.WriteLine("SonnetTest11");
 
             Model model = new Model();
-            Solver solver = new Solver(model, solverType);
+            Solver solver;
+            solver = new Solver(model, solverType);
 
             Variable x0 = new Variable("x0");
             Variable x1 = new Variable("x1");
@@ -820,7 +820,7 @@ namespace SonnetTest
             x0.Lower = Double.MinValue;
             x1.Lower = Double.MinValue;
 
-            Objective obj = model.Objective = (3 * x0 + 1 * x1);
+            model.Objective = (3 * x0 + 1 * x1);
 
             RangeConstraint r0 = Double.MinValue <= x0 + x0 + x1 <= 10;
             RangeConstraint r1 = Double.MinValue <= x0 * 1 + x1 + x1 <= 15;
@@ -856,14 +856,6 @@ namespace SonnetTest
             Assert(MathExtension.CompareDouble(r0.Value, 10.0) == 0 &&
                 MathExtension.CompareDouble(r1.Value, 0.0) == 0);
 
-            //model.SetConstraintLower(r0, Double.MinValue);
-            //model.SetConstraintLower(r1, Double.MinValue);
-            //model.SetConstraintUpper(r0, 20.0);
-            //model.SetConstraintUpper(r1, 15.0);
-            //model.SetCoefficient(r0, x0, 4.0);
-            //model.SetCoefficient(r0, x1, 1.0);
-            //model.SetCoefficient(r1, x0, 2.0);
-            //model.SetCoefficient(r1, x1, 3.0);
             r0.Lower = Double.MinValue;
             r1.Lower = Double.MinValue;
             r0.Upper = 20.0;
@@ -900,7 +892,7 @@ namespace SonnetTest
             Variable x0 = new Variable("x0");
             Variable x1 = new Variable("x1");
 
-            Objective obj = model.Objective = (3 * x0 + 1 * x1);
+            model.Objective = (3 * x0 + 1 * x1);
 
             RangeConstraint r0 = 10 <= 4 * x0 - 30 <= -10;
             Constraint r1 = 2 * x0 + 3 * x1 <= 15 + x0;
@@ -956,7 +948,7 @@ namespace SonnetTest
             Variable x0 = new Variable("x0");
             Variable x1 = new Variable("x1");
 
-            Objective obj = model.Objective = (3 * x0 + 1 * x1);
+            model.Objective = (3 * x0 + 1 * x1);
 
             RangeConstraint r0 = 10 <= 4 * x0 - 30 <= -10;
             Constraint r1 = 2 * x0 + 3 * x1 <= 15 + x0;
@@ -1072,7 +1064,9 @@ namespace SonnetTest
 
             Expression expr = xArray.Sum();
             Expression expr2 = -1.0 * expr;
+            expr2.ToString();
             Objective obj = model.Objective = (-1.0 * expr);
+            obj.ToString();
 
             RangeConstraint r1 = (RangeConstraint)model.Add(1 <= -1 * x2 + 0 * x3 - 2 * x5 <= Double.MaxValue);
 
@@ -1087,14 +1081,13 @@ namespace SonnetTest
 
 
             double[] coefs = { 1.0, 0.0, -3.0, 0.0, 4.0 };
-            RangeConstraint r2 = (RangeConstraint)model.Add(-2.0 <= Expression.ScalarProduct(coefs, xArray) <= Double.MaxValue);
+            model.Add(-2.0 <= Expression.ScalarProduct(coefs, xArray) <= Double.MaxValue);
 
             System.Collections.Generic.LinkedList<double> morecoefs = new System.Collections.Generic.LinkedList<double>(new double[] { 0, 3, 0, -5, 0 });
 
-            //Constraint r3 = model.Add(3 * x2 - 5 * x4 >= 3);
-            Constraint r3 = model.Add(Expression.ScalarProduct(morecoefs, xArray) >= 3);
-            Constraint r4 = model.Add(5 * x3 - 6 * x5 >= -4.0);
-            RangeConstraint r5 = (RangeConstraint)model.Add(5.0 <= 2 * x1 - 4 * x2 + 6 * x4 <= Double.MaxValue);
+            model.Add(Expression.ScalarProduct(morecoefs, xArray) >= 3);
+            model.Add(5 * x3 - 6 * x5 >= -4.0);
+            model.Add(5.0 <= 2 * x1 - 4 * x2 + 6 * x4 <= Double.MaxValue);
 
             solver.Solve();
 
@@ -1269,7 +1262,6 @@ namespace SonnetTest
                 MathExtension.CompareDouble(model.GetConstraint("con1").Value, 15.0) == 0);
 
 
-            //model.SetObjectiveCoefficient(x0, 3);
             obj2.SetCoefficient(x0, 3);
             model.Objective.SetCoefficient(x1, 2);
 
@@ -1388,14 +1380,14 @@ namespace SonnetTest
                     solver.OsiSolver.setHintParam(hintParam, true, hintStrength);
                     solver.OsiSolver.getHintParam(hintParam, out yesNoTest, out strengthTest);
 
-                    Assert(yesNoTest == true);
+                    Assert(yesNoTest);
                     Assert(strengthTest == hintStrength);
 
                     // test get and set the hint param at given strength to FALSE
                     solver.OsiSolver.setHintParam(hintParam, false, hintStrength);
                     solver.OsiSolver.getHintParam(hintParam, out yesNoTest, out strengthTest);
 
-                    Assert(yesNoTest == false);
+                    Assert(!yesNoTest);
                     Assert(strengthTest == hintStrength);
                 }
 
@@ -1441,8 +1433,9 @@ namespace SonnetTest
             Expression expr7 = exprs[i++] = expr1 + 5.0;						// x1 + 5 x2 + 5
             Expression expr8 = exprs[i++] = new Expression(x1);					// x1
             Expression expr9 = exprs[i++] = x2 + x3;	// returns new			// x2 + x3
-            Expression expr10 = exprs[i++] = 1 + x4;							// x4 + 1
-            Expression expr11 = exprs[i++] = x5 + 1;							// x5 + 1
+            Expression expr10 = exprs[i++] = 1 + x4;                            // x4 + 1
+
+            Expression expr11 = exprs[i++] = x5 + 1;                            // x5 + 1
             Expression expr12 = exprs[i++] = 1.0 * x6;							// x6
             Expression expr13 = exprs[i++] = x7 * 2.0;							// 2 x7
             Expression expr14 = exprs[i++] = x8 / 2.0;							// 0.5 x8
@@ -1573,7 +1566,7 @@ namespace SonnetTest
             cons[++i] = new Constraint("mycon", expr3, ConstraintType.EQ, expr4);
             cons[++i] = new Constraint(cons[i - 1]);
             cons[++i] = new Constraint("othercon", cons[i - 1]);
-            cons[++i] = new Expression() >= new Expression();
+            cons[++i] = new Expression(0.0) >= new Expression();
             cons[++i] = 1.2 * (new Variable("xNEW")) >= new Expression();
             m = i + 1;
 
@@ -1660,8 +1653,11 @@ namespace SonnetTest
             Assert(SonnetTest.EqualsString(modelString, referenceGeneratedModel));
 
             solver.Export("test.mps");
-            System.IO.StreamReader test = new System.IO.StreamReader("test.mps");
-            string testMps = test.ReadToEnd();
+            string testMps;
+            using (System.IO.StreamReader test = new System.IO.StreamReader("test.mps"))
+            {
+                testMps = test.ReadToEnd();
+            }
 
             string referenceTestMps = "NAME BLANK FREE\n" +
                 "ROWS\n" +
@@ -1985,11 +1981,11 @@ namespace SonnetTest
                 x.Name = "x" + (++i);
             }
 
-            x1 = (Variable)xArray[0];
-            x2 = (Variable)xArray[1];
-            x3 = (Variable)xArray[2];
-            x4 = (Variable)xArray[3];
-            x5 = (Variable)xArray[4];
+            x1 = xArray[0];
+            x2 = xArray[1];
+            x3 = xArray[2];
+            x4 = xArray[3];
+            x5 = xArray[4];
 
             Expression expr = Expression.Sum(xArray);
             Expression expr2 = -1.0 * expr;
@@ -2044,7 +2040,7 @@ namespace SonnetTest
             Variable x0 = new Variable("x0", 4, model.Infinity);
             Variable x1 = new Variable("x1", 3, model.Infinity);
 
-            Objective obj = model.Objective = (3 * x0 + 1 * x1);
+            model.Objective = (3 * x0 + 1 * x1);
 
             Constraint r0 = x0 * 2 + x1 * 1 <= 10;
             Constraint r1 = x0 * 1 + x1 * 3 <= 15;
@@ -2117,11 +2113,9 @@ namespace SonnetTest
             model.Objective = (x0 + x1);
             model.ObjectiveSense = ObjectiveSense.Minimise;
 
-            //solver.OsiSolver.setHintParam(OsiHintParam.OsiDoPresolveInResolve, false, OsiHintStrength.OsiHintDo);
             solver.OsiSolver.setHintParam(OsiHintParam.OsiDoPresolveInInitial, true, OsiHintStrength.OsiHintDo);
             solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInInitial, false, OsiHintStrength.OsiHintDo);
-            //solver.OsiSolver.setHintParam(OsiHintParam.OsiDoDualInResolve, false, OsiHintStrength.OsiHintDo);
-
+            
             solver.Generate();
             solver.Resolve(); // !
 
@@ -2259,9 +2253,10 @@ namespace SonnetTest
             Model model = Model.New("egout.mps");
             Assert(model != null);
             Solver solver = new Solver(model, solverType);
-            if (solver.OsiSolver is OsiCbcSolverInterface)
+            var osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            if (osiCbc != null)
             {
-                ((OsiCbcSolverInterface)solver.OsiSolver).SetCbcSolverArgs("-branchAndBound");                
+                osiCbc.SetCbcSolverArgs("-branchAndBound");                
             }
 
             solver.Generate();
@@ -2408,7 +2403,7 @@ namespace SonnetTest
             // the stress test
             int N = (int)(f * 3000); // number of variables
             int M = (int)(f * 30000); // number of rangeconstraints
-            int p = (int)M / 10;
+            int p = M / 10;
             int Z = 100; // number nonzeros per constraint
 
             Variable x = new Variable();
@@ -2605,6 +2600,7 @@ namespace SonnetTest
             Assert(passed);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1199:Nested code blocks should not be used", Justification = "For simplicity here.")]
         public void SonnetTest33()
         {
             Console.WriteLine("SonnetTest33 : WarmStart test 3");
@@ -2885,7 +2881,8 @@ namespace SonnetTest
                 modelLp.Name = modelOrig.Name;
                 string stringLp = modelLp.ToString();
                 Assert(SonnetTest.EqualsString(stringOrig, stringLp));
-                //File.Delete("export-test.lp");
+
+                            //File.Delete("export-test.lp");
             }
             else { Console.WriteLine("Skipping test for export/import LP"); }
         }
@@ -2922,7 +2919,7 @@ namespace SonnetTest
             // Note we use new Constraint copy constructor to allow immedate initialization
             // Also, note that the constraint is not actually created until the cons2 set is used, since below merely defines the projection
             var cons2 = toys.Select(t => new Constraint(y[t] <= N) { Name = "Limit_" + t });
-            // m.Add(cons2);
+            // Not necessary here to do m.Add(cons2);
             Console.WriteLine(" - Testing Select vs ForAll");
             Assert(SonnetTest.EqualsString(cons2.ToItemString(), constraintsTest));
 
@@ -3013,5 +3010,7 @@ namespace SonnetTest
             return true;
         }
     }
-
 }
+#pragma warning restore S125 // Sections of code should not be commented out
+#pragma warning restore S1481 // Unused local variables should be removed
+#pragma warning restore S1854 // Unused assignments should be removed

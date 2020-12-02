@@ -26,7 +26,7 @@ namespace Sonnet
     ///   tmp.Add(exp1).Add(exp2).Add(exp3);
     /// which performs only n1 + n2 + n3 operations.
     /// </summary>
-    public class Expression
+    public sealed class Expression 
     {
         #region Constructors
         /// <summary>
@@ -130,17 +130,9 @@ namespace Sonnet
             constant = 0.0;
         }
 
+
         // Assignment operator cannot be overloaded in c#
         //public static Expression operator =(Expression rhs)
-        //{
-        //    Ensure.NotNull(rhs, "rhs");
-        //
-        //    if(object.ReferenceEquals(this, rhs)) return this;
-        //    Clear();
-        //    Add(rhs);
-        //
-        //    return this;
-        //}
 
         /// <summary>
         /// Determines whether the specified Expression is equal to the current Expression.
@@ -154,9 +146,6 @@ namespace Sonnet
         {
             if (object.ReferenceEquals(expr, null)) return false;
             if (object.ReferenceEquals(expr, this)) return true;
-
-            //this.Assemble();
-            //expression.Assemble();
 
             // coefs is a pointer to a CoefVector. CoefVector is derived from list, and list implements the "==" operator
             // However, the CoefVector's elements are Coefs, which implement "==" only by comparing the id of the variables of two coefs.
@@ -180,7 +169,7 @@ namespace Sonnet
         /// <returns>True iff the given object is an Expression and is equal to the current Expression.</returns>
         public override bool Equals(object obj)
         {
-            return base.Equals(obj as Expression);
+            return this.Equals(obj as Expression);
         }
 
         /// <summary>
@@ -189,7 +178,8 @@ namespace Sonnet
         /// <returns>A hash code for the current Expression.</returns>
         public override int GetHashCode()
         {
-            return this.constant.GetHashCode() ^ this.coefs.GetHashCode() ^ this.quadCoefs.GetHashCode();
+            // don't use constant.GetHashCode() because it's not readonly
+            return this.coefs.GetHashCode() ^ this.quadCoefs.GetHashCode();
         }
 
         /// <summary>
@@ -218,7 +208,6 @@ namespace Sonnet
             }
 
             // if there are coefs, but these are all 0.0, then coefs.size() will be > 0, but the string will still be empty
-            //if (coefs.size() == 0) 
             if (tmp.Length == 0) tmp.Append(constant);
             else if (constant > 0.0)
             {
@@ -612,7 +601,7 @@ namespace Sonnet
         /// </summary>
         /// <param name="var">The variable to be removed.</param>
         /// <returns>The sum of all coefficients of the given variable before removing.</returns>
-        protected double Remove(Variable var)
+        private double Remove(Variable var)
         {
             Ensure.NotNull(var, "var");
 
@@ -644,7 +633,7 @@ namespace Sonnet
         /// <param name="var1">The variable1 to be removed.</param>
         /// <param name="var2">The variable2 to be removed.</param>
         /// <returns>The sum of all coefficients of the given variables terms before removing.</returns>
-        protected double Remove(Variable var1, Variable var2)
+        private double Remove(Variable var1, Variable var2)
         {
             Ensure.NotNull(var1, "var1");
             Ensure.NotNull(var2, "var2");
@@ -799,7 +788,7 @@ namespace Sonnet
                 while (i < qn)
                 {
                     QuadCoef c = quadCoefs[i];
-                    //if (newc.id != c.id) break;
+                    //if the newc.id != c.id then break
                     if (!newc.EqualsVariables(c)) break;
 
                     newc.coef += c.coef;
@@ -1084,7 +1073,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, Expression rhs)
         {
-            throw new NotSupportedException();
+            Ensure.NotSupported();
+            return null;
         }
 
         /// <summary>
@@ -1095,7 +1085,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, double c)
         {
-            throw new NotSupportedException();
+            Ensure.NotSupported();
+            return null;
         }
 
         /// <summary>
@@ -1106,7 +1097,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(double c, Expression rhs)
         {
-            throw new NotSupportedException();
+            Ensure.NotSupported();
+            return null;
         }
 
         /// <summary>
@@ -1117,7 +1109,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, Expression rhs)
         {
-            throw new NotSupportedException();
+            Ensure.NotSupported();
+            return null;
         }
 
         /// <summary>
@@ -1128,7 +1121,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, Variable x)
         {
-            throw new NotSupportedException();
+            Ensure.NotSupported();
+            return null;
         }
         #endregion
 
@@ -1414,8 +1408,8 @@ namespace Sonnet
         }
         #endregion
 
-        private CoefVector coefs;
-        private QuadCoefVector quadCoefs;
+        private readonly CoefVector coefs;
+        private readonly QuadCoefVector quadCoefs;
         private double constant;
     }
 }

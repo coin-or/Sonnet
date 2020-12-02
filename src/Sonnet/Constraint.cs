@@ -127,8 +127,6 @@ namespace Sonnet
             }
             tmp.AppendFormat("{0} : ", Name);
             string exprString;
-            //if (expr == nullptr && lean) exprString = "LEAN!";
-            //else
             exprString = expr.ToString();
 
             tmp.AppendFormat("{0} {1} {2}",
@@ -162,8 +160,6 @@ namespace Sonnet
             }
 
             string exprLevel;
-            //if (expr == nullptr && lean) exprLevel = "LEAN!";
-            //else 
             exprLevel = expr.Level().ToString();
 
             tmp.AppendFormat("{0} : ", Name);
@@ -195,14 +191,9 @@ namespace Sonnet
         /// <returns>The new range constraint.</returns>
         public static RangeConstraint operator <=(Constraint con, double upper)
         {
-            if (con.expr.NumberOfCoefficients > 0) // not constant!
-            {
-                throw new SonnetException("Range constraints must have constant lower and upper bounds!");
-            }
-            if (con.type != ConstraintType.LE)
-            {
-                throw new SonnetException("Range constraints can only be <= constraints");
-            }
+            // not constant!
+            Ensure.IsTrue(con.expr.NumberOfCoefficients == 0, "Range constraints must have constant lower and upper bounds!");
+            Ensure.IsTrue(con.type == ConstraintType.LE, "Range constraints can only be <= constraints");
 
             return new RangeConstraint(con.expr.Constant, con.rhs, upper);
         }
@@ -215,7 +206,8 @@ namespace Sonnet
         /// <returns>A SonnetException</returns>
         public static RangeConstraint operator >=(Constraint con, double rhs)
         {
-            throw new SonnetException("Range constraints can only be <= constraints");
+            Ensure.IsTrue(false, "Range constraints can only be <= constraints");
+            return null;
         }
         #endregion
 
@@ -233,6 +225,7 @@ namespace Sonnet
         /// </summary>
         public override string Name
         {
+            get { return base.Name; }
             set
             {
                 if (!Name.Equals(value))
@@ -286,10 +279,10 @@ namespace Sonnet
             {
                 switch (this.type)
                 {
-                    case ConstraintType.EQ: return RhsConstant;
                     case ConstraintType.LE: return double.MinValue;
                     case ConstraintType.GE: return RhsConstant;
-                    default: throw new SonnetException("Unknown constraint type");
+                    case ConstraintType.EQ:
+                    default: return RhsConstant;
                 }
             }
             set
@@ -309,10 +302,10 @@ namespace Sonnet
             {
                 switch (this.type)
                 {
-                    case ConstraintType.EQ: return RhsConstant;
                     case ConstraintType.LE: return RhsConstant;
                     case ConstraintType.GE: return double.MaxValue;
-                    default: throw new SonnetException("Unknown constraint type");
+                    case ConstraintType.EQ:
+                    default: return RhsConstant;
                 }
             }
             set
@@ -385,6 +378,7 @@ namespace Sonnet
             this.value = value;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields", Justification = "Called only from constructor")]
         private void GutsOfConstructor(string name, Expression expr, ConstraintType type, Expression rhs)
         {
             Ensure.IsFalse(expr.IsQuadratic, "Quadratic constraints lhs are not supported");
@@ -404,7 +398,7 @@ namespace Sonnet
         /// <summary>
         /// Counts the global number of constraints. Mainly used for id.
         /// </summary>
-        protected static int numberOfConstraints = 0;
+        private static int numberOfConstraints = 0;
 
         private ConstraintType type;
         private double price;

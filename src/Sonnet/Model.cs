@@ -285,9 +285,7 @@ namespace Sonnet
                 log.PassToCoinMpsIO(m);
 
                 m.setInfinity(MathUtils.Infinity);
-                //m.passInMessageHandler(modelPtr_.messageHandler());
-                //*m.messagesPointer()=modelPtr_.coinMessages();
-
+                
                 int numberErrors = m.readMps(fullPathWithoutExtension);
                 if (numberErrors != 0)
                 {
@@ -335,6 +333,7 @@ namespace Sonnet
             return model;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Privage member and by design")]
         private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
             double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers)
         {
@@ -506,6 +505,7 @@ namespace Sonnet
             return variables.Values;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields", Justification = "This is a constructor, and by design.")]
         private void GutsOfConstructor(string name)
         {
             id = numberOfModels++;
@@ -525,6 +525,6 @@ namespace Sonnet
         private Objective objective;
         private ObjectiveSense objectiveSense;
         private List<Constraint> constraints;
-        private List<Solver> solvers = new List<Solver>();
+        private readonly List<Solver> solvers = new List<Solver>();
     }
 }

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Sonnet
 {
@@ -84,7 +83,9 @@ namespace Sonnet
             this.type = type;
 
             this.frozen = 0;
+#pragma warning disable S3010 // Static fields should not be updated in constructors
             this.id = numberOfVariables++;
+#pragma warning restore S3010 // Static fields should not be updated in constructors
 
             if (name != null) Name = name;
             else Name = string.Format("Var_{0}", id);
@@ -281,6 +282,7 @@ namespace Sonnet
         /// </summary>
         public override string Name
         {
+            get { return base.Name; }
             set
             {
                 if (!Name.Equals(value))
@@ -314,8 +316,8 @@ namespace Sonnet
 
                 // Now, really do the Freezing:
                 // Adjust the upper and lower bound *in the model only* to this value
-                double value = Value;
-                foreach(Solver solver in solvers) solver.SetVariableBounds(this, value, value);
+                double freezeValue = Value;
+                foreach(Solver solver in solvers) solver.SetVariableBounds(this, freezeValue, freezeValue);
                 return true;
             }
             return false;
@@ -354,12 +356,6 @@ namespace Sonnet
         {
             get
             {
-#if (DEBUG)
-                if (!Assigned)
-                {
-                    throw new SonnetException("Variable has no assigned model!");
-                }
-#endif
                 return this.value;
             }
             set
@@ -497,7 +493,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(double c, Variable x)
         {
-            throw new SonnetException("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator");
+            return null;
         }
 
         /// <summary>
@@ -519,7 +516,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, double c)
         {
-            throw new SonnetException("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator");
+            return null;
         }
         
         /// <summary>
@@ -541,7 +539,8 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, Variable y)
         {
-            throw new SonnetException("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator");
+            return null;
         }
         #endregion
 
@@ -675,7 +674,7 @@ namespace Sonnet
         /// <summary>
         /// Counts the global number of variables. Mainly used for id.
         /// </summary>
-        protected static int numberOfVariables = 0;
+        private static int numberOfVariables = 0;
 
         private int frozen;
         private double value;

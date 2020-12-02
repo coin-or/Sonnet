@@ -16,3 +16,4 @@
 /MSVisualStudio/**/Win32*/
 /test.mps
 /testmiqp.mps
+/MSVisualStudio/v16/.sonarlint

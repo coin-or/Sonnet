@@ -13,6 +13,7 @@ namespace Sonnet
     /// are Compared using an integer ID. 
     /// The ID must be set within the derived constructor.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4035:Classes implementing \"IEquatable<T>\" should be sealed", Justification = "By design")]
     public class Named : IComparable<Named>
     {
         /// <summary>
@@ -84,11 +85,11 @@ namespace Sonnet
         /// <summary>
         /// Compares the ID of this object to the ID of the given object.
         /// </summary>
-        /// <param name="obj">The object to compare this to.</param>
+        /// <param name="other">The object to compare this to.</param>
         /// <returns>The int.CompareTo value.</returns>
-        public virtual int CompareTo(Named obj)
+        public virtual int CompareTo(Named other)
         {
-            return id.CompareTo(obj.id);
+            return id.CompareTo(other.id);
         }
 
         private string name = string.Empty;
@@ -100,7 +101,7 @@ namespace Sonnet
     /// </summary>
 	public class ModelEntity : Named
 	{
-        private static SonnetLog log = SonnetLog.Default;
+        private readonly static SonnetLog log = SonnetLog.Default;
 
         /// <summary>
         /// Constructs a new ModelEntity with the given name.

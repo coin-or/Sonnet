@@ -17,7 +17,6 @@ namespace Sonnet
     {
         public const double Infinity = double.MaxValue;
         public const double Epsilon = 1e-5;
-        public static bool UseAbsoluteComparisonOnly = false;
         /// <summary>
         /// Compares this double to the given value.
         /// Returns -1 if b is larger, 1 if b is smaller, and 0 otherwise.
@@ -33,8 +32,7 @@ namespace Sonnet
             double eps = Epsilon;
             // if either a or b is close to zero, then do absolute difference
             // otherwise (the 'if' here) do a relative comparison (relative to the absolute value of the highest of a and b)
-            if (!UseAbsoluteComparisonOnly &&
-                System.Math.Abs(a) >= Epsilon && System.Math.Abs(b) >= Epsilon)
+            if (System.Math.Abs(a) >= Epsilon && System.Math.Abs(b) >= Epsilon)
                 eps *= System.Math.Abs(System.Math.Max(a, b));
 
             if (a < b - eps)
@@ -228,7 +226,7 @@ namespace Sonnet
     /// For example:
     ///     Ensure.IsTrue(a == 5);
     /// </summary>
-    public class Ensure
+    public static class Ensure
     {
         /// <summary>
         /// Throws an ArgumentException if b is not true.
@@ -282,7 +280,16 @@ namespace Sonnet
         /// <param name="b">The object to compare to.</param>
         public static void Equals<T>(IEquatable<T> a, IEquatable<T> b)
         {
-            if (!a.Equals(b)) throw new ArgumentException();
+            if (!a.Equals(b)) throw new ArgumentException("The objects are not equal");
+        }
+
+        /// <summary>
+        /// Throws a NotSupportedException (always), with the given message.
+        /// </summary>
+        /// <param name="message">The message to be included</param>
+        public static void NotSupported(string message = null)
+        {
+            throw new NotSupportedException(message);
         }
 
         /// <summary>
@@ -295,7 +302,7 @@ namespace Sonnet
             if (object.ReferenceEquals(obj, null))
             {
                 if (paramName != null) throw new ArgumentNullException(paramName);
-                else throw new ArgumentNullException();
+                else throw new ArgumentNullException("obj", "object cannot be null, but is.");
             }
         }
 
@@ -309,7 +316,7 @@ namespace Sonnet
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (paramName != null) throw new ArgumentNullException(paramName);
-                else throw new ArgumentNullException();
+                else throw new ArgumentNullException("value", "Value cannot be null or whitespace, but is.");
             }
         }
     }
