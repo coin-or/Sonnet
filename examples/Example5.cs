@@ -130,6 +130,8 @@ namespace SonnetExamples.Example5
         {
             using (XmlTextReader reader = new XmlTextReader(filePath))
             {
+                reader.DtdProcessing = DtdProcessing.Prohibit;
+
                 DataContractSerializer ser = new DataContractSerializer(typeof(AgriCoop));
                 AgriCoop deserialized = (AgriCoop)ser.ReadObject(reader, true);
                 reader.Close();

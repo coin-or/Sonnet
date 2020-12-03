@@ -96,6 +96,8 @@ namespace SonnetExamples.Example4
         {
             using (XmlTextReader reader = new XmlTextReader(filePath))
             {
+                reader.DtdProcessing = DtdProcessing.Prohibit;
+
                 DataContractSerializer ser = new DataContractSerializer(typeof(LinnenRentalCo));
                 LinnenRentalCo deserialized = (LinnenRentalCo)ser.ReadObject(reader, true);
                 reader.Close();

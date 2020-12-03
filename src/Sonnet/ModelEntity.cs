@@ -68,6 +68,8 @@ namespace Sonnet
         /// <returns>A hash code (ID) for the current object.</returns>
         public override int GetHashCode()
         {
+            // Find a way to make id readonly, because gethashcode should not be able
+            // to change over the lifetime of an object.
             return id;
         }
 
