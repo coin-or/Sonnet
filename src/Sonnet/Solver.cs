@@ -26,7 +26,7 @@ namespace Sonnet
     /// </summary>
     public class Solver : Named, IDisposable
     {
-        private static SonnetLog log = SonnetLog.Default;
+        private readonly SonnetLog log = SonnetLog.Default;
 
         #region Constructors
         /// <summary>
@@ -127,8 +127,7 @@ namespace Sonnet
         {
             get
             {
-                int value;
-                solver.getIntParam(OsiIntParam.OsiNameDiscipline, out value);
+                solver.getIntParam(OsiIntParam.OsiNameDiscipline, out int value);
                 return value;
             }
             set { solver.setIntParam(OsiIntParam.OsiNameDiscipline, value); }
@@ -337,9 +336,8 @@ namespace Sonnet
                     isSolving = true;
                     if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
 
-                    if (solver is OsiCbcSolverInterface)
+                    if (solver is OsiCbcSolverInterface cbcSolver)
                     {
-                        OsiCbcSolverInterface cbcSolver = (OsiCbcSolverInterface)solver;
                         #warning "SONNET: Clean this code. Experimental only."
                         if (!objective.IsQuadratic && cbcSolver.UseBranchAndBound())
                         {
@@ -349,7 +347,7 @@ namespace Sonnet
                         else
                         {
                             string[] cbcMainArgs = cbcSolver.GetCbcSolverArgs();
-                            List<string> args = new List<string>();
+                            var args = new List<string>();
                             args.Add("Sonnet");
                             if (cbcSolver.UseBranchAndBound())
                             {
@@ -521,12 +519,11 @@ namespace Sonnet
             // the user needs to be able to switch the solutions in the variables by calling AssignSolution on 
             // the prefered model.
             // But the problem with ResetAfterMIPSolve is bigger: also the solver.get.. functions (getObjValue etc) no longer work
-            if (solver is OsiCbcSolverInterface)
+            if (solver is OsiCbcSolverInterface osiCbc)
             {
                 // Since the model was already generated before, we can safely Reset to the reference solver instance 
                 // see also at the end of Generate()
-                OsiCbcSolverInterface osiCbcModel = ((OsiCbcSolverInterface)solver);
-                osiCbcModel.resetModelToReferenceSolver();
+                osiCbc.resetModelToReferenceSolver();
             }
             else
             {
@@ -556,10 +553,10 @@ namespace Sonnet
 
         private void SaveBeforeMIPSolveInternal()
         {
-            if (solver is OsiCbcSolverInterface)
+            if (solver is OsiCbcSolverInterface osiCbc)
             {
                 // save the new reference solver including the new constraints.
-                ((OsiCbcSolverInterface)solver).saveModelReferenceSolver();
+                osiCbc.saveModelReferenceSolver();
             }
             else
             {
@@ -1114,32 +1111,28 @@ namespace Sonnet
                     }
 
                     // only some solvers support quadratic terms in the objective for continuous variables (QP)
-                    if (solver is OsiClpSolverInterface)
+                    if (solver is OsiClpSolverInterface osiClp)
                     {
                         log.Debug("Using CLP-specific quadratic objective loading.");
 
                         if (isMip) log.Warn("Only experimantal support for MIQP!");
-                        //if (isMip) log.Error("Solving MIQP with OsiClp is not supported.");
 
-                        OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
                         ClpSimplex clpSimplex = osiClp.getModelPtr();
                         
                         clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);
                         //clpSimplex.writeMps("testquad.mps", 0, 1);// for CPLEX compatibility, use formatType = 0, numberAcross = 1);
                     }
-                    else if (solver is OsiCbcSolverInterface)
+                    else if (solver is OsiCbcSolverInterface osiCbc)
                     {
                         // TODO: does QP with Cbc work? Does MIQP with Cbc work?
                         log.Debug("Using CBC-specific quadratic objective loading.");
 
                         if (isMip) log.Warn("Only experimantal support for MIQP!"); 
 
-                        OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
-                        OsiSolverInterface realSolver = osiCbc.getModelPtr().solver(); //usually the OsiClpSolver
-                        if (realSolver is OsiClpSolverInterface)
+                        OsiSolverInterface osiReal = osiCbc.getRealSolverPtr(); //usually the OsiClpSolver
+                        if (osiReal is OsiClpSolverInterface osiRealClp)
                         {
-                            OsiClpSolverInterface osiClp = (OsiClpSolverInterface)realSolver;
-                            ClpSimplex clpSimplex = osiClp.getModelPtr();
+                            ClpSimplex clpSimplex = osiRealClp.getModelPtr();
 
                             clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);
                         }
@@ -1209,10 +1202,7 @@ namespace Sonnet
             {
                 if (hintParam == OsiHintParam.OsiLastHintParam) continue;
 
-                bool yesNo;
-                OsiHintStrength hintStrength;
-
-                solver.getHintParam(hintParam, out yesNo, out hintStrength);
+                solver.getHintParam(hintParam, out bool yesNo, out OsiHintStrength hintStrength);
                 hintsMessage.AppendFormat("Hint: {0} : {1} at {2}\n", hintParam, yesNo, hintStrength);
             }
             if (hintsMessage.Length > 0) log.Debug(hintsMessage.ToString());
@@ -1233,7 +1223,7 @@ namespace Sonnet
             {
                 generated = false;
 
-                if (object.ReferenceEquals(null, objective)) throw new NullReferenceException("Ungenerate: A generated model must have a valid objective function");
+                if (objective is null) throw new NullReferenceException("Ungenerate: A generated model must have a valid objective function");
                 objective.Unregister(this);
 
                 foreach (Constraint con in constraints)
@@ -1278,20 +1268,17 @@ namespace Sonnet
                 if (objective.IsQuadratic) // Osi doesnt handle Quadratic obj, so custom export.
                 {
                     bool success = false;
-                    if (solver is OsiClpSolverInterface)
+                    if (solver is OsiClpSolverInterface osiClp)
                     {
-                        OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
                         osiClp.getModelPtr().writeMps(filename, 0, 1);
                         success = true;
                     }
-                    else if (solver is OsiCbcSolverInterface)
+                    else if (solver is OsiCbcSolverInterface osiCbc)
                     {
-                        OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
                         OsiSolverInterface osiReal = osiCbc.getRealSolverPtr();
-                        if (osiReal is OsiClpSolverInterface)
+                        if (osiReal is OsiClpSolverInterface osiRealClp)
                         {
-                            OsiClpSolverInterface osiClp = (OsiClpSolverInterface)osiReal;
-                            osiClp.getModelPtr().writeMps(filename, 0, 1);
+                            osiRealClp.getModelPtr().writeMps(filename, 0, 1);
                             success = true;
                         }
                     }
@@ -1464,7 +1451,7 @@ namespace Sonnet
             Ensure.NotNull(con, "constraint");
             if (!con.IsRegistered(this)) throw new SonnetException("Constraint not registered with model.");
  
-            int offset = -1;
+            int offset;
             if (this == con.AssignedSolver) offset = con.Offset;
             else offset = constraints.IndexOf(con);
 
@@ -1487,7 +1474,7 @@ namespace Sonnet
                 else throw new SonnetException("Variable not registered with model, because the model is not generated.");
             }
 
-            int offset = -1;
+            int offset;
             if (this == var.AssignedSolver) offset = var.Offset;
             else offset = variables.IndexOf(var);
 
@@ -1913,13 +1900,11 @@ namespace Sonnet
                 return;
             }
 
-            if (solver is OsiCbcSolverInterface)
+            if (solver is OsiCbcSolverInterface osiCbc)
             {
-                OsiCbcSolverInterface osiCbc = (OsiCbcSolverInterface)solver;
                 OsiSolverInterface osiReal = osiCbc.getRealSolverPtr();
-                if (osiReal is OsiClpSolverInterface)
+                if (osiReal is OsiClpSolverInterface osiClp)
                 {
-                    OsiClpSolverInterface osiClp = (OsiClpSolverInterface)osiReal;
                     osiClp.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
                     return;
                 }

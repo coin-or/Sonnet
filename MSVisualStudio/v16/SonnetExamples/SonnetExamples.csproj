@@ -13,12 +13,14 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
     <PlatformTarget>x86</PlatformTarget>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -26,6 +28,7 @@
     <OutputPath>bin\x64\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -33,6 +36,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +44,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -77,6 +82,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.sonarlint\sonnet-master-cicsharp.ruleset">
+      <Link>sonnet-master-cicsharp.ruleset</Link>
+    </None>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +96,11 @@
       <Project>{650bcd91-b9ab-4a37-9a33-d1ae8cffa49f}</Project>
       <Name>Sonnet</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml">
+      <Link>SonarLint.xml</Link>
+    </AdditionalFiles>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

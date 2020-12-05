@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Sonnet
 {
@@ -14,7 +13,7 @@ namespace Sonnet
     /// The ID must be set within the derived constructor.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S4035:Classes implementing \"IEquatable<T>\" should be sealed", Justification = "By design")]
-    public class Named : IComparable<Named>
+    public class Named : IComparable<Named>, IEquatable<Named>
     {
         /// <summary>
         /// Constructor of a new Named object with the given name.
@@ -63,6 +62,17 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Compares this object to the given object and returns true iff the objects are of the same type, and have the same ID.
+        /// </summary>
+        /// <param name="other">The object to compare this to.</param>
+        /// <returns>True iff the objects are of the same type, and have the same ID.</returns>
+        public bool Equals(Named other)
+        {
+            if (other is null) return false;
+            return id.Equals(other.id) && this.GetType().Equals(other.GetType());
+        }
+
+        /// <summary>
         /// Returns the ID of this object as hash code.
         /// </summary>
         /// <returns>A hash code (ID) for the current object.</returns>
@@ -74,25 +84,45 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Compares this object to the given object and returns true iff the objects are of the same type, and have the same ID.
-        /// </summary>
-        /// <param name="obj">The object to compare this to.</param>
-        /// <returns>True iff the objects are of the same type, and have the same ID.</returns>
-        public bool Equals(Named obj)
-        {
-            if (obj == null) return false;
-            return id.Equals(obj.id) && this.GetType().Equals(obj.GetType());
-        }
-
-        /// <summary>
         /// Compares the ID of this object to the ID of the given object.
         /// </summary>
         /// <param name="other">The object to compare this to.</param>
         /// <returns>The int.CompareTo value.</returns>
         public virtual int CompareTo(Named other)
         {
+            if (other is null) return 1;
             return id.CompareTo(other.id);
         }
+
+        //public static bool operator ==(Named left, Named right)
+        //{
+        //    return left.CompareTo(right) == 0;
+        //}
+
+        //public static bool operator >(Named left, Named right)
+        //{
+        //    return left.CompareTo(right) > 0; // check this!
+        //}
+
+        //public static bool operator >=(Named left, Named right)
+        //{
+        //    return left.CompareTo(right) >= 0; // check this!
+        //}
+
+        //public static bool operator <(Named left, Named right)
+        //{
+        //    return left.CompareTo(right) < 0;
+        //}
+
+        //public static bool operator <=(Named left, Named right)
+        //{
+        //    return left.CompareTo(right) <= 0; // check this!
+        //}
+
+        //public static bool operator !=(Named left, Named right)
+        //{
+        //    return !(left == right);
+        //}
 
         private string name = string.Empty;
         internal int id;
@@ -100,6 +130,7 @@ namespace Sonnet
 
     /// <summary>
     /// The class ModelEntity is a base class for entities that are registered with solvers.
+    /// Every ModelEntity can be Registered with multiple solvers, but can only be Assigned to at most one solver
     /// </summary>
 	public class ModelEntity : Named
 	{
@@ -165,6 +196,7 @@ namespace Sonnet
             if (Assigned && object.ReferenceEquals(this.solver, solver)) return true;
 
             int id = solver.ID;
+           // return solvers.Find(s => s == solver);
             return solvers.Find(s => string.Equals(s.ID, id)) != null;
         }
 
@@ -178,7 +210,7 @@ namespace Sonnet
             // if this modelEntity is already assigned, 
             // then if it is assigned to another model throw an exception
             //      or if it has a different offset within the requested model, throw an exception
-            if (Assigned && (AssignedTo(solver) == false || offset != this.offset))
+            if (Assigned && (!AssignedTo(solver) || offset != this.offset))
             {
                 string message = log.ErrorFormat("Trying to assign to new solver while already assigned to solver ", solver.Name);
                 throw new SonnetException(message);
@@ -225,7 +257,7 @@ namespace Sonnet
         /// </summary>
         internal bool Assigned
         {
-            get { return solver != null; }
+            get { return !(solver is null); }
         }
 
         /// <summary>

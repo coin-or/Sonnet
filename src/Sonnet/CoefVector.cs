@@ -13,14 +13,11 @@ namespace Sonnet
         public Coef(Variable aVar, double aCoef)
         {
             Ensure.NotNull(aVar, "variable of coef");
+            Ensure.IsFalse(double.IsNaN(aCoef), $"The value of the coefficient of variable {aVar.Name} is not a number! (NaN)");
 
             var = aVar;
             id = var.id;
             coef = aCoef;
-
-#if (DEBUG)
-            if (double.IsNaN(coef)) throw new SonnetException("The value of the coefficient of variable " + var.Name + " is not a number! (NaN)");
-#endif
         }
 
         public override string ToString()
@@ -41,7 +38,7 @@ namespace Sonnet
 
         public override bool Equals(object obj)
         {
-            if (obj is Coef) return Equals((Coef)obj);
+            if (obj is Coef rhs) return Equals(rhs);
             return false;
         }
 
@@ -60,6 +57,34 @@ namespace Sonnet
             return id.CompareTo(other.id);
         }
 
+        public static bool operator ==(Coef left, Coef right)
+        {
+            return left.CompareTo(right) == 0;
+        }
+
+        public static bool operator >(Coef left, Coef right)
+        {
+            return left.CompareTo(right) > 0; // check this!
+        }
+        public static bool operator >=(Coef left, Coef right)
+        {
+            return left.CompareTo(right) >= 0; // check this!
+        }
+
+        public static bool operator <(Coef left, Coef right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+        public static bool operator <=(Coef left, Coef right)
+        {
+            return left.CompareTo(right) <= 0; // check this!
+        }
+
+        public static bool operator != (Coef left, Coef right)
+        {
+            return !(left == right);
+        }
+
         public double Level()
         {
             return coef * (var.Value);
@@ -75,6 +100,7 @@ namespace Sonnet
             coef /= divider;
             return this;
         }
+
 
         public Variable var;
         public readonly int id;
@@ -132,7 +158,7 @@ namespace Sonnet
 
         public override bool Equals(object obj)
         {
-            if (obj is QuadCoef) return Equals((QuadCoef)obj);
+            if (obj is QuadCoef rhs) return Equals(rhs);
             return false;
         }
 
@@ -156,6 +182,36 @@ namespace Sonnet
             int id1compare = id1.CompareTo(other.id1);
             if (id1compare != 0) return id1compare;
             return id2.CompareTo(other.id2);
+        }
+
+        public static bool operator ==(QuadCoef left, QuadCoef right)
+        {
+            return left.CompareTo(right) == 0;
+        }
+
+        public static bool operator >(QuadCoef left, QuadCoef right)
+        {
+            return left.CompareTo(right) > 0; // check this!
+        }
+
+        public static bool operator >=(QuadCoef left, QuadCoef right)
+        {
+            return left.CompareTo(right) >= 0; // check this!
+        }
+
+        public static bool operator <(QuadCoef left, QuadCoef right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(QuadCoef left, QuadCoef right)
+        {
+            return left.CompareTo(right) <= 0; // check this!
+        }
+
+        public static bool operator !=(QuadCoef left, QuadCoef right)
+        {
+            return !(left == right);
         }
 
         public double Level()
@@ -191,7 +247,6 @@ namespace Sonnet
         public override string ToString()
         {
             StringBuilder tmp = new StringBuilder();
-            int cap = this.Capacity;
             int n = this.Count;
             for (int i = 0; i < n; i++)
             {
@@ -221,7 +276,6 @@ namespace Sonnet
         public override string ToString()
         {
             StringBuilder tmp = new StringBuilder();
-            int cap = this.Capacity;
             int n = this.Count;
             for (int i = 0; i < n; i++)
             {

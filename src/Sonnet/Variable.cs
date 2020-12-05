@@ -226,7 +226,7 @@ namespace Sonnet
         /// <returns>A string representation of this instance using its value and reduced cost.</returns>
         public string ToLevelString()
         {
-            return string.Format("{0} = {1}   ( {2} )", this, value, reducedCost);
+            return string.Format("{0} = {1}   ( {2} )", this, Value, reducedCost);
         }
 
         /// <summary>
@@ -352,17 +352,7 @@ namespace Sonnet
         /// <summary>
         /// Get or set the value of this variable in the current solution.
         /// </summary>
-        public double Value
-        {
-            get
-            {
-                return this.value;
-            }
-            set
-            {
-                this.value = value;
-            }
-        }
+        public double Value { get; set; }
 
         /// <summary>
         /// Get the reduced cost of this variable in the current solution.
@@ -378,9 +368,9 @@ namespace Sonnet
         /// <returns>True iff bounds and type are satisfied.</returns>
         public bool IsFeasible()
         {
-            if (!value.IsBetween(lower, upper)) return false;
+            if (!Value.IsBetween(lower, upper)) return false;
 
-            if (type == VariableType.Integer && !value.IsInteger()) return false;
+            if (type == VariableType.Integer && !Value.IsInteger()) return false;
 
             return true;
         }
@@ -398,7 +388,7 @@ namespace Sonnet
         internal virtual void Assign(Solver solver, int offset, double value, double reducedCost)
         {
             base.Assign(solver, offset);
-            this.value = value;
+            this.Value = value;
             this.reducedCost = reducedCost;
         }
 
@@ -677,7 +667,6 @@ namespace Sonnet
         private static int numberOfVariables = 0;
 
         private int frozen;
-        private double value;
         private double reducedCost;
 
         /// <summary>
