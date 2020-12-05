@@ -94,35 +94,7 @@ namespace Sonnet
             return id.CompareTo(other.id);
         }
 
-        //public static bool operator ==(Named left, Named right)
-        //{
-        //    return left.CompareTo(right) == 0;
-        //}
-
-        //public static bool operator >(Named left, Named right)
-        //{
-        //    return left.CompareTo(right) > 0; // check this!
-        //}
-
-        //public static bool operator >=(Named left, Named right)
-        //{
-        //    return left.CompareTo(right) >= 0; // check this!
-        //}
-
-        //public static bool operator <(Named left, Named right)
-        //{
-        //    return left.CompareTo(right) < 0;
-        //}
-
-        //public static bool operator <=(Named left, Named right)
-        //{
-        //    return left.CompareTo(right) <= 0; // check this!
-        //}
-
-        //public static bool operator !=(Named left, Named right)
-        //{
-        //    return !(left == right);
-        //}
+        //if we also implement the operators ==, !=, <, etc then those get called for Solver etc. while this not necessary
 
         private string name = string.Empty;
         internal int id;

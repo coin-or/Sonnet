@@ -33,7 +33,7 @@ namespace Sonnet
         /// Initializes a new instance of the Solver class with the given name and model, 
         /// and using the given instance derived from OsiSolverInterface.
         /// QP is supported for OsiClp and OsiCbc only.
-        /// MIQP is not supported for any solver type.
+        /// MIQP is supported for OsiCbcsolver only.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="solver">The instance of an OsiSolver, eg, OsiClpSolverInterface to be used.</param>
@@ -50,7 +50,7 @@ namespace Sonnet
         /// Initializes a new instance of the Solver class with the given name and model,
         /// and using a to be constructed instance of the given type derived from OsiSolverInterface.
         /// QP is supported for OsiClp and OsiCbc only.
-        /// MIQP is not supported for any solver type.
+        /// MIQP is supported for OsiCbcsolver only.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="osiSolverInterfaceType">The type derived from OsiSolverInterface to be used.</param>
@@ -213,10 +213,7 @@ namespace Sonnet
         /// Get whether this model was already generated (at least) once before.
         /// Note, if alterations have been made after the last solve (Generate), then still this will return true.
         /// </summary>
-        protected bool Generated
-        {
-            get { return generated; }
-        }
+        private bool IsGenerated { get; set; }
 
         #endregion
 
@@ -226,10 +223,17 @@ namespace Sonnet
             Ensure.NotNull(this.objective, "this.objective");
             // this method should ONLY be called FROM the model
 
-            if (Generated)
+            if (IsGenerated)
             {
+                // If generated already and the old or new objective is quadratic, then that's not supported 
+                // because no updater for quad objectives is currently available--only loading.
+                // Also, don't ungenerate automatically here, since ungenerate/generate is computationally long. This probabably is a bug.
+                if (this.objective.IsQuadratic) throw new NotSupportedException("Updating the quadratic objective of an already generated model is not supported. UnGenerate first.");
+                if (objective.IsQuadratic) throw new NotSupportedException("Updating the objective to a quadratic objective is not supported for an already generated model. UnGenerate first.");
+
                 this.objective.Unregister(this);
                 this.objective = objective;
+                // if the new or old objective are Quadratic, then ungenerate first
                 Generate(this.objective);
             }
             else
@@ -275,7 +279,7 @@ namespace Sonnet
         public void Maximise(bool forceRelaxation = false)
         {
             ApplyObjectiveSense(ObjectiveSense.Maximise);
-            if (!Generated) Solve(forceRelaxation);
+            if (!IsGenerated) Solve(forceRelaxation);
             else Resolve(forceRelaxation);
         }
 
@@ -288,7 +292,7 @@ namespace Sonnet
         public void Minimise(bool forceRelaxation = false)
         {
             ApplyObjectiveSense(ObjectiveSense.Minimise);
-            if (!Generated) Solve(forceRelaxation);
+            if (!IsGenerated) Solve(forceRelaxation);
             else Resolve(forceRelaxation);
         }
 
@@ -316,7 +320,7 @@ namespace Sonnet
         {
             if (doResolve)
             {
-                if (!Generated) throw new SonnetException("Cannot Resolve a model that hasn't been generated yet.");
+                if (!IsGenerated) throw new SonnetException("Cannot Resolve a model that hasn't been generated yet.");
             }
 
             double genStart = CoinUtils.CoinCpuTime();
@@ -589,7 +593,7 @@ namespace Sonnet
 
             GenerateVariables(con.Coefficients);
 
-            if (Generated)
+            if (IsGenerated)
             {
                 // Now, the new constraints are added here.
 
@@ -637,7 +641,7 @@ namespace Sonnet
         private void Generate(Objective obj)
         {
             Ensure.NotNull(obj, "objective");
-
+            
             //this.objective.Unregister(this); // this should have already been done!
 
             // Registering the objective is important for changing coefficients: If we change coefs of an objective,
@@ -650,8 +654,11 @@ namespace Sonnet
 
             GenerateVariables(obj.QuadCoefficients);
 
-            if (Generated)
+            if (IsGenerated)
             {
+                // WARNING: This exception could be due to an implicit call to Generate by a Debugger Local or Watch evaluation at a breakpoint.
+                if (obj.IsQuadratic) throw new NotSupportedException("Updating the quadratic objective is not supported for already generated models.");
+
                 // now load the objective into the solver
                 int n = variables.Count;	// the NEW number of variables
                 double[] c = new double[n];
@@ -672,8 +679,6 @@ namespace Sonnet
                 // change all coefficients at the same time
                 solver.setObjective(c);
 
-                if (obj.IsQuadratic) throw new NotSupportedException("Updating the quadratic objective is not supported for already generated models.");
-
                 // Skip this: doesnt work as expected with max/min problems
                 // The constant part goes in via the ObjOffset
                 // solver.setDblParam(OsiObjOffset, obj->Constant);
@@ -693,21 +698,17 @@ namespace Sonnet
             variables.Add(var);		// from offset to variables;
 
             // if the model has already been generated before, then Add this new variable to the solver
-            if (Generated)
+            if (IsGenerated)
             {
 #if (SONNET_USE_SEMICONTVAR)
     			if (var is SemiContinuousVariable) throw new SonnetException("Cannot add semi continuous variables after the model was generated!");
 #endif
-#if (DEBUG)
                 int oldn = solver.getNumCols();
-#endif
                 solver.addCol(0, null, null, var.Lower, var.Upper, 0.0);
-#if (DEBUG)
                 int newn = solver.getNumCols();
                 if (oldn + 1 != newn) throw new SonnetException("Adding a variable to an already generated model failed! Variable was not added correctly.");
-
                 if (Offset(var) != oldn) throw new SonnetException("Adding a variable to an already generated model failed! Variable was added with wrong offset.");
-#endif
+
                 SetVariableName(var, var.Name);
                 if (var.Type == VariableType.Integer)
                 {
@@ -743,11 +744,13 @@ namespace Sonnet
         ///<summary>
         /// Generates (builds) the model to be solved. 
         /// This can be called explicitly, but is done automatically within a solve.
+        /// Note that this call is also made by external methods and priorties (IsMIP, ToString(), etc.) to ensure the expected result.
+        /// DEBUG WARNING: At breakpoints, debugger Locals and Watches can implicitly call the properties and thus Generate. Notably for MIQP this can be a problem.
         ///</summary>
         public void Generate()
         {
             #region If already Generated
-            if (Generated)
+            if (IsGenerated)
             {
                 // CBCs and CLPs branchAndBound() behaves 'strangely': 
                 // throughout the b&b, the bounds on variables etc (and dual limit)
@@ -802,7 +805,6 @@ namespace Sonnet
             int nz = 0;
 
             // Assemble objective function coefficients
-
             Generate(objective); // insert the variables in the objective into the overall set Variables
 
             log.DebugFormat("Done generating objective after {0}.", (CoinUtils.CoinCpuTime() - genStart));
@@ -1077,7 +1079,6 @@ namespace Sonnet
                         // note that the Offset is not the same as var.Id!
                         // so it can happen that var1.id < var2.id, but offset(var1) > offset(var2)!
                         // only, var1.id == var2.id iff offset(var1) == offset(var2) iff var1 == var2
-                        // how does this work for constraint matrix? don't worry for now
                         int col1 = Offset(quadcoef.var1);
                         
                         if (quadcoef.var1.AssignedSolver != this) throw new SonnetException("Trying to use variable that is not part of this model!");
@@ -1208,7 +1209,7 @@ namespace Sonnet
             if (hintsMessage.Length > 0) log.Debug(hintsMessage.ToString());
 
             System.GC.Collect();
-            generated = true;
+            IsGenerated = true;
 
             //if (ProblemType == ProblemType.MILP) SaveBeforeMIPSolve();
             #endregion
@@ -1219,9 +1220,9 @@ namespace Sonnet
         /// </summary>
         public void UnGenerate()
         {
-            if (Generated)
+            if (IsGenerated)
             {
-                generated = false;
+                IsGenerated = false;
 
                 if (objective is null) throw new NullReferenceException("Ungenerate: A generated model must have a valid objective function");
                 objective.Unregister(this);
@@ -1470,7 +1471,7 @@ namespace Sonnet
 
             if (!var.IsRegistered(this))
             {
-                if (Generated) throw new SonnetException("Variable not registered with model.");
+                if (IsGenerated) throw new SonnetException("Variable not registered with model.");
                 else throw new SonnetException("Variable not registered with model, because the model is not generated.");
             }
 
@@ -1992,7 +1993,7 @@ namespace Sonnet
             if (name != null) Name = name;
             else Name = string.Format("{0}_{1}", solver.GetType().FullName, id);
 
-            generated = false;
+            IsGenerated = false;
 
             model.Register(this);
 
@@ -2014,8 +2015,6 @@ namespace Sonnet
         private List<Variable> variables;
         private List<Constraint> constraints;
         private List<Constraint> rawconstraints;
-
-        private bool generated;
         private bool autoResetMIPSolve = true;
         private double saveOsiDualObjectiveLimit;
         private double[] saveColLower;

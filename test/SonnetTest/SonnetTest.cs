@@ -2145,6 +2145,15 @@ namespace SonnetTest
             Assert(solver.IsProvenOptimal);
             Assert(!solver.IsProvenPrimalInfeasible);
             Assert(!solver.IsProvenDualInfeasible);
+
+            solver.UnGenerate();
+            solver.Solve();
+
+            Assert(MathExtension.CompareDouble(model.Objective.Value, 5.55555555) == 0);
+            Assert(MathExtension.CompareDouble(model.Objective.Level(), 5.55555555) == 0);
+            Assert(solver.IsProvenOptimal);
+            Assert(!solver.IsProvenPrimalInfeasible);
+            Assert(!solver.IsProvenDualInfeasible);
         }
 
         public void SonnetTest25()
