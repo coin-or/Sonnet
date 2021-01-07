@@ -1882,7 +1882,7 @@ namespace Sonnet
         /// <param name="value">The new coefficient to set for this variable within the solver.</param>
         internal void SetObjectiveQuadCoefficient(Variable var1, Variable var2, double value)
         {
-             throw new NotSupportedException("No available solver supports setting quadratic coefs of objective.");
+             Ensure.NotSupported("No available solver supports setting quadratic coefs of objective.", var1, var2, value);
         }
 
         // methods for changing Range Constraints
@@ -1894,9 +1894,8 @@ namespace Sonnet
             int conOffset = Offset(con);
             int varOffset = Offset(var);
 
-            if (solver is OsiClpSolverInterface)
+            if (solver is OsiClpSolverInterface osiClp)
             {
-                OsiClpSolverInterface osiClp = (OsiClpSolverInterface)solver;
                 osiClp.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
                 return;
             }
@@ -1904,9 +1903,9 @@ namespace Sonnet
             if (solver is OsiCbcSolverInterface osiCbc)
             {
                 OsiSolverInterface osiReal = osiCbc.getRealSolverPtr();
-                if (osiReal is OsiClpSolverInterface osiClp)
+                if (osiReal is OsiClpSolverInterface osiClpReal)
                 {
-                    osiClp.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
+                    osiClpReal.getModelPtr().modifyCoefficient(conOffset, varOffset, value);
                     return;
                 }
                 else

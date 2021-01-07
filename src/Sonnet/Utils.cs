@@ -121,7 +121,7 @@ namespace Sonnet
     /// </summary>
     public static class Utils
     {
-        private static Dictionary<COIN.OsiCbcSolverInterface, string[]> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, string[]>();
+        private static readonly Dictionary<COIN.OsiCbcSolverInterface, string[]> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, string[]>();
         
         /// <summary>
         /// Returns the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
@@ -132,8 +132,7 @@ namespace Sonnet
         /// <returns>The arguments for CbcMain1(..).</returns>
         public static string[] GetCbcSolverArgs(this COIN.OsiCbcSolverInterface solver)
         {
-            string []result;
-            if (cbcSolverArgs.TryGetValue(solver, out result)) return result;
+            if (cbcSolverArgs.TryGetValue(solver, out string[] result)) return result;
             else return new string[0];
         }
 
@@ -162,9 +161,7 @@ namespace Sonnet
             message.AppendLine("Framework: " + Environment.Version.ToString());
             message.AppendLine("Assembly runtime version: " + System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion);
 
-            System.Reflection.PortableExecutableKinds portableExecutableKinds;
-            System.Reflection.ImageFileMachine imageFileMachine;
-            System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out portableExecutableKinds, out imageFileMachine);
+            System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out System.Reflection.PortableExecutableKinds portableExecutableKinds, out System.Reflection.ImageFileMachine imageFileMachine);
             message.AppendLine("Portable executable kinds: " + portableExecutableKinds.ToString());
             message.AppendLine("Image file machine: " + imageFileMachine.ToString());
 
@@ -287,8 +284,12 @@ namespace Sonnet
         /// Throws a NotSupportedException (always), with the given message.
         /// </summary>
         /// <param name="message">The message to be included</param>
-        public static void NotSupported(string message = null)
+        /// <param name="args">Any parameters that would otherwise be unused.</param>
+        public static void NotSupported(string message = null, params object[] args)
         {
+            // This is mostly used to prevent "Exceptions should not be thrown from unexpected methods" since
+            // Sonnet used operator overloading, which is normally considered an unexpected method for throwing 
+            // exceptions.
             throw new NotSupportedException(message);
         }
 

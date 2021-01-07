@@ -119,7 +119,7 @@ namespace Sonnet
         /// </summary>
         public void Clear()
         {
-            if (!object.ReferenceEquals(coefs, null))
+            if (coefs is object)
             {
                 coefs.Clear();
                 coefs.TrimExcess();
@@ -144,7 +144,7 @@ namespace Sonnet
         /// <returns>true iff the given expression has the same constant and all coefficients and variables as the current Expression.</returns>
         public bool Equals(Expression expr)
         {
-            if (object.ReferenceEquals(expr, null)) return false;
+            if (expr is null) return false;
             if (object.ReferenceEquals(expr, this)) return true;
 
             // coefs is a pointer to a CoefVector. CoefVector is derived from list, and list implements the "==" operator
@@ -878,7 +878,6 @@ namespace Sonnet
         /// <returns>The constant plus the product of all coefficients and the Value in the current solution of their variables.</returns>
         public double Level()
         {
-            int n = coefs.Count;
             double level = constant;
             foreach (Coef coef in coefs)
             {
@@ -1066,14 +1065,14 @@ namespace Sonnet
 
         #region Operator !=
         /// <summary>
-        /// Not supported. Added to prevent error CS0216.
+        /// Not supported. Added to prevent error CS0216, but remains not supported.
         /// </summary>
         /// <param name="lhs">The left-hand-side expression.</param>
         /// <param name="rhs">The right-hand-side expression.</param>
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, Expression rhs)
         {
-            Ensure.NotSupported();
+            Ensure.NotSupported("Cannot create unequality constraint", lhs, rhs);
             return null;
         }
 
@@ -1085,7 +1084,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, double c)
         {
-            Ensure.NotSupported();
+            Ensure.NotSupported("Cannot create unequality constraint", lhs, c);
             return null;
         }
 
@@ -1097,7 +1096,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(double c, Expression rhs)
         {
-            Ensure.NotSupported();
+            Ensure.NotSupported("Cannot create unequality constraint", c, rhs);
             return null;
         }
 
@@ -1109,7 +1108,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, Expression rhs)
         {
-            Ensure.NotSupported();
+            Ensure.NotSupported("Cannot create unequality constraint", x, rhs);
             return null;
         }
 
@@ -1121,7 +1120,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Expression lhs, Variable x)
         {
-            Ensure.NotSupported();
+            Ensure.NotSupported("Cannot create unequality constraint", lhs, x);
             return null;
         }
         #endregion
