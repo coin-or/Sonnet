@@ -262,6 +262,12 @@ namespace Sonnet
         /// <param name="paramName">The given parameter name to be reported.</param>
         public static void Is<Base>(Type derived, string paramName = null)
         {
+            if (derived is null)
+            {
+                string message = $"Given type argument is null but should be derived from type {typeof(Base).Name}";
+                if (paramName is null) throw new ArgumentNullException(message);
+                else throw new ArgumentNullException(paramName, message);                  
+            }
             if (!derived.IsSubclassOf(typeof(Base)))
             {
                 string message = string.Format("Type {0} is not derived from type {1}", derived.Name, typeof(Base).Name);

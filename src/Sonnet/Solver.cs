@@ -57,8 +57,8 @@ namespace Sonnet
         /// <param name="name">The name for this solver.</param>
         public Solver(Model model, Type osiSolverInterfaceType, string name = null)
         {
-            Ensure.NotNull(model, "model");
-            Ensure.Is<COIN.OsiSolverInterface>(osiSolverInterfaceType, "osiSolverInterfaceType");
+            Ensure.NotNull(model, nameof(model));
+            Ensure.Is<COIN.OsiSolverInterface>(osiSolverInterfaceType, nameof(osiSolverInterfaceType));
 
             OsiSolverInterface solver = (OsiSolverInterface)osiSolverInterfaceType.GetConstructor(System.Type.EmptyTypes).Invoke(null);
             GutsOfConstructor(model, solver, name);
@@ -77,7 +77,7 @@ namespace Sonnet
         public static Solver New<T>(Model model, string name = null)
             where T : OsiSolverInterface
         {
-            Ensure.NotNull(model, "model");
+            Ensure.NotNull(model, nameof(model));
 
             return new Solver(model, typeof(T), name);
         }
