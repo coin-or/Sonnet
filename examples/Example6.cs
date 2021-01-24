@@ -21,6 +21,13 @@ namespace SonnetExamples.Example6
         
         public Solver Run()
         {
+            double objValue;
+            string solutionString;
+            return Run(out objValue, out solutionString);
+        }
+
+        public Solver Run(out double objValue, out string solutionString)
+        {
             Model m = new Model();
 
             Dictionary<char, Variable[,]> x = CreateXVariables(n);
@@ -116,6 +123,9 @@ namespace SonnetExamples.Example6
             Console.WriteLine(s.IsFeasible());
 
             ToSolutionString(n, x);
+
+            objValue = m.Objective.Value;
+            solutionString = s.ToSolutionString();
 
             return s;
         }

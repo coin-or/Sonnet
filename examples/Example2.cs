@@ -17,6 +17,13 @@ namespace SonnetExamples
 
         public void Run()
         {
+            double objValue;
+            string solutionString;
+            Run(out objValue, out solutionString);
+        }
+      
+        public void Run(out double objValue, out string solutionString)
+        {
             List<Days> DaysArray = Enum.GetValues(typeof(Days)).OfType<Days>().ToList();
 
             Dictionary<Days, double> demand = new Dictionary<Days, double>();
@@ -57,6 +64,9 @@ namespace SonnetExamples
             model.Objective = totemp;
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             solver.Minimise();
+            
+            objValue = model.Objective.Value;
+            solutionString = solver.ToSolutionString();
 
             Console.WriteLine(solver.ToSolutionString());
         }

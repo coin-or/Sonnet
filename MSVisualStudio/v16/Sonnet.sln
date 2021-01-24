@@ -4,8 +4,6 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sonnet", "Sonnet\Sonnet.csproj", "{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetTest", "SonnetTest\SonnetTest.csproj", "{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SonnetWrapper", "SonnetWrapper\SonnetWrapper.vcxproj", "{A703591E-08AB-4F79-A74A-42F418EF2A2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetExamples", "SonnetExamples\SonnetExamples.csproj", "{FBCB8A0D-BC0C-406E-B5FC-CA260C195056}"
@@ -40,6 +38,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\..\..\Co
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\..\..\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonnetTest", "SonnetTest\SonnetTest.csproj", "{252E3E95-6E97-45E9-9470-26E11644C879}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -62,18 +62,6 @@ Global
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.ReleaseParallel|x64.Build.0 = Release|x64
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.ReleaseParallel|x86.ActiveCfg = Release|x86
 		{650BCD91-B9AB-4A37-9A33-D1AE8CFFA49F}.ReleaseParallel|x86.Build.0 = Release|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|x64.ActiveCfg = Debug|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|x64.Build.0 = Debug|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|x86.ActiveCfg = Debug|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Debug|x86.Build.0 = Debug|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|x64.ActiveCfg = Release|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|x64.Build.0 = Release|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|x86.ActiveCfg = Release|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.Release|x86.Build.0 = Release|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.ReleaseParallel|x64.ActiveCfg = Release|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.ReleaseParallel|x64.Build.0 = Release|x64
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.ReleaseParallel|x86.ActiveCfg = Release|x86
-		{5411E8AB-5E5D-4D61-951B-D76AD31A65F3}.ReleaseParallel|x86.Build.0 = Release|x86
 		{A703591E-08AB-4F79-A74A-42F418EF2A2F}.Debug|x64.ActiveCfg = Debug|x64
 		{A703591E-08AB-4F79-A74A-42F418EF2A2F}.Debug|x64.Build.0 = Debug|x64
 		{A703591E-08AB-4F79-A74A-42F418EF2A2F}.Debug|x86.ActiveCfg = Debug|Win32
@@ -194,6 +182,18 @@ Global
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x64.Build.0 = Release|x64
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x86.ActiveCfg = Release|Win32
 		{BF5C7532-EE0A-479B-9993-72134087D530}.ReleaseParallel|x86.Build.0 = Release|Win32
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Debug|x64.ActiveCfg = Debug|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Debug|x64.Build.0 = Debug|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Debug|x86.ActiveCfg = Debug|x86
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Debug|x86.Build.0 = Debug|x86
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Release|x64.ActiveCfg = Release|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Release|x64.Build.0 = Release|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Release|x86.ActiveCfg = Release|x86
+		{252E3E95-6E97-45E9-9470-26E11644C879}.Release|x86.Build.0 = Release|x86
+		{252E3E95-6E97-45E9-9470-26E11644C879}.ReleaseParallel|x64.ActiveCfg = Release|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.ReleaseParallel|x64.Build.0 = Release|x64
+		{252E3E95-6E97-45E9-9470-26E11644C879}.ReleaseParallel|x86.ActiveCfg = Release|x86
+		{252E3E95-6E97-45E9-9470-26E11644C879}.ReleaseParallel|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

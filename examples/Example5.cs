@@ -47,6 +47,13 @@ namespace SonnetExamples.Example5
     {
         public void Run()
         {
+            double objValue;
+            string solutionString;
+            Run(out objValue, out solutionString);
+        }
+
+        public void Run(out double objValue, out string solutionString)
+        {
             Producer producerA = new Producer("A", 950);
             Producer producerB = new Producer("B", 1200);
             Producer producerC = new Producer("C", 1500);
@@ -83,7 +90,7 @@ namespace SonnetExamples.Example5
             AgriCoop agriCoop2 = AgriCoop.LoadXml("agricoop.xml");
             agriCoop2.Initialize();
             agriCoop2.Build();
-            agriCoop2.Solve();
+            agriCoop2.Solve(out objValue, out solutionString);
         }
     }
 
@@ -188,8 +195,18 @@ namespace SonnetExamples.Example5
 
         public void Solve()
         {
+            double objValue;
+            string solutionString;
+            Solve(out objValue, out solutionString);
+        }
+
+        public void Solve(out double objValue, out string solutionString)
+        {
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface), "MachineAssignmentMIP");
             solver.Minimise();
+
+            objValue = model.Objective.Value;
+            solutionString = solver.ToSolutionString();
 
             Console.WriteLine(solver.ToSolutionString());
         }

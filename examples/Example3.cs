@@ -16,6 +16,12 @@ namespace SonnetExamples
     {
         public void Run()
         {
+            double objValue;
+            string solutionString;
+            Run(out objValue, out solutionString);
+        }
+        public void Run(out double objValue, out string solutionString)
+        {
             Console.WriteLine("Williams_12_1_FoodManufacture");
 
             const int numberRawMaterials = 5;
@@ -187,6 +193,9 @@ namespace SonnetExamples
             model.ObjectiveSense = ObjectiveSense.Maximise;
             model.Export("Food.sonnet");
             solver.Solve();
+
+            objValue = model.Objective.Value;
+            solutionString = solver.ToSolutionString();
 
             if (solver.IsProvenOptimal)
             {

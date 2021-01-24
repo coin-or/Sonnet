@@ -18,6 +18,13 @@ namespace SonnetExamples
 
         public void Run()
         {
+            double objValue;
+            string solutionString;
+            Run(out objValue, out solutionString);
+        }
+
+        public void Run(out double objValue, out string solutionString)
+        {
             Console.WriteLine("Example1 - Optimising investments");
 
             var YearsList = Enum.GetValues(typeof(Years)).OfType<Years>().ToList();
@@ -106,6 +113,9 @@ namespace SonnetExamples
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             solver.Maximise();
 
+            objValue = model.Objective.Value;
+            solutionString = solver.ToSolutionString();
+            
             Console.WriteLine(solver.ToSolutionString());
         }
     }

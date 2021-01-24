@@ -17,3 +17,6 @@
 /test.mps
 /testmiqp.mps
 /MSVisualStudio/v16/.sonarlint
+/MSVisualStudio/v16/packages/
+/MSVisualStudio/v16/TestResults/
+/MSVisualStudio/v16/UpgradeLog.htm

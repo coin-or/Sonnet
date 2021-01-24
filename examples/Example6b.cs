@@ -13,6 +13,8 @@ namespace SonnetExamples.Example6b
     /// T W O 
     /// E A N
     /// N B E
+    /// Due to the differnt way the model is generated, the order of the variables in the model is 
+    /// different from Example6, but the solution is the same.
     /// </summary>
     public class Example
     {
@@ -21,6 +23,13 @@ namespace SonnetExamples.Example6b
         static char[] Alfabet = GetAlfabet(Words).ToCharArray();
         
         public Solver Run()
+        {
+            double objValue;
+            string solutionString;
+            return Run(out objValue, out solutionString);
+        }
+
+        public Solver Run(out double objValue, out string solutionString)
         {
             char[] hv = { 'h', 'v' }; // write the word horizontally or vertically
 
@@ -112,6 +121,9 @@ namespace SonnetExamples.Example6b
 
             ToSolutionString(x, n);
 
+            objValue = m.Objective.Value;
+            solutionString = s.ToSolutionString();
+            
             return s;
         }
 

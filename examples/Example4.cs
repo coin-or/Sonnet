@@ -35,6 +35,13 @@ namespace SonnetExamples.Example4
     {
         public void Run()
         {
+            double objValue;
+            string solutionString;
+            Run(out objValue, out solutionString);
+        }
+
+        public void Run(out double objValue, out string solutionString)
+        {
             List<Day> days = new List<Day>();
             days.Add(new Day(1, 900));
             days.Add(new Day(2, 1440));
@@ -57,7 +64,7 @@ namespace SonnetExamples.Example4
             LinnenRentalCo linnenRentalCo2 = LinnenRentalCo.LoadXml("linnenrentalco.xml");
             linnenRentalCo2.Initialize();
             linnenRentalCo2.Build();
-            linnenRentalCo2.Solve();
+            linnenRentalCo2.Solve(out objValue, out solutionString);
         }
     }
 
@@ -138,10 +145,20 @@ namespace SonnetExamples.Example4
 
         public void Solve()
         {
+            double objValue;
+            string solutionString;
+            Solve(out objValue, out solutionString);
+        }
+
+        public void Solve(out double objValue, out string solutionString)
+        {
             if (model == null) Build();
 
             Solver solver = new Solver(model, typeof(OsiClpSolverInterface));
             solver.Minimise();
+
+            objValue = model.Objective.Value;
+            solutionString = solver.ToSolutionString();
 
             Console.WriteLine(solver.ToSolutionString());
         }
