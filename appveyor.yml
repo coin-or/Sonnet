@@ -108,10 +108,13 @@ build_script:
 after_build:
   - echo -- After_build
 
-test_script:
-  - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
-  - SonnetTest.exe
-  - cd /d %APPVEYOR_BUILD_FOLDER%
+test:
+# use automatic test discovery
+
+#test_script:
+#  - cd MSVisualStudio\v16\SonnetTest\bin\x86\Release
+#  - SonnetTest.exe
+#  - cd /d %APPVEYOR_BUILD_FOLDER%
 
 after_test:
   - echo -- after_test
