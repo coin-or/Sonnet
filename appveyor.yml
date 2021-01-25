@@ -97,6 +97,7 @@ before_build:
   - echo -- Before_build
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
+  - nuget restore MSVisualStudio\v16\Sonnet.sln
   - SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=-
 
 build_script:
