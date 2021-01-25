@@ -102,7 +102,7 @@ namespace Sonnet
         /// </summary>
         public void Clear()
         {
-            if (!object.ReferenceEquals(expression, null))
+            if (!(expression is null))
             {
                 expression.Clear();
             }
@@ -234,16 +234,22 @@ namespace Sonnet
         /// <param name="expr">The expression to be used for this objective.</param>
         private void GutsOfConstructor(string name, Expression expr)
         {
-            this.id = numberOfObjectives++;
+            this.id = NextId();
 
-            if (!object.ReferenceEquals(expr, null)) this.expression = new Expression(expr);
+            if (!(expr is null)) this.expression = new Expression(expr);
             else this.expression = new Expression();
-
-            // get rid of the constrant
-            //this.expression.Subtract(this.expression.constant);
 
             if (name != null) Name = name;
             else Name = string.Format("Obj_{0}", id);
+        }
+
+        /// <summary>
+        /// Used for assigning this.id as numberOf++
+        /// </summary>
+        /// <returns>numberOf++</returns>
+        private static int NextId()
+        {
+            return numberOfObjectives++;
         }
 
         private static int numberOfObjectives = 0;

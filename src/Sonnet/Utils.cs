@@ -286,11 +286,13 @@ namespace Sonnet
             if (!a.Equals(b)) throw new ArgumentException("The objects are not equal");
         }
 
+
         /// <summary>
         /// Throws a NotSupportedException (always), with the given message.
         /// </summary>
         /// <param name="message">The message to be included</param>
         /// <param name="args">Any parameters that would otherwise be unused.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "This is NotSupported, so disregard the args.")]
         public static void NotSupported(string message = null, params object[] args)
         {
             // This is mostly used to prevent "Exceptions should not be thrown from unexpected methods" since
@@ -306,7 +308,7 @@ namespace Sonnet
         /// <param name="paramName">The given parameter name to be reported.</param>
         public static void NotNull(object obj, string paramName = null)
         {
-            if (object.ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 if (paramName != null) throw new ArgumentNullException(paramName);
                 else throw new ArgumentNullException("obj", "object cannot be null, but is.");

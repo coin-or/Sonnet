@@ -83,9 +83,7 @@ namespace Sonnet
             this.type = type;
 
             this.frozen = 0;
-#pragma warning disable S3010 // Static fields should not be updated in constructors
-            this.id = numberOfVariables++;
-#pragma warning restore S3010 // Static fields should not be updated in constructors
+            this.id = NextId();
 
             if (name != null) Name = name;
             else Name = string.Format("Var_{0}", id);
@@ -483,7 +481,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(double c, Variable x)
         {
-            Ensure.NotSupported("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator", c, x);
             return null;
         }
 
@@ -506,7 +504,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, double c)
         {
-            Ensure.NotSupported("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator", x, c);
             return null;
         }
         
@@ -529,7 +527,7 @@ namespace Sonnet
         /// <returns>NotSupportedException</returns>
         public static Constraint operator !=(Variable x, Variable y)
         {
-            Ensure.NotSupported("Cannot use != operator");
+            Ensure.NotSupported("Cannot use != operator", x, y);
             return null;
         }
         #endregion
@@ -660,6 +658,15 @@ namespace Sonnet
             return (new Expression(x)).Divide(c);
         }
         #endregion
+
+        /// <summary>
+        /// Used for assigning this.id as numberOf++
+        /// </summary>
+        /// <returns>numberOf++</returns>
+        private static int NextId()
+        {
+            return numberOfVariables++;
+        }
 
         /// <summary>
         /// Counts the global number of variables. Mainly used for id.

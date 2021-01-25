@@ -26,7 +26,7 @@ namespace Sonnet
     ///   tmp.Add(exp1).Add(exp2).Add(exp3);
     /// which performs only n1 + n2 + n3 operations.
     /// </summary>
-    public sealed class Expression 
+    public sealed class Expression : IEquatable<Expression>
     {
         #region Constructors
         /// <summary>
@@ -140,24 +140,24 @@ namespace Sonnet
         /// Therefore, for example, the expression (x + x) not "Equals" (2 * x).
         /// This has nothing to do with equality (EQ) constraints.
         /// </summary>
-        /// <param name="expr">The Expression to compare with the current Expression.</param>
+        /// <param name="other">The Expression to compare with the current Expression.</param>
         /// <returns>true iff the given expression has the same constant and all coefficients and variables as the current Expression.</returns>
-        public bool Equals(Expression expr)
+        public bool Equals(Expression other)
         {
-            if (expr is null) return false;
-            if (object.ReferenceEquals(expr, this)) return true;
+            if (other is null) return false;
+            if (object.ReferenceEquals(other, this)) return true;
 
             // coefs is a pointer to a CoefVector. CoefVector is derived from list, and list implements the "==" operator
             // However, the CoefVector's elements are Coefs, which implement "==" only by comparing the id of the variables of two coefs.
-            if (this.constant != expr.constant) return false;
+            if (this.constant != other.constant) return false;
 
-            if (this.coefs.Count != expr.coefs.Count) return false;
+            if (this.coefs.Count != other.coefs.Count) return false;
 
-            if (this.quadCoefs.Count != expr.quadCoefs.Count) return false;
+            if (this.quadCoefs.Count != other.quadCoefs.Count) return false;
 
-            if (!this.coefs.Equals(expr.coefs)) return false;
+            if (!this.coefs.Equals(other.coefs)) return false;
 
-            if (!this.quadCoefs.Equals(expr.quadCoefs)) return false;
+            if (!this.quadCoefs.Equals(other.quadCoefs)) return false;
 
             return true;
         }
@@ -165,11 +165,11 @@ namespace Sonnet
         /// <summary>
         ///  Determines whether the specified object is equal to the current Expression.
         /// </summary>
-        /// <param name="obj">The object to compare with the current Expression.</param>
+        /// <param name="other">The object to compare with the current Expression.</param>
         /// <returns>True iff the given object is an Expression and is equal to the current Expression.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            return this.Equals(obj as Expression);
+            return this.Equals(other as Expression);
         }
 
         /// <summary>

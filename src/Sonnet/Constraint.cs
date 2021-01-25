@@ -92,12 +92,12 @@ namespace Sonnet
         /// </summary>
         public void Clear()
         {
-            if (!object.ReferenceEquals(expr, null))
+            if (!(expr is null))
             {
                 expr.Clear();
             }
 
-            if (!object.ReferenceEquals(rhs, null))
+            if (!(rhs is null))
             {
                 rhs.Clear();
             }
@@ -206,7 +206,7 @@ namespace Sonnet
         /// <returns>A SonnetException</returns>
         public static RangeConstraint operator >=(Constraint con, double rhs)
         {
-            Ensure.IsTrue(false, "Range constraints can only be <= constraints");
+            Ensure.NotSupported("Range constraints can only be <= constraints", con, rhs);
             return null;
         }
         #endregion
@@ -378,13 +378,12 @@ namespace Sonnet
             this.value = value;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields", Justification = "Called only from constructor")]
         private void GutsOfConstructor(string name, Expression expr, ConstraintType type, Expression rhs)
         {
             Ensure.IsFalse(expr.IsQuadratic, "Quadratic constraints lhs are not supported");
             Ensure.IsFalse(rhs.IsQuadratic, "Quadratic constraints rhs are not supported");
 
-            id = numberOfConstraints++;
+            id = NextId();
 
             this.expr = new Expression(expr);
             this.rhs = new Expression(rhs);
@@ -395,6 +394,15 @@ namespace Sonnet
             else Name = string.Format("Con_{0}", id);
         }
 
+        /// <summary>
+        /// Used for assigning this.id as numberOf++
+        /// </summary>
+        /// <returns>numberOf++</returns>
+        private static int NextId()
+        {
+            return numberOfConstraints++;
+        }
+        
         /// <summary>
         /// Counts the global number of constraints. Mainly used for id.
         /// </summary>

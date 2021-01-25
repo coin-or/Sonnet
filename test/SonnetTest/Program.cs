@@ -10,7 +10,8 @@ using Sonnet;
 
 namespace SonnetTest
 {
-    public class Program
+    [TestClass]
+    public static class Program
     {
 
         [AssemblyInitialize]
@@ -43,10 +44,13 @@ namespace SonnetTest
                     //if (testType != typeof(Sonnet_ExampleTests)) continue;
                     //if (testType == typeof(Sonnet_StressTests)) continue;
 
-                    object testInstance = assembly.CreateInstance(testType.FullName);
+                    object testInstance = null;
                     var methods = testType.GetMethods()
                             .Where(m => m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
                             .ToArray();
+
+                    // If there are any TestMethods found, then create an instance of the TestClass
+                    if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
                         var p = method.GetParameters();
