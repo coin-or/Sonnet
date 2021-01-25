@@ -75,7 +75,7 @@ namespace Sonnet
         /// <returns>A System.String that represents the current RangeConstraint.</returns>
         public override string ToString()
         {
-            if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
+            Ensure.IsTrue(Type == ConstraintType.LE, "Range constraints must be of type <= .");
 
             return string.Format("{0} : {1} <= {2} <= {3}", Name, Lower, expr.ToString(), Upper);
         }
@@ -86,7 +86,7 @@ namespace Sonnet
         /// <returns>A string representation of this instance using the Level.</returns>
         public override string ToLevelString()
         {
-            if (Type != ConstraintType.LE) throw new SonnetException("Range constraints must be of type <= .");
+            Ensure.IsTrue(Type == ConstraintType.LE, "Range constraints must be of type <= .");
 
             return string.Format("{0} : {1} <= {2} <= {3}  ( {4} )", Name, Lower, expr.Level(), Upper, Price);
         }

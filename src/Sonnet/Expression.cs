@@ -165,11 +165,11 @@ namespace Sonnet
         /// <summary>
         ///  Determines whether the specified object is equal to the current Expression.
         /// </summary>
-        /// <param name="other">The object to compare with the current Expression.</param>
+        /// <param name="obj">The object to compare with the current Expression.</param>
         /// <returns>True iff the given object is an Expression and is equal to the current Expression.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            return this.Equals(other as Expression);
+            return this.Equals(obj as Expression);
         }
 
         /// <summary>

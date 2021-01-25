@@ -184,7 +184,8 @@ namespace Sonnet
         {
             foreach (var s in source)
             {
-                if (s is System.Collections.IEnumerable) ((System.Collections.IEnumerable)s).ToItemString(builder);
+                var enumerable = s as System.Collections.IEnumerable;
+                if (enumerable != null) enumerable.ToItemString(builder);
                 else builder.AppendLine(s.ToString());
             }
             return builder;
@@ -194,7 +195,8 @@ namespace Sonnet
         {
             foreach (var s in source)
             {
-                if (s is System.Collections.IEnumerable) ((System.Collections.IEnumerable)s).ToItemString(builder);
+                var enumerable = s as System.Collections.IEnumerable;
+                if (enumerable != null) enumerable.ToItemString(builder);
                 else builder.AppendLine(s.ToString());
             }
             return builder;
