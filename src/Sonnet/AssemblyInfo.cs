@@ -11,12 +11,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("Sonnet Development build")]
+[assembly: AssemblyTitle("Sonnet")]
 [assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SONNET")]
-[assembly: AssemblyCopyright("Copyright © 2011-2020")]
+[assembly: AssemblyCopyright("Copyright © 2011-2021")]
 [assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
 [assembly: AssemblyCulture("")]
 
