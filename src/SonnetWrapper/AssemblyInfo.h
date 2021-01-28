@@ -1,5 +1,4 @@
 // Copyright (C) Jan-Willem Goossens 
-// All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 #pragma once
@@ -16,6 +15,8 @@
 #define VER_PRODUCTVERSION		1,4,0,0
 #define VER_PRODUCTVERSION_STR	"1.4.0.0"
 #define VER_ASSEMBLYVERSION_STR	"1.4.0.0" // Can use *
+// Copyright (C) Jan-Willem Goossens 
+// This code is licensed under the terms of the Eclipse Public License (EPL).
 
 #ifdef _DEBUG
 #ifndef WIN32

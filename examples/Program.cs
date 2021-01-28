@@ -1,9 +1,11 @@
-﻿using System;
+﻿// Copyright (C) Jan-Willem Goossens 
+// This code is licensed under the terms of the Eclipse Public License (EPL).
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sonnet;
-
 
 namespace SonnetExamples
 {

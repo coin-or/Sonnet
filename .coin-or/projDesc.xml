@@ -12,8 +12,8 @@
     </projectShortDescription>
     <projectManager>Jan-Willem Goossens</projectManager>
     <projectHomePage>https://github.com/coin-or/SONNET</projectHomePage>
-    <projectLicense>Eclipse Public License 1.0</projectLicense>
-    <projectLicenseURL>https://opensource.org/licenses/eclipse-1.0</projectLicenseURL>
+    <projectLicense>Eclipse Public License - v 2.0</projectLicense>
+    <projectLicenseURL>https://opensource.org/licenses/EPL-2.0</projectLicenseURL>
     <coinLinkedProjects>
       <coinProject>
         <repoName>Osi</repoName>

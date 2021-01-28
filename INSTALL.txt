@@ -37,8 +37,7 @@ Ensure that the Sonnet root directory is at the same level as Cbc, Clp, etc.
 Building SONNET
 ---------------------
 The SONNET projects and solution are provided for Visual Studio 2019 (MSVisualStudio\v16).
-The Sonnet solution for Visual Studio 2019 refers to the v10 project files of the relevant COIN-OR libraries.
-As a result, either the v10 Toolset (v100) has to be installed, or 'Retarget Project' each of the COIN-OR project files to v142 (recommended). To retarget, open the Sonnet solution, and for each project within the COIN-OR v10 folder (libCbc, etc.) do right-click and select Retarget Projects.
+The Sonnet solution for Visual Studio 2019 refers to the project files of the relevant COIN-OR libraries.
 
 Older versions of SONNET projects and solutions files are available for Visual Studio 2010 (v10), but these are not maintained.
 
