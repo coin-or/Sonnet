@@ -1,3 +1,48 @@
+#ifdef NETCOREAPP
+
+#include "AssemblyInfo.h"
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION VER_FILEVERSION
+PRODUCTVERSION VER_PRODUCTVERSION
+FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+FILEFLAGS 0x1L
+#else
+FILEFLAGS 0x0L
+#endif
+FILEOS 0x40004L
+FILETYPE 0x2L
+FILESUBTYPE 0x0L
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "200004b0"
+BEGIN
+VALUE "CompanyName", ""
+VALUE "FileDescription", VER_FILEDESCRIPTION
+VALUE "FileVersion", VER_FILEVERSION_STR
+VALUE "InternalName", VER_FILENAME
+VALUE "LegalCopyright", VER_COPYRIGHT
+VALUE "OriginalFilename", VER_FILENAME
+VALUE "ProductName", "SONNET"
+VALUE "ProductVersion", VER_PRODUCTVERSION_STR
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x2000, 1200
+END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+
+#else
+// NETFRAMEWORK
 #include <VerRsrc.h>
 #include "AssemblyInfo.h"
 
@@ -37,5 +82,10 @@ BEGIN
 END
 
 /////////////////////////////////////////////////////////////////////////////
+
+#endif
+
+
+
 
 

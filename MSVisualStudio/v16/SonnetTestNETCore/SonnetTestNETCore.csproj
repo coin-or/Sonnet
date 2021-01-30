@@ -50,10 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Examples\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SonnetNETCore\SonnetNETCore.csproj" />
     <ProjectReference Include="..\SonnetWrapperNETCore\SonnetWrapperNETCore.vcxproj" />
   </ItemGroup>

@@ -6,6 +6,7 @@
 *.db
 *.bak
 *.user
+app.aps
 
 **/.vs/
 /MSVisualStudio/**/obj/

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2011, Jan-Willem Goossens 
+﻿// Copyright (C) Jan-Willem Goossens 
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 using System.Reflection;
@@ -11,12 +11,16 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("SonnetTest")]
 [assembly: InternalsVisibleTo("SonnetTestNETCore")]
 
+#if NETCOREAPP
+// nothing to be done. All is in project settings
+#else
+// NETFRAMEWORK
 //
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-#if NETFRAMEWORK
+
 [assembly: AssemblyTitle("Sonnet")]
 [assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
 [assembly: AssemblyConfiguration("")]

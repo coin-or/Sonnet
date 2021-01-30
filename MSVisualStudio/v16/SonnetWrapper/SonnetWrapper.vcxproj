@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\src\SonnetWrapper\app.rc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\src\SonnetWrapper\AssemblyInfo.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcModel.cpp" />
@@ -95,6 +92,9 @@
     <ProjectReference Include="..\..\..\..\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj">
       <Project>{bf5c7532-ee0a-479b-9993-72134087d530}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\SonnetWrapper\app.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
