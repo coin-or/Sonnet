@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <GenerateProgramFile>false</GenerateProgramFile>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>SonnetTest</RootNamespace>
+
+    <Platforms>x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\examples\Example1.cs" Link="Examples\Example1.cs" />
+    <Compile Include="..\..\..\examples\Example2.cs" Link="Examples\Example2.cs" />
+    <Compile Include="..\..\..\examples\Example3.cs" Link="Examples\Example3.cs" />
+    <Compile Include="..\..\..\examples\Example4.cs" Link="Examples\Example4.cs" />
+    <Compile Include="..\..\..\examples\Example5.cs" Link="Examples\Example5.cs" />
+    <Compile Include="..\..\..\examples\Example6.cs" Link="Examples\Example6.cs" />
+    <Compile Include="..\..\..\examples\Example6b.cs" Link="Examples\Example6b.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" Link="Sonnet_BasicTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" Link="Sonnet_ExampleTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" Link="Sonnet_QuadraticTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_StressTests.cs" Link="Sonnet_StressTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\test\brandy.mps" Link="brandy.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\egout.mps" Link="egout.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\expect-feasible.mps" Link="expect-feasible.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\MIP-124725.mps" Link="MIP-124725.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.0" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Examples\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SonnetNETCore\SonnetNETCore.csproj" />
+    <ProjectReference Include="..\SonnetWrapperNETCore\SonnetWrapperNETCore.vcxproj" />
+  </ItemGroup>
+
+</Project>

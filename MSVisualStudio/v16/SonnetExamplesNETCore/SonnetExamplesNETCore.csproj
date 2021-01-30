@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\examples\Example1.cs" Link="Example1.cs" />
+    <Compile Include="..\..\..\examples\Example2.cs" Link="Example2.cs" />
+    <Compile Include="..\..\..\examples\Example3.cs" Link="Example3.cs" />
+    <Compile Include="..\..\..\examples\Example4.cs" Link="Example4.cs" />
+    <Compile Include="..\..\..\examples\Example5.cs" Link="Example5.cs" />
+    <Compile Include="..\..\..\examples\Example6.cs" Link="Example6.cs" />
+    <Compile Include="..\..\..\examples\Example6b.cs" Link="Example6b.cs" />
+    <Compile Include="..\..\..\examples\Program.cs" Link="Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SonnetNETCore\SonnetNETCore.csproj" />
+    <ProjectReference Include="..\SonnetWrapperNETCore\SonnetWrapperNETCore.vcxproj" />
+  </ItemGroup>
+
+</Project>

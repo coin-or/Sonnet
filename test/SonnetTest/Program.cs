@@ -4,10 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Management;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sonnet;
 
@@ -31,7 +28,7 @@ namespace SonnetTest
         /// This is a very rudimentary way to run the test self-contained without framework.
         /// </summary>
         /// <param name="args"></param>
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             double startMemoryGb = Utils.AvailableMemoryGb;
             {
@@ -130,10 +127,11 @@ namespace SonnetTest
         {
             get
             {
-                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                //var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
                 //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much
-                double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
-                return memoryGB;
+                //double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
+                //return memoryGB;
+                return 1.0;
             }
         }
 
