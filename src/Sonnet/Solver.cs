@@ -1752,12 +1752,10 @@ namespace Sonnet
                 throw new SonnetException(string.Format("The number of registered constraints {0} is higher than to the number of constraints at the solver {1}", m_constraints, m_solver));
             }
 
-#if (DEBUG)
             if (!objective.IsQuadratic && m_constraints != m_solver)
             {
                 throw new SonnetException(string.Format("Number of constraints in the solution {0} is not equal to the number of registered constraints {1}", m_constraints, m_solver));
             }
-#endif
 
             unsafe
             {
