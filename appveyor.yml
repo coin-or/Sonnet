@@ -102,8 +102,8 @@ before_build:
 
 build_script:
   - echo -- Build_script
-  - if not "%RELEASE_TYPE%"=="ci" ( MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x64 )
-  - MSBuild MSVisualStudio\v16\Sonnet.sln /m /p:Configuration=Release;Platform=x86
+  - if not "%RELEASE_TYPE%"=="ci" ( MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x64 )
+  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x86
 
 after_build:
   - echo -- After_build
