@@ -4,6 +4,7 @@
     <TargetFrameworks>net5.0</TargetFrameworks>
     <RootNamespace>Sonnet</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
 

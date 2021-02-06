@@ -24,15 +24,15 @@
 #if NETCOREAPP
 #ifdef _DEBUG
 #ifndef WIN32
-#define VER_FILEDESCRIPTION L"SonnetWrapper 64-bit (.NET Core) (Debug)"
+#define VER_FILEDESCRIPTION L"SonnetWrapper 64-bit (net5.0, Debug)"
 #else
-#define VER_FILEDESCRIPTION L"SonnetWrapper 32-bit (.NET Core) (Debug)"
+#define VER_FILEDESCRIPTION L"SonnetWrapper 32-bit (net5.0, Debug)"
 #endif
 #else
 #ifndef WIN32
-#define VER_FILEDESCRIPTION L"SonnetWrapper 64-bit (.NET Core)"
+#define VER_FILEDESCRIPTION L"SonnetWrapper 64-bit (net5.0)"
 #else
-#define VER_FILEDESCRIPTION L"SonnetWrapper 32-bit (.NET Core)"
+#define VER_FILEDESCRIPTION L"SonnetWrapper 32-bit (net5.0)"
 #endif
 #endif
 
@@ -43,15 +43,15 @@
 
 #ifdef _DEBUG
 #ifndef WIN32
-#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (Debug)"
+#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (net40, Debug)"
 #else
-#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (Debug)"
+#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (net40, Debug)"
 #endif
 #else
 #ifndef WIN32
-#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit"
+#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (net40)"
 #else
-#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit"
+#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (net40)"
 #endif
 #endif
 

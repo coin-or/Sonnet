@@ -15,7 +15,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("Sonnet")]
+#if NETCOREAPP
+[assembly: AssemblyTitle("Sonnet (net5.0)")]
+#else
+[assembly: AssemblyTitle("Sonnet (net40)")]
+#endif
 [assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
