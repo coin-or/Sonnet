@@ -127,11 +127,15 @@ namespace SonnetTest
         {
             get
             {
-                //var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
-                //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much
-                //double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
-                //return memoryGB;
+#if NETCOREAPP
+                #warning "SONNET: TODO Implement AvailableMemoryGb for .NET Core."
                 return 1.0;
+#else
+                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much
+                double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
+                return memoryGB;
+#endif
             }
         }
 
