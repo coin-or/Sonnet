@@ -102,7 +102,8 @@ before_build:
 
 build_script:
   - echo -- Build_script
-  - if not "%RELEASE_TYPE%"=="ci" ( MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x64 )
+#if not "%RELEASE_TYPE%"=="ci" ( .. )
+  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x64
   - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x86
 
 after_build:
@@ -114,15 +115,14 @@ test:
 after_test:
   - echo -- after_test
   - mkdir package\x64
-  - if not "%RELEASE_TYPE%"=="ci" mkdir package\x64\net5.0
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.dll package\x64\net5.0\.
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.xml package\x64\net5.0\.
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\SonnetWrapper.dll package\x64\net5.0\.
-  - if not "%RELEASE_TYPE%"=="ci" mkdir package\x64\net40
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net40\.
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net40\.
-  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net40\.
-  - if "%RELEASE_TYPE%"=="ci" echo x64 is not included in %RELEASE_NAME% > package\x64\readme.txt
+  - mkdir package\x64\net5.0
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.xml package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\SonnetWrapper.dll package\x64\net5.0\.
+  - mkdir package\x64\net40
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net40\.
   - mkdir package\x86\net5.0
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.dll package\x86\net5.0\.
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.xml package\x86\net5.0\.
