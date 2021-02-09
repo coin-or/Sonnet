@@ -27,12 +27,18 @@ image: Visual Studio 2019
 
 # scripts that are called at very beginning, before repo cloning
 init:
-  - if "%sonar_token%"=="" echo Error decrypting token! Did you use the correct account to create it? && exit 1
+  - ps: |
+      if ($env:sonar_token -like '')
+      {
+        Write-Host "Cannot decrypt SonarQube token. This could happen for builds from Pull Requests from other repos."
+        Write-Host "Proceeding without SonarQube..."
+      } else {
+        Write-Host "Proceeding with SonarQube..."
+        choco install "sonarscanner-msbuild-net46" -y
+        $env:JAVA_HOME = "C:\Program Files\Java\jdk11"
+        $env:PATH += ";JAVA_HOME%\bin"
+      }
 #  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - choco install "sonarscanner-msbuild-net46" -y
-  - set JAVA_HOME=C:\Program Files\Java\jdk11
-  - set PATH=%JAVA_HOME%\bin;%PATH%
-  - set
 
 # scripts that run after cloning repository
 install:
@@ -65,7 +71,13 @@ install:
   - set RELEASE_NAME=undefined
   # be careful of trailing white spaces in env values!
   - if "%APPVEYOR_REPO_TAG%"=="true" ( set RELEASE_TYPE=tag&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_TAG_NAME%) else if "%APPVEYOR_FORCED_BUILD%"=="true" ( set RELEASE_TYPE=manual&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-manual) else ( set RELEASE_TYPE=ci&& set RELEASE_NAME=Sonnet-%APPVEYOR_REPO_BRANCH%-CI)
-  - appveyor AddMessage "For SonarQube report, see https://sonarcloud.io/dashboard?id=%RELEASE_NAME%"
+  - ps: |
+      if ($env:sonar_token -like '')
+      { 
+        appveyor AddMessage "No SonarQube report for this build. For other SonarQube report, see https://sonarcloud.io/dashboard?id=%RELEASE_NAME%"
+      } else { 
+        appveyor AddMessage "For SonarQube report, see https://sonarcloud.io/dashboard?id=%RELEASE_NAME%"
+      }
 
 # enable patching of AssemblyInfo.* files
 assembly_info:
@@ -98,7 +110,7 @@ before_build:
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
   - nuget restore MSVisualStudio\v16\Sonnet.sln
-  - SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=-
+  - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=- )
 
 build_script:
   - echo -- Build_script
@@ -140,7 +152,7 @@ after_test:
   - cd package
   - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *
   - cd ..
-  - SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%"
+  - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%" )
 
 artifacts:
   - path: $(RELEASE_NAME)-bin.zip
