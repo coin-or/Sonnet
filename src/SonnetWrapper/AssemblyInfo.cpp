@@ -8,7 +8,6 @@ using namespace System::Runtime::CompilerServices;
 using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
-#if NETCOREAPP
 [assembly:AssemblyTitleAttribute(VER_FILENAME)] ;
 [assembly:AssemblyDescriptionAttribute(VER_FILECOMMENTS)] ;
 [assembly:AssemblyConfigurationAttribute(L"")] ;
@@ -24,20 +23,3 @@ using namespace System::Security::Permissions;
 [assembly:ComVisible(false)] ;
 
 [assembly:CLSCompliantAttribute(true)] ;
-#else
-[assembly:AssemblyTitleAttribute(VER_FILENAME)];
-[assembly:AssemblyDescriptionAttribute(VER_FILECOMMENTS)];
-[assembly:AssemblyConfigurationAttribute("")];
-[assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("SONNET")];
-[assembly:AssemblyCopyrightAttribute(VER_COPYRIGHT)];
-[assembly:AssemblyTrademarkAttribute(VER_TRADEMARK)];
-[assembly:AssemblyCultureAttribute("")];
-
-[assembly:AssemblyVersionAttribute(VER_ASSEMBLYVERSION_STR)];
-[assembly:AssemblyFileVersionAttribute(VER_FILEVERSION_STR)];
-
-[assembly:ComVisible(false)];
-
-[assembly:CLSCompliantAttribute(true)];
-#endif

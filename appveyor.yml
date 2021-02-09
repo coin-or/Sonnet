@@ -36,7 +36,7 @@ init:
         Write-Host "Proceeding with SonarQube..."
         choco install "sonarscanner-msbuild-net46" -y
         $env:JAVA_HOME = "C:\Program Files\Java\jdk11"
-        $env:PATH += ";JAVA_HOME%\bin"
+        $env:PATH += ";JAVA_HOME\bin"
       }
 #  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
@@ -74,9 +74,9 @@ install:
   - ps: |
       if ($env:sonar_token -like '')
       { 
-        appveyor AddMessage "No SonarQube report for this build. For other SonarQube report, see https://sonarcloud.io/dashboard?id=%RELEASE_NAME%"
+        appveyor AddMessage "No SonarQube report for this build. For other SonarQube report, see https://sonarcloud.io/dashboard?id=$env:RELEASE_NAME"
       } else { 
-        appveyor AddMessage "For SonarQube report, see https://sonarcloud.io/dashboard?id=%RELEASE_NAME%"
+        appveyor AddMessage "For SonarQube report, see https://sonarcloud.io/dashboard?id=$env:RELEASE_NAME"
       }
 
 # enable patching of AssemblyInfo.* files
