@@ -6,11 +6,13 @@
 *.db
 *.bak
 *.user
+app.aps
 
 **/.vs/
 /MSVisualStudio/**/obj/
 /MSVisualStudio/**/bin/
 /MSVisualStudio/**/Release/
+/MSVisualStudio/**/ReleaseParallel/
 /MSVisualStudio/**/Debug/
 /MSVisualStudio/**/x64*/
 /MSVisualStudio/**/Win32*/
@@ -20,3 +22,4 @@
 /MSVisualStudio/v16/packages/
 /MSVisualStudio/v16/TestResults/
 /MSVisualStudio/v16/UpgradeLog.htm
+

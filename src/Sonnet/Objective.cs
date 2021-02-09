@@ -142,12 +142,7 @@ namespace Sonnet
         /// <returns>The level.</returns>
         public double Level()
         {
-#if (DEBUG)
-            if (!Assigned)
-            {
-                throw new SonnetException("No solver not set!");
-            }
-#endif
+            Ensure.IsTrue(Assigned, "No solver not set!");
             return expression.Level();
         }
 
