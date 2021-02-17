@@ -66,10 +66,26 @@ namespace COIN
 			return gcnew CbcModel(Base->getModelPtr());
 		}
 
+		/// <summary>
+		/// Returns the CbcModel
+		/// </summary>
+		property CbcModel^ Model
+		{
+			CbcModel^ get() { return getModelPtr(); }
+		}
+
 		/// Get pointer to underlying solver
 		inline OsiSolverInterface ^ getRealSolverPtr()
 		{
 			return getModelPtr()->solver();
+		}
+
+		/// <summary>
+		/// Get the underlying continuous solver
+		/// </summary>
+		property OsiSolverInterface^ RealSolver
+		{
+			OsiSolverInterface^ get() { return getRealSolverPtr(); }
 		}
 
 		void resetModelToReferenceSolver();

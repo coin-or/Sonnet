@@ -124,6 +124,10 @@
       <Link>expect-feasible.mps</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\..\test\mas74.mps">
+      <Link>mas74.mps</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\..\test\MIP-124725.mps">
       <Link>MIP-124725.mps</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

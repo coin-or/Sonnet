@@ -119,12 +119,12 @@ namespace COIN
 		}
 
 		/// Clone
-		virtual CoinMessageHandler * clone() const
+		CoinMessageHandler * clone() const override
 		{
 			return new CoinMessageHandlerProxy(*this);
 		}
 
-		virtual int print();
+		int print() override;
 
 	private:
 		CoinMessageHandlerProxy(const ::CoinMessageHandler &rhs, gcroot<COIN::CoinMessageHandler ^> wrapper)

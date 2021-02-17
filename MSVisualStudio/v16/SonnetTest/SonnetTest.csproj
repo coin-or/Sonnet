@@ -18,6 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SonnetTest.csproj.bak" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\..\examples\Example1.cs" Link="Examples\Example1.cs" />
     <Compile Include="..\..\..\examples\Example2.cs" Link="Examples\Example2.cs" />
     <Compile Include="..\..\..\examples\Example3.cs" Link="Examples\Example3.cs" />
@@ -40,6 +44,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\..\test\expect-feasible.mps" Link="expect-feasible.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\mas74.mps" Link="mas74.mps">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\..\test\MIP-124725.mps" Link="MIP-124725.mps">

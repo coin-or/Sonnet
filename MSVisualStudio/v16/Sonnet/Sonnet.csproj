@@ -6,6 +6,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Platforms>x64;x86</Platforms>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -42,6 +43,10 @@
     <Compile Include="..\..\..\src\Sonnet\Utils.cs" Link="Utils.cs" />
     <Compile Include="..\..\..\src\Sonnet\Variable.cs" Link="Variable.cs" />
     <Compile Include="..\..\..\src\Sonnet\WarmStart.cs" Link="WarmStart.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml" Link="SonarLint.xml" />
   </ItemGroup>
 
   <ItemGroup>

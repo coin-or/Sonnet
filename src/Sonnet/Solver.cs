@@ -365,6 +365,7 @@ namespace Sonnet
                             }
                             args.Add("-quit");
 
+                            Sonnet.SonnetLog.Default.InfoFormat("Using CbcSolver.CbcMain0/1 with args {0}", string.Join(" ", args));
                             CbcSolver.CbcMain0(cbcSolver.getModelPtr());
                             CbcSolver.CbcMain1(args.ToArray(), cbcSolver.getModelPtr());
                         }
@@ -417,50 +418,50 @@ namespace Sonnet
             Generate();
 
             bool feasible = true;
-            StringBuilder tmp = new StringBuilder();
 
-            tmp.Append(string.Concat("Claimed Solution status: ", ((IsProvenOptimal) ? ("Optimal") : "not Optimal")));
-            tmp.Append("\n");
+            log.Debug("IsFeasible: Determine whether the current solution satisfies all constraints and variables bounds and types.");
+            log.Debug(string.Concat("Claimed Solution status: ", ((IsProvenOptimal) ? ("Optimal") : "not Optimal")));
 
-            StringBuilder infeasibleVariables = new StringBuilder();
+            log.Debug("Infeasible variables:");
+            bool hasInfeasibleVariables = false;
             int m = variables.Count;
             for (int j = 0; j < m; j++)
             {
                 Variable aVar = variables[j];
                 if (!aVar.IsFeasible())
                 {
-                    infeasibleVariables.Append(aVar.ToLevelString());
+                    log.Debug(aVar.ToLevelString());
                     feasible = false;
+                    hasInfeasibleVariables = true;
                 }
             }
 
-            if (infeasibleVariables.Length > 0)
+            if (!hasInfeasibleVariables)
             {
-                tmp.Append("Infeasible variables:");
-                tmp.Append(infeasibleVariables.ToString());
+                log.Debug("No infeasible variables.");
             }
 
-            StringBuilder infeasibleConstraints = new StringBuilder();
+            log.Debug("Infeasible constraints:");
+            bool hasInfeasibleConstraints = false;
             int n = constraints.Count;
             for (int i = 0; i < n; i++)
             {
                 Constraint aCon = constraints[i];
                 if (!aCon.IsFeasible())
                 {
-                    infeasibleConstraints.Append(aCon.ToLevelString());
+                    log.Debug(aCon.ToLevelString());
                     feasible = false;
+                    hasInfeasibleConstraints = true;
                 }
             }
 
-            if (infeasibleConstraints.Length > 0)
+            if (!hasInfeasibleConstraints)
             {
-                tmp.Append("Infeasible constraints:");
-                tmp.Append(infeasibleConstraints.ToString());
+                log.Debug("No infeasible constraints.");
             }
 
-            tmp.Append("End");
-            log.Debug(tmp.ToString());
-
+            log.Debug("End IsFeasible");
+            
             return feasible;
         }
 

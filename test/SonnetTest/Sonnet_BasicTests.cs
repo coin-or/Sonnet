@@ -55,11 +55,11 @@ namespace SonnetTest
             Assert.IsFalse(solver.IsProvenPrimalInfeasible);
             Assert.IsFalse(solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(con0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(con0.Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 5.0));
 
             model.Objective.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -70,11 +70,11 @@ namespace SonnetTest
             Assert.IsFalse(solver.IsProvenPrimalInfeasible);
             Assert.IsFalse(solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -644,12 +644,12 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0 &&
-                Utils.CompareDouble(r2.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0) &&
+                Utils.EqualsDouble(r2.Value, 5.0));
 
             obj.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -660,12 +660,12 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0 &&
-                Utils.CompareDouble(r2.Value, 7.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0) &&
+                Utils.EqualsDouble(r2.Value, 7.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -699,11 +699,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 5.0));
 
             model.Objective.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -715,11 +715,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -752,11 +752,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
 
             model.Objective.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -767,11 +767,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -811,11 +811,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -849,11 +849,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
 
             obj.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -864,11 +864,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -935,11 +935,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 6.0) == 0 &&
-                Utils.CompareDouble(x1.Value, -2.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 6.0) &&
+                Utils.EqualsDouble(x1.Value, -2.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 0.0));
 
             obj.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -951,11 +951,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -988,12 +988,12 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 4.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 2.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 4.0) &&
+                Utils.EqualsDouble(x1.Value, 2.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r2.Value, 12.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 10.0) &&
+                Utils.EqualsDouble(r2.Value, 12.0));
 
             obj.SetCoefficient(x0, 1.0);
             obj.SetCoefficient(x1, 1.0);
@@ -1004,12 +1004,12 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0 &&
-                Utils.CompareDouble(r2.Value, 19.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0) &&
+                Utils.EqualsDouble(r2.Value, 19.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1041,11 +1041,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
 
             obj.SetCoefficient(x0, 1);
             obj.SetCoefficient(x1, 1);
@@ -1057,11 +1057,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1110,11 +1110,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 6.0) == 0 &&
-                Utils.CompareDouble(x1.Value, -2.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 6.0) &&
+                Utils.EqualsDouble(x1.Value, -2.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 10.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 10.0) &&
+                Utils.EqualsDouble(r1.Value, 0.0));
 
             r0.Lower = Double.MinValue;
             r1.Lower = Double.MinValue;
@@ -1135,11 +1135,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 4.5) == 0 &&
-                Utils.CompareDouble(x1.Value, 2.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 4.5) &&
+                Utils.EqualsDouble(x1.Value, 2.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1162,7 +1162,7 @@ namespace SonnetTest
             model.Add(r0);
             solver.Generate();
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Lower, 40.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Lower, 40.0));
 
             r0.Lower = 0.0;
             r0.SetCoefficient(x1, 2.0);
@@ -1177,11 +1177,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
 
             model.Objective.SetCoefficient(x0, 1);
             model.Objective.SetCoefficient(x1, 1);
@@ -1193,11 +1193,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 15.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1220,15 +1220,15 @@ namespace SonnetTest
             model.Add(r0);
             solver.Generate();
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Lower, 40.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Lower, 40.0));
             r0.Lower = 0.0;
             r0.SetCoefficient(x1, 2.0);
             model.Add(r1);
 
             model.ObjectiveSense = ObjectiveSense.Maximise;
 
-            Assert.IsTrue(Utils.CompareDouble(r0.GetCoefficient(x0), 4.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(r0.GetCoefficient(x1), 2.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.GetCoefficient(x0), 4.0));
+            Assert.IsTrue(Utils.EqualsDouble(r0.GetCoefficient(x1), 2.0));
 
             solver.Solve();
 
@@ -1237,11 +1237,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
 
 
             RangeConstraint r2 = -Double.MaxValue <= 4 * x0 + x1 - 20 <= 0;
@@ -1249,26 +1249,26 @@ namespace SonnetTest
 
             solver.Generate();
 
-            Assert.IsTrue(Utils.CompareDouble(r2.Lower, -Double.MaxValue) == 0);
-            Assert.IsTrue(Utils.CompareDouble(r2.Upper, 20.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r2.Lower, -Double.MaxValue));
+            Assert.IsTrue(Utils.EqualsDouble(r2.Upper, 20.0));
 
             RangeConstraint r3 = -40.0 <= -4 * x0 - x1 - 20.0 <= Double.MaxValue;
             model.Add(r3);
 
             solver.Generate();
 
-            Assert.IsTrue(Utils.CompareDouble(r3.Lower, -20.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(r3.Upper, Double.MaxValue) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r3.Lower, -20.0));
+            Assert.IsTrue(Utils.EqualsDouble(r3.Upper, Double.MaxValue));
 
 
             solver.Solve();
 
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(r0.Value, 20.0) == 0 &&
-                Utils.CompareDouble(r1.Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(r0.Value, 20.0) &&
+                Utils.EqualsDouble(r1.Value, 5.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1508,11 +1508,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 5.0));
 
             Objective obj2 = new Objective(x0 + x1);
             model.Objective = obj2;
@@ -1527,18 +1527,18 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 4.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0) &&
+                Utils.EqualsDouble(x1.Value, 4.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 15.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 15.0));
 
 
             obj2.SetCoefficient(x0, 3);
             model.Objective.SetCoefficient(x1, 2);
 
-            Assert.IsTrue(Utils.CompareDouble(obj2.GetCoefficient(x1), 2.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(obj2.GetCoefficient(x0), 3.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(obj2.GetCoefficient(x1), 2.0));
+            Assert.IsTrue(Utils.EqualsDouble(obj2.GetCoefficient(x0), 3.0));
             obj2.SetCoefficient(x1, 1);
 
             solver.Resolve();
@@ -1549,11 +1549,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 5.0));
 
             model.Objective = obj;
 
@@ -1564,11 +1564,11 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x1.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 5.0) &&
+                Utils.EqualsDouble(x1.Value, 0.0));
 
-            Assert.IsTrue(Utils.CompareDouble(model.GetConstraint("con0").Value, 10.0) == 0 &&
-                Utils.CompareDouble(model.GetConstraint("con1").Value, 5.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.GetConstraint("con0").Value, 10.0) &&
+                Utils.EqualsDouble(model.GetConstraint("con1").Value, 5.0));
 
         }
 
@@ -1600,9 +1600,9 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x2.Value, 0.0) == 0 &&
-                Utils.CompareDouble(x3.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 5.0) &&
+                Utils.EqualsDouble(x2.Value, 0.0) &&
+                Utils.EqualsDouble(x3.Value, 0.0));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1633,9 +1633,9 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 5.0) == 0 &&
-                Utils.CompareDouble(x2.Value, 0.0) == 0 &&
-                Utils.CompareDouble(x3.Value, 0.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 5.0) &&
+                Utils.EqualsDouble(x2.Value, 0.0) &&
+                Utils.EqualsDouble(x3.Value, 0.0));
 
             // TEST ALL HINTPARAMETERS and HINTSTRENGTHS
             foreach (OsiHintParam hintParam in Enum.GetValues(typeof(OsiHintParam)))
@@ -1868,8 +1868,8 @@ namespace SonnetTest
             solver.Generate();
             solver.Resolve(); // !
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 5.55555555) == 0);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Level(), 5.55555555) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 5.55555555));
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Level(), 5.55555555));
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
@@ -1891,8 +1891,8 @@ namespace SonnetTest
             solver.Generate();
             solver.Resolve();
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 5.55555555) == 0);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Level(), 5.55555555) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 5.55555555));
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Level(), 5.55555555));
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
@@ -1900,8 +1900,8 @@ namespace SonnetTest
             solver.UnGenerate();
             solver.Solve();
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 5.55555555) == 0);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Level(), 5.55555555) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 5.55555555));
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Level(), 5.55555555));
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
@@ -1935,10 +1935,10 @@ namespace SonnetTest
             Assert.IsTrue(numInts == solver.OsiSolver.getNumIntegers());
 
             // with resetaftermipsolve the objectivevalue() doesnt work.
-            //Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, model.ObjectiveValue()) == 0);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 3.45) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 0.45) == 0);
+            //Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, model.ObjectiveValue()));
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 3.45));
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0));
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 0.45));
 
             model.Add(x0 <= 2.0);
             solver.Solve();
@@ -1947,9 +1947,9 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 2.95) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 2.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 0.95) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 2.95));
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 2.0));
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 0.95));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -1978,9 +1978,9 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 3.45) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x0.Value, 3.0) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 0.45) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 3.45));
+            Assert.IsTrue(Utils.EqualsDouble(x0.Value, 3.0));
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 0.45));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2006,7 +2006,7 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 568.1007) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 568.1007));
             Assert.IsTrue(numElements == solver.OsiSolver.getNumElements());
             Assert.IsTrue(numInts == solver.OsiSolver.getNumIntegers());
         }
@@ -2039,7 +2039,7 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 568.1007) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 568.1007));
             Assert.IsTrue(numElements == solver.OsiSolver.getNumElements());
             Assert.IsTrue(numInts == solver.OsiSolver.getNumIntegers());
         }
@@ -2133,7 +2133,7 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsProvenOptimal);
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 149.58876622009566) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 149.58876622009566));
 
             model.Objective = (Expression.Sum(variables));
             model.ObjectiveSense = (ObjectiveSense.Minimise);
@@ -2391,8 +2391,8 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 13.45) == 0); // with Constant
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Level(), 13.45) == 0); // with Constant
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 13.45)); // with Constant
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Level(), 13.45)); // with Constant
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2405,7 +2405,7 @@ namespace SonnetTest
             Assert.IsTrue(model != null);
             Solver solver = new Solver(model, solverType);
             solver.Minimise();
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 124725) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2430,8 +2430,8 @@ namespace SonnetTest
 
             solver.Minimise();
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 124725) == 0);
-            //Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 104713.12807881772) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
+            //Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 104713.12807881772));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2462,10 +2462,10 @@ namespace SonnetTest
 
             Console.WriteLine(message);
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 124725) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
 
             solver.Solve(true);
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 104713.12807881772) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 104713.12807881772));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2489,7 +2489,7 @@ namespace SonnetTest
             Console.WriteLine("Status: y = " + y.Value);
             Console.WriteLine("Status: obj = " + m.Objective.Value);
 
-            Assert.IsTrue(Utils.CompareDouble(m.Objective.Value, 7) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(m.Objective.Value, 7));
 
 
             s.Maximise(true);
@@ -2497,7 +2497,7 @@ namespace SonnetTest
             Console.WriteLine("Status: x = " + x.Value);
             Console.WriteLine("Status: y = " + y.Value);
             Console.WriteLine("Status: obj = " + m.Objective.Value);
-            Assert.IsTrue(Utils.CompareDouble(m.Objective.Value, 7.6923076923076907) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(m.Objective.Value, 7.6923076923076907));
 
             m.GetConstraint("con1").Lower = 4;
 
@@ -2506,14 +2506,14 @@ namespace SonnetTest
             Console.WriteLine("Status: x = " + x.Value);
             Console.WriteLine("Status: y = " + y.Value);
             Console.WriteLine("Status: obj = " + m.Objective.Value);
-            Assert.IsTrue(Utils.CompareDouble(m.Objective.Value, 3.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(m.Objective.Value, 3.0));
 
             s.Minimise(true);
             Console.WriteLine("Status: Optimal? " + s.IsProvenOptimal);
             Console.WriteLine("Status: x = " + x.Value);
             Console.WriteLine("Status: y = " + y.Value);
             Console.WriteLine("Status: obj = " + m.Objective.Value);
-            Assert.IsTrue(Utils.CompareDouble(m.Objective.Value, 2.66666666666) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(m.Objective.Value, 2.66666666666));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2663,9 +2663,99 @@ namespace SonnetTest
             solver.Minimise();
             Ensure.IsTrue(SonnetLog.Default.LogLevel == 2, "Somehow the SonnetLog LogLevel changed!");
 
-            Assert.IsTrue(Utils.CompareDouble(model.Objective.Value, 124725) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
         }
 
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetTest41(Type solverType)
+        {
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest41 - Test CbcModel with args to stop after solution");
+
+            SonnetLog.Default.LogLevel = 0;
+            SonnetLog.Default.Debug("Log Debug");
+            SonnetLog.Default.Info("Log Info");
+            SonnetLog.Default.Warn("Log Warn");
+            SonnetLog.Default.Error("Log Error");
+
+            Model model = Model.New("mas74.mps");
+            Assert.IsTrue(model != null);
+
+            Solver solver = new Solver(model, solverType);
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            osiCbc.AddCbcSolverArgs("-secni", "5"); // Stop if no improvement in the best solution within 5 seconds after a solution
+            solver.Solve();
+
+            Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
+            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
+
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 12310.694360600004), "Best solution until now is different than expected");
+        }
+
+        private static int SonnetTest42numSolutions = 0;
+        public static CbcAction SonnetTest42EventHandler(CbcModel model, CbcEvent cbcevent)
+        {
+            // This is an example EventHandler for CbcModel, invoked at events such as a solution was found, etc.
+            if (cbcevent == CbcEvent.solution)
+            {
+                SonnetTest42numSolutions++;
+                if (SonnetTest42numSolutions == 1)
+                {
+                    Assert.IsTrue(Utils.EqualsDouble(model.getBestPossibleObjValue(), 10482.79528033122), "Dual bound is different than expected");
+                    Assert.IsTrue(Utils.EqualsDouble(model.getObjValue(), 14372.871258200006), "Best solution until now is different than expected");
+                    // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
+                    return CbcAction.noAction;
+                }
+                else if (SonnetTest42numSolutions == 2)
+                {
+                    Assert.IsTrue(Utils.EqualsDouble(model.getBestPossibleObjValue(), 10593.326017175183), "Dual bound is different than expected");
+                    Assert.IsTrue(Utils.EqualsDouble(model.getObjValue(), 14168.332791700004), "Best solution until now is different than expected");
+                    // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
+                    return CbcAction.stop;
+                }
+            }
+
+            return CbcAction.noAction;
+        }
+
+        //private static int SonnetTest42NumCalls = 0;
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetTest42(Type solverType)
+        {
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest42 - Test CbcModel Event Handler");
+
+            SonnetLog.Default.LogLevel = 4;
+            SonnetLog.Default.Debug("Log Debug");
+            SonnetLog.Default.Info("Log Info");
+            SonnetLog.Default.Warn("Log Warn");
+            SonnetLog.Default.Error("Log Error");
+
+            Model model = Model.New("mas74.mps");
+            Assert.IsTrue(model != null);
+            
+            Solver solver = new Solver(model, solverType);
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            var args = osiCbc.GetCbcSolverArgs().ToList();
+            args.Add("-secni");
+            args.Add("5");
+            osiCbc.SetCbcSolverArgs(args.ToArray());
+            osiCbc.Model.passInEventHandler(SonnetTest42EventHandler); // will stop after 2nd solution
+
+            int SonnetTest42NumCalls = 0;
+            CbcSolver.CallBack = delegate (CbcModel m, int whereFrom) { SonnetTest42NumCalls++;  return 0; };
+            solver.Solve();
+            // DONT use the cbcModel after solver.Solve() because of ResetAfterMIPSolveInternal at the end of Solve()
+
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
+            Assert.IsTrue(SonnetTest42numSolutions == 2);
+            Assert.IsTrue(SonnetTest42NumCalls == 5);
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 14168.332791700004), "Best solution until now is different than expected");
+        }
     }
 
 }

@@ -43,7 +43,7 @@ namespace SonnetTest
                     // Use the following line to only run one TestClass
                     //if (testType != typeof(Sonnet_ExampleTests)) continue;
                     //if (testType == typeof(Sonnet_StressTests)) continue;
-
+                    
                     object testInstance = null;
                     var methods = testType.GetMethods()
                             .Where(m => m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
@@ -53,6 +53,9 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
+                        if (method.Name != nameof(Sonnet_BasicTests.SonnetTest41) &&
+                            method.Name != nameof(Sonnet_BasicTests.SonnetTest42)) continue;
+
                         var p = method.GetParameters();
                         if (p.Length == 0)
                         {
@@ -209,6 +212,11 @@ namespace SonnetTest
             if (a > b + Utils.Epsilon) return 1;
 
             return 0;
+        }
+
+        public static bool EqualsDouble(double a, double b)
+        {
+            return CompareDouble(a, b) == 0;
         }
     }
 

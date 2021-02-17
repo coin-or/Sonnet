@@ -5,6 +5,7 @@
 
 #include <CbcModel.hpp>
 
+#include "CbcEventHandler.h"
 #include "CbcStrategy.h"
 #include "CglCutGenerator.h"
 #include "CbcCutGenerator.h"
@@ -19,7 +20,7 @@ namespace COIN
 	public ref class CbcModel : WrapperBase<::CbcModel>
 	{
 	internal:
-		CbcModel(::CbcModel* obj)
+		CbcModel(const ::CbcModel* obj)
 			: WrapperBase(obj)
 		{
 		}
@@ -27,27 +28,33 @@ namespace COIN
 	public:
 		CbcModel() { }
 
+		/// <summary>
 		/// Solve the initial LP relaxation
+		/// </summary>
 		void initialSolve()
 		{
 			Base->initialSolve();
 		}
 
-		/** \brief Invoke the branch \& cut algorithm
-
-	The method assumes that initialSolve() has been called to solve the
-	LP relaxation. It processes the root node, then proceeds to explore the
-	branch & cut search tree. The search ends when the tree is exhausted or
-	one of several execution limits is reached.
-	If doStatistics is 1 summary statistics are printed
-	if 2 then also the path to best solution (if found by branching)
-	if 3 then also one line per node
-  */
+		/// <summary>
+		/// Invoke the branch \& cut algorithm
+		///
+		/// The method assumes that initialSolve() has been called to solve the
+		///	LP relaxation.It processes the root node, then proceeds to explore the
+		/// branch& cut search tree.The search ends when the tree is exhausted or
+		/// one of several execution limits is reached.
+		/// </summary>
+		/// <param name="doStatistics">If doStatistics is 1 summary statistics are printed, 
+		/// if 2 then also the path to best solution(if found by branching),
+		/// if 3 then also one line per node</param>
 		void branchAndBound(int doStatistics)
 		{
 			Base->branchAndBound(doStatistics);
 		}
 
+		/// <summary>
+		/// Invoke the branch \& cut algorithm, with doStatistics = 0
+		/// </summary>
 		void branchAndBound()
 		{
 			branchAndBound(0);
@@ -57,15 +64,50 @@ namespace COIN
 			return OsiSolverInterface::CreateDerived(Base->solver());
 		}
 
+		/// <summary>
+		/// Set an event handler
+		/// Note: In SonnetWrapper the eventHandler is merely a method delegate, not an instance of a class derived from the native CbcEventHandler class
+		/// This is a shortcut with limited functionality, but easier to use.
+		/// </summary>
+		/// <param name="eventHandler">A clone of the handler passed as a parameter is stored in CbcModel.</param>
+		void passInEventHandler(CbcEventHandler^ eventHandler)
+		{
+			CbcDelegateEventHandlerProxy handler(eventHandler);
+			Base->passInEventHandler(&handler); // clones the handler and will delete it later
+		}
+		
+		/// <summary>
+		/// Retrieve a pointer to the event handler
+		/// </summary>
+		/// <returns>Returns the delegate event handler, or null if none was assigned.</returns>
+		inline CbcEventHandler^ getEventHandler()
+		{
+			::CbcEventHandler* native = Base->getEventHandler();
+			CbcDelegateEventHandlerProxy* handler = dynamic_cast<CbcDelegateEventHandlerProxy*>(native);
+			if (handler != nullptr)
+			{
+				return handler->getDelegate();
+			}
+			return nullptr;
+		}
+
 		#pragma region void addCutGenerator
-		/** Add one generator - up to user to delete generators.
-        howoften affects how generator is used. 0 or 1 means always,
-        >1 means every that number of nodes.  Negative values have same
-        meaning as positive but they may be switched off (-> -100) by code if
-        not many cuts generated at continuous.  -99 is just done at root.
-        Name is just for printout.
-        If depth >0 overrides how often generator is called (if howOften==-1 or >0).
-		*/
+
+		/// <summary>
+		/// Add one generator - up to user to delete generators.	
+		/// </summary>
+		/// <param name="generator"></param>
+		/// <param name="howOften">howoften affects how generator is used. 0 or 1 means always,
+		/// > 1 means every that number of nodes.Negative values have same
+		/// meaning as positive but they may be switched off(-> - 100) by code if
+		/// not many cuts generated at continuous. - 99 is just done at root.</param>
+		/// <param name="name">Name is just for printout.</param>
+		/// <param name="normal"></param>
+		/// <param name="atSolution"></param>
+		/// <param name="infeasible"></param>
+		/// <param name="howOftenInSub"></param>
+		/// <param name="whatDepth">If depth > 0 overrides how often generator is called(if howOften == -1 or > 0).</param>
+		/// <param name="whatDepthInSub"></param>
 		void addCutGenerator(CglCutGenerator ^ generator,
                          int howOften, String ^ name,
                          bool normal, bool atSolution,
@@ -170,85 +212,124 @@ namespace COIN
 			else Base->setStrategy(nullptr);
 		}
 
+		/// <summary>
+		/// Is optimality proven?
+		/// </summary>
+		/// <returns>True if optimality is proven, false otherwise.	</returns>
 		bool isProvenOptimal()
 		{
 			return Base->isProvenOptimal();
 		}
 
+		/// <summary>
 		/// Get current objective function value
+		/// </summary>
+		/// <returns>The current objective function value</returns>
 		inline double getCurrentObjValue()
 		{
 			return Base->getCurrentObjValue();
 		}
 
+		/// <summary>
 		/// Get current minimization objective function value
+		/// </summary>
+		/// <returns>The current minimization objective function value</returns>
 		inline double getCurrentMinimizationObjValue()
 		{
 			return Base->getCurrentMinimizationObjValue();
 		}
 
+		/// <summary>
 		/// Get best objective function value as minimization
+		/// </summary>
+		/// <returns>Best objective function value as minimization</returns>
 		inline double getMinimizationObjValue()
 		{
 			return Base->getMinimizationObjValue();
 		}
 
+		/// <summary>
 		/// Set best objective function value as minimization
+		/// </summary>
+		/// <param name="value">best objective function value as minimization</param>
 		inline void setMinimizationObjValue(double value)
 		{
 			Base->setMinimizationObjValue(value);
 		}
 
+		/// <summary>
 		/// Get best objective function value
+		/// </summary>
+		/// <returns>Best objective function value</returns>
 		inline double getObjValue()
 		{
 			return Base->getObjValue();
 		}
-		/** Get best possible objective function value.
-			  This is better of best possible left on tree
-			  and best solution found.
-			  If called from within branch and cut may be optimistic.
-		  */
+
+		/// <summary>
+		/// Get best possible objective function value.
+		/// This is better of best possible left on tree and best solution found.
+		/// If called from within branch and cut may be optimistic.
+		/// </summary>
+		/// <returns>Best possible objective function value.</returns>
 		double getBestPossibleObjValue()
 		{
 			return Base->getBestPossibleObjValue();
 		}
 		
+		/// <summary>
 		/// Set best objective function value
+		/// </summary>
+		/// <param name="value">best objective function value</param>
 		inline void setObjValue(double value)
 		{
 			Base->setObjValue(value);
 		}
 
-		/// Get solver objective function value (as minimization)
+		/// <summary>
+		/// Get solver objective function value (changed sign to be as minimization)
+		/// </summary>
+		/// <returns></returns>
 		inline double getSolverObjValue()
 		{
 			return Base->getSolverObjValue();
 		}
-
-		/** The best solution to the integer programming problem.
-
-			The best solution to the integer programming problem found during
-			the search. If no solution is found, the method returns null.
-		  */
+		
+		/// <summary>
+		/// The best solution to the integer programming problem.
+		///
+		///	The best solution to the integer programming problem found during
+		///	the search. If no solution is found, the method returns null.
+		/// Returns the internal array of best solution (no copy)
+		/// </summary>
+		/// <returns>internal array of best solution</returns>
 		inline double* bestSolution()
 		{
 			return Base->bestSolution();
 		}
 
+		/// <summary>
 		/// Final status of problem - 0 finished, 1 stopped, 2 difficulties
+		/// </summary>
+		/// <returns>0 finished, 1 stopped, 2 difficulties</returns>
 		int status()
 		{ 
 			return Base->status();
 		}
 
+		/// <summary>
 		/// Get the number of cut generators
+		/// </summary>
+		/// <returns>the number of cut generators</returns>
 		int numberCutGenerators() 
 		{
 			return Base->numberCutGenerators();
 		}
     
+		/// <summary>
 		/// Get the list of cut generators
+		/// </summary>
+		/// <returns>Enumerable of cut generators</returns>
 		System::Collections::Generic::IEnumerable<CbcCutGenerator ^> ^ cutGenerators() 
 		{
 			int n = Base->numberCutGenerators();

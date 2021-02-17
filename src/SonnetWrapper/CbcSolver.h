@@ -17,28 +17,45 @@ using namespace msclr::interop;
 
 namespace COIN
 {
-	public ref class CbcSolver //: WrapperBase<::CbcModel>
+	/// <summary>
+	/// Delegate for handling CbcEvents.
+	///	Meaning of whereFrom :
+	/// 1 after initial solve by dualsimplex etc
+	/// 2 after preprocessing
+	/// 3 just before branchAndBound(so user can override)
+	/// 4 just after branchAndBound(before postprocessing)
+	/// 5 after postprocessing
+	/// 6 after a user called heuristic phase
+	/// </summary>
+	public delegate int CbcSolverCallBack(COIN::CbcModel^ model, int whereFrom);
+
+	// Native call back used for CbcMain1
+	// If you're looking for events like solution found etc.
+	// then more useful is CbcEventHandler. See Cbc/examples/inc.cpp and interupt.cpp
+	static int NativeCallBackProxy(::CbcModel* model, int whereFrom);
+
+	public ref class CbcSolver //: WrapperBase<::CbcSolver>
 	{
 	public:
-		int static callCbc(System::String ^ input2)
+		static int callCbc(System::String ^ input2)
 		{
 			std::string input2s = marshal_as<std::string>(input2);
 			return ::callCbc(input2s);
 		}
 
-		int static callCbc(System::String ^ input2, OsiClpSolverInterface ^ solver1)
+		static int callCbc(System::String ^ input2, OsiClpSolverInterface ^ solver1)
 		{
 			std::string input2s = marshal_as<std::string>(input2);
 			return ::callCbc(input2s, *(solver1->Base));
 		}
 
-		int static callCbc(System::String ^ input2, CbcModel ^ babSolver)
+		static int callCbc(System::String ^ input2, CbcModel ^ babSolver)
 		{
 			std::string input2s = marshal_as<std::string>(input2);
 			return ::callCbc(input2s, *(babSolver->Base));
 		}
 
-		int static CbcMain(array<System::String ^> ^args, CbcModel ^ cbcModel)
+		static int CbcMain(array<System::String ^> ^args, CbcModel ^ cbcModel)
 		{
 			marshal_context^ context = gcnew marshal_context();
 			int argc = 0;
@@ -48,7 +65,7 @@ namespace COIN
 			for(int i = 0; i < argc; i++)
 			{
 				argv[i] = context->marshal_as<const char *>(args[i]);
-//					(char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
+//				(char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
 			}
 
 			int result = ::CbcMain(argc, argv, *(cbcModel->Base));
@@ -57,13 +74,14 @@ namespace COIN
 
 			return result;
 		}
-		void static CbcMain0(CbcModel ^ cbcModel)
+
+		static void CbcMain0(CbcModel ^ cbcModel)
 		{
 			CbcSolverUsefulData cbcData;
 			::CbcMain0(*(cbcModel->Base), cbcData);
 		}
 
-		int static CbcMain1(array<System::String ^> ^args, CbcModel ^ cbcModel)
+		static int CbcMain1(array<System::String ^> ^args, CbcModel ^ cbcModel)
 		{
 			marshal_context^ context = gcnew marshal_context();
 			int argc = 0;
@@ -76,11 +94,27 @@ namespace COIN
 				//argv[i] = (char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
 			}
 			CbcSolverUsefulData cbcData;
-			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), cbcData);
+
+			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), NativeCallBackProxy, cbcData);
 			delete context;
 			delete []argv;
 
 			return result;
 		}
+
+		/// <summary>
+		/// The CallBack to delegate to be invoked.
+		/// If you add multiple delegates, all will be invoked, 
+		/// but the return value will come from the last one.
+		///
+		///	Meaning of whereFrom :
+		/// 1 after initial solve by dualsimplex etc
+		/// 2 after preprocessing
+		/// 3 just before branchAndBound(so user can override)
+		/// 4 just after branchAndBound(before postprocessing)
+		/// 5 after postprocessing
+		/// 6 after a user called heuristic phase
+		/// </summary>
+		static CbcSolverCallBack^ CallBack;
 	};
 }

@@ -120,8 +120,31 @@ namespace Sonnet
     /// </summary>
     public static class Utils
     {
-        private static readonly Dictionary<COIN.OsiCbcSolverInterface, string[]> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, string[]>();
-        
+        //private static readonly Dictionary<COIN.OsiCbcSolverInterface, >
+        private static readonly Dictionary<COIN.OsiCbcSolverInterface, List<string>> cbcSolverArgs = new Dictionary<COIN.OsiCbcSolverInterface, List<string>>();
+
+        /// <summary>
+        /// Adds one or more args to the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
+        /// The final list of arguments passed to CbcMain is   [SolverArgs] -solve -quit
+        /// See also Sonnet.Solve(..)        /// 
+        /// </summary>
+        /// <param name="solver">The OsiCbcSolverInterface instance.</param>
+        /// <param name="args">The list of arguments added for CbcMain1(..)</param>
+        public static void AddCbcSolverArgs(this COIN.OsiCbcSolverInterface solver, params string[] args)
+        {
+            Ensure.NotNull(args);
+
+            // Already have some args for this solver?
+            List<string> result;
+            if (!cbcSolverArgs.TryGetValue(solver, out result))
+            {
+                result = new List<string>();
+                cbcSolverArgs[solver] = result;
+            }
+
+            result.AddRange(args);
+        }
+
         /// <summary>
         /// Returns the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
         /// Returns an empty array if no arguments were found.
@@ -131,10 +154,9 @@ namespace Sonnet
         /// <returns>The arguments for CbcMain1(..).</returns>
         public static string[] GetCbcSolverArgs(this COIN.OsiCbcSolverInterface solver)
         {
-            if (cbcSolverArgs.TryGetValue(solver, out string[] result)) return result;
+            if (cbcSolverArgs.TryGetValue(solver, out var result)) return result.ToArray();
             else return new string[0];
         }
-
         /// <summary>
         /// Sets the array of arguments to be used when solving using an instance of OsiCbcSolverInterface.
         /// See also Sonnet.Solve(..)
@@ -143,7 +165,7 @@ namespace Sonnet
         /// <param name="args">The arguments for CbcMain1(..).</param>
         public static void SetCbcSolverArgs(this COIN.OsiCbcSolverInterface solver, params string []args)
         {
-            cbcSolverArgs[solver] = args;
+            cbcSolverArgs[solver] = args.ToList();
         }
 
     }

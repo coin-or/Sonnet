@@ -5,6 +5,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TargetFramework>net5.0</TargetFramework>
     <Platforms>x64;x86</Platforms>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,10 @@
     <Compile Include="..\..\..\examples\Example6.cs" Link="Example6.cs" />
     <Compile Include="..\..\..\examples\Example6b.cs" Link="Example6b.cs" />
     <Compile Include="..\..\..\examples\Program.cs" Link="Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml" Link="SonarLint.xml" />
   </ItemGroup>
 
   <ItemGroup>
