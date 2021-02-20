@@ -68,6 +68,8 @@ namespace COIN
 		/// Set an event handler
 		/// Note: In SonnetWrapper the eventHandler is merely a method delegate, not an instance of a class derived from the native CbcEventHandler class
 		/// This is a shortcut with limited functionality, but easier to use.
+		/// Multiple delegates can be assigned to the eventHandler. All will be invoked, 
+		/// but onluy the return value (CbcAction) of the last will be used.
 		/// </summary>
 		/// <param name="eventHandler">A clone of the handler passed as a parameter is stored in CbcModel.</param>
 		void passInEventHandler(CbcEventHandler^ eventHandler)

@@ -18,9 +18,9 @@ namespace SonnetTest
         public void SonnetTest1(Type solverType)
         {
             Console.WriteLine("SonnetTest1");
-                       
+
             Ensure.Is<COIN.OsiSolverInterface>(solverType, nameof(solverType));
-        
+
             Model model = new Model();
             Solver solver = new Solver(model, solverType);
 
@@ -2688,9 +2688,11 @@ namespace SonnetTest
             solver.Solve();
 
             Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
-            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
+            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet (unless solver got a lot better)");
 
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 12310.694360600004), "Best solution until now is different than expected");
+            // Allow also better solutions, but not worse. The problem is minimization.
+            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
+            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 12310.70, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 12310.70");
         }
 
         private static int SonnetTest42numSolutions = 0;
@@ -2702,24 +2704,24 @@ namespace SonnetTest
                 SonnetTest42numSolutions++;
                 if (SonnetTest42numSolutions == 1)
                 {
-                    Assert.IsTrue(Utils.EqualsDouble(model.getBestPossibleObjValue(), 10482.79528033122), "Dual bound is different than expected");
-                    Assert.IsTrue(Utils.EqualsDouble(model.getObjValue(), 14372.871258200006), "Best solution until now is different than expected");
+                    Assert.IsTrue(model.getBestPossibleObjValue() >= 10482.79 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10482.79 and 11801.18 (opt)");
+                    Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14372.88, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14372.88");
                     // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
+                    // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
                     return CbcAction.noAction;
                 }
                 else if (SonnetTest42numSolutions == 2)
                 {
-                    Assert.IsTrue(Utils.EqualsDouble(model.getBestPossibleObjValue(), 10593.326017175183), "Dual bound is different than expected");
-                    Assert.IsTrue(Utils.EqualsDouble(model.getObjValue(), 14168.332791700004), "Best solution until now is different than expected");
+                    Assert.IsTrue(model.getBestPossibleObjValue() >= 10593.32 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10593.32 and 11801.18 (opt)");
+                    Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14168.34, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14168.34");
                     // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
+                    // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
                     return CbcAction.stop;
                 }
             }
 
             return CbcAction.noAction;
         }
-
-        //private static int SonnetTest42NumCalls = 0;
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
         [TestMethod, TestCategory("Cbc")]
@@ -2736,26 +2738,31 @@ namespace SonnetTest
 
             Model model = Model.New("mas74.mps");
             Assert.IsTrue(model != null);
-            
+
             Solver solver = new Solver(model, solverType);
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
             var args = osiCbc.GetCbcSolverArgs().ToList();
             args.Add("-secni");
             args.Add("5");
             osiCbc.SetCbcSolverArgs(args.ToArray());
-            osiCbc.Model.passInEventHandler(SonnetTest42EventHandler); // will stop after 2nd solution
+
+            CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) { return CbcAction.noAction; };
+            handler += new CbcEventHandler(SonnetTest42EventHandler); // will stop after 2nd solution
+            osiCbc.Model.passInEventHandler(handler); //
 
             int SonnetTest42NumCalls = 0;
-            CbcSolver.CallBack = delegate (CbcModel m, int whereFrom) { SonnetTest42NumCalls++;  return 0; };
+            CbcSolver.CallBack = delegate (CbcModel m, int whereFrom) { SonnetTest42NumCalls++; return 0; };
             solver.Solve();
             // DONT use the cbcModel after solver.Solve() because of ResetAfterMIPSolveInternal at the end of Solve()
 
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
-            Assert.IsTrue(SonnetTest42numSolutions == 2);
+            Assert.IsTrue(SonnetTest42numSolutions == 2, "should have found two solutions by now");
             Assert.IsTrue(SonnetTest42NumCalls == 5);
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 14168.332791700004), "Best solution until now is different than expected");
+
+            // Allow also better solutions, but not worse. The problem is minimization.
+            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
+            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 14168.34, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 14168.34");
         }
     }
-
 }
