@@ -90,11 +90,15 @@ namespace Sonnet
             get { return SonnetLog.Default.LogLevel; }
             set { SonnetLog.Default.LogLevel = value; }
         }
-        
+
         /// <summary>
         /// When true, automatically reset the solver after a MIP has been solved (= Default)
         /// When false, you have to manually Save before and Reset after a MIP solve.
         /// Note, this only affects MIP.
+        /// 
+        /// Background: After solving a MIP, the bounds etc. are not at original values. To resolve etc. a reset is required.
+        /// This reset does a reset of bounds, but also the solution! 
+        /// Therefore AssignSolution is automatically called, but should not be called manually after a reset since that would result in zeros.
         /// </summary>
         public bool AutoResetMIPSolve
         {
@@ -341,7 +345,6 @@ namespace Sonnet
 
                     if (solver is OsiCbcSolverInterface cbcSolver)
                     {
-                        #warning "SONNET: Clean this code. Experimental only."
                         if (!objective.IsQuadratic && cbcSolver.UseBranchAndBound())
                         {
                             cbcSolver.getModelPtr().branchAndBound();
@@ -359,7 +362,7 @@ namespace Sonnet
                                 //args.Add("out.txt");
                             }
                             else
-                            { 
+                            {
                                 args.AddRange(cbcMainArgs);
                                 args.Add("-solve");
                             }
@@ -377,7 +380,11 @@ namespace Sonnet
 
 
                     AssignSolution(true);
-                    if (AutoResetMIPSolve) ResetAfterMIPSolveInternal(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
+                    if (AutoResetMIPSolve)
+                    {
+                        SonnetLog.Default.Info("Resetting automatically after MIPSolve. Use solver.AutoResetMIPSolver = false if you don't want this.");
+                        ResetAfterMIPSolveInternal(); // mainly to reset bounds etc, but use AssignSolutionStatus because the Reset messes up the IsProvenOptimal etc!
+                    }
                 }
                 else
                 {
@@ -500,7 +507,11 @@ namespace Sonnet
         /// <summary>
         /// Reset the bounds etc after a MIP solve (branch and bound).
         /// This is done automatically according to the AutoResetMIPSolve property.
-        /// Note that this also reselt the results of solver.get.. functions.
+        /// Note that this also resets the results of solver.get.. functions.
+        ///
+        /// Background: After solving a MIP, the bounds etc. are not at original values. To resolve etc. a reset is required.
+        /// This reset does a reset of bounds, but also the solution! 
+        /// Therefore AssignSolution is automatically called, but should not be called manually after a reset since that would result in zeros.
         /// </summary>
         public void ResetAfterMIPSolve()
         {
@@ -515,7 +526,7 @@ namespace Sonnet
         
         private void ResetAfterMIPSolveInternal()
         {
-            //TODO: this needs some work: ResetAfterMIPSolve also clears the solution, so afterwards any AssignSolution yields all zero values!
+            // ResetAfterMIPSolve also clears the solution, so afterwards any AssignSolution yields all zero values!
             // so, either we always AssignSolution, and discourage the user from calling it (in MIP),
             // or we (force) manual ResetAfterMIPSolve from the user in MIP.
             // Decision: *automatic* assign solution and but dont make this private: we need AssignSolution
