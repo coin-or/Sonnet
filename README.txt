@@ -13,7 +13,7 @@ The SONNET libraries allow for code like this:
   Solver solver = new Solver(model, typeof(COIN.OsiClpSolverInterface));
   solver.Maximise();
 
-You can find the latest binaries from CI builds on AppVeyor on
+You can find the latest binaries and sources from CI builds on AppVeyor on
   https://ci.appveyor.com/project/coin-or/sonnet/build/artifacts
 You can find SONNET on 
   https://github.com/coin-or/SONNET
