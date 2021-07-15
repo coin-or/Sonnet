@@ -18,21 +18,24 @@ Code is provided to perform various tests on the Sonnet library.
 
 Getting the source code
 ---------------------
-The latest SONNET sources can be downloaded from the Subversion repository from this link:
-https://github.com/coin-or/SONNET
+Option 1: Get the full src.zip artifact from AppVeyor (if available)
+The easiest way to get started with SONNET source code is to use the ..-src.zip artefact (if available) from the latest AppVeyor build
+https://ci.appveyor.com/project/coin-or/sonnet/build/artifacts
+This zip contains the SONNET sources as well as all COIN-OR dependencies from their master branch. 
+Simply unzip, open the SONNET solution in sonnet\MSVisualStudio\v16\Sonnet.sln, and Build. 
 
+Option 2: Get sources from github.com
+The latest SONNET sources can be downloaded from the github repository
+https://github.com/coin-or/SONNET
 If you use "Download ZIP", the downloaded zip file contains the Sonnet source code and MS Visual Studio 2019 solution. 
 It also includes several examples.
-
-Before you can build SONNET, the sources of the used COIN-OR libraries are also required. Since the Cbc project has the same dependencies, the easiest way is to download a Cbc source archive from
+For this option, before you can build SONNET, the sources of the COIN-OR libraries are also required. Since the Cbc project has the same dependencies, the easiest way is to download a Cbc source archive from
 http://www.coin-or.org/download/source/Cbc/
-
 It is recommended to build SONNET against a released version of Cbc--not against master branch. SONNET has been tested to work with Cbc 2.10.3 sources.
 From the archive, copy the folders BuildTools, Cbc, Cgl, Clp, CoinUtils and Osi
 such that the Sonnet root directory is at the same level as Cbc, Clp, etc.
-
 If you want to build SONNET against master branch or the relevant COIN-OR projects, then download the relevant sources from github, either from the web portal, using coinbrew, or from Visual Studio.
-Ensure that the Sonnet root directory is at the same level as Cbc, Clp, etc.
+Ensure that the Sonnet directory is at the same level as Cbc, Clp, etc.
 
 Building SONNET
 ---------------------
@@ -46,7 +49,6 @@ About x64 or Win32/x86
 Specific builds are required for x86 or x64, in particular for SonnetWrapper.dll.
 Since the C++/CLI of SonnetWraper.dll has no "AnyCPU" equivalent, it is NOT possible to use 
 the x86 and/or x64 Sonnet.dll and SonnetWrapper.dll in an "AnyCPU" project. The project has to target x86 or x64. 
-
 
 Strongly naming / Signing assemblies
 ---------------------
