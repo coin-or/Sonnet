@@ -109,6 +109,8 @@ before_build:
   - echo -- Before_build
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
+  - echo Creating %RELEASE_NAME%-src.zip artefact from projects folder
+  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-src.zip" c:\projects\*
   - nuget restore MSVisualStudio\v16\Sonnet.sln
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=- )
 
@@ -149,15 +151,16 @@ after_test:
   - copy LICENSE.txt package\.
   - copy README.txt package\.
   - copy examples\Example5.cs package\.
-  - cd package
-  - 7z a -tzip -r c:\projects\sonnet\%RELEASE_NAME%-bin.zip *
-  - cd ..
+  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" package\*
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%" )
 
 artifacts:
   - path: $(RELEASE_NAME)-bin.zip
     name: Sonnet
-
+    
+  - path: $(RELEASE_NAME)-src.zip
+    name: Sonnet Sources
+    
 #deploy:
 #  - provider: GitHub
 #    tag: $(RELEASE_NAME)
