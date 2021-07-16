@@ -75,33 +75,6 @@ namespace COIN
 			return result;
 		}
 
-		static void CbcMain0(CbcModel ^ cbcModel)
-		{
-			CbcSolverUsefulData cbcData;
-			::CbcMain0(*(cbcModel->Base), cbcData);
-		}
-
-		static int CbcMain1(array<System::String ^> ^args, CbcModel ^ cbcModel)
-		{
-			marshal_context^ context = gcnew marshal_context();
-			int argc = 0;
-			if (args != nullptr) argc = args->Length;
-			
-			const char **argv = new const char *[argc];
-			for(int i = 0; i < argc; i++)
-			{
-				argv[i] = context->marshal_as<const char *>(args[i]);
-				//argv[i] = (char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
-			}
-			CbcSolverUsefulData cbcData;
-
-			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), NativeCallBackProxy, cbcData);
-			delete context;
-			delete []argv;
-
-			return result;
-		}
-
 		/// <summary>
 		/// The CallBack to delegate to be invoked.
 		/// If you add multiple delegates, all will be invoked, 

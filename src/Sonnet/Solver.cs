@@ -368,9 +368,9 @@ namespace Sonnet
                             }
                             args.Add("-quit");
 
-                            Sonnet.SonnetLog.Default.InfoFormat("Using CbcSolver.CbcMain0/1 with args {0}", string.Join(" ", args));
-                            CbcSolver.CbcMain0(cbcSolver.getModelPtr());
-                            CbcSolver.CbcMain1(args.ToArray(), cbcSolver.getModelPtr());
+                            Sonnet.SonnetLog.Default.InfoFormat("Using CbcSolver.CbcMain with args {0}", string.Join(" ", args));
+                            CbcSolver.CbcMain(args.ToArray(), cbcSolver.getModelPtr());
+                            // Use CbcMain and not CbcMain0/1 because it passes parameters between CbcMain0 and 1
                         }
                     }
                     else
