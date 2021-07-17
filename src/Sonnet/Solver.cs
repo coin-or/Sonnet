@@ -369,6 +369,9 @@ namespace Sonnet
                             args.Add("-quit");
 
                             Sonnet.SonnetLog.Default.InfoFormat("Using CbcSolver.CbcMain with args {0}", string.Join(" ", args));
+                            // The default strategy for regular CbcModel is null, but for OsiCbcSolverInterface is the default strategy
+                            // This causes a difference between cbc and here, so if we're asked to solve using the cbcmain, then set strategy to null
+                            if (cbcSolver.getModelPtr().strategy() is COIN.CbcStrategyDefault) cbcSolver.getModelPtr().setStrategy(null);
                             CbcSolver.CbcMain(args.ToArray(), cbcSolver.getModelPtr());
                             // Use CbcMain and not CbcMain0/1 because it passes parameters between CbcMain0 and 1
                         }
