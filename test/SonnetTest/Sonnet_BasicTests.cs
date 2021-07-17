@@ -2764,5 +2764,51 @@ namespace SonnetTest
             // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
             Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 14168.34, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 14168.34");
         }
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetTest43(Type solverType)
+        {
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest43 - Test CbcModel setObjValue");
+
+            // This test check the improvement of solving when a good solution obj value is given in advance.
+            // This should help most if the relaxation bound is tight.
+
+            SonnetLog.Default.LogLevel = 4;
+            SonnetLog.Default.Debug("Log Debug");
+            SonnetLog.Default.Info("Log Info");
+            SonnetLog.Default.Warn("Log Warn");
+            SonnetLog.Default.Error("Log Error");
+
+            Model model = Model.New("mip-124725.mps");
+            Assert.IsTrue(model != null);
+
+            Solver solver = new Solver(model, solverType);
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            osiCbc.AddCbcSolverArgs("-preproc", "off");
+            osiCbc.AddCbcSolverArgs("-strong", "0");
+            osiCbc.AddCbcSolverArgs("-heurist", "off");
+            osiCbc.AddCbcSolverArgs("-cuts", "off");
+            
+            solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
+
+            osiCbc.Model.setObjValue(225035.0);
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes1 = osiCbc.getNodeCount();
+
+            solver.UnGenerate();
+            
+            osiCbc.Model.setObjValue(125035.0);
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+
+            int nodes2 = osiCbc.getNodeCount();
+
+            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+        }
     }
 }

@@ -91,6 +91,12 @@ namespace COIN
 		void resetModelToReferenceSolver();
 		void saveModelReferenceSolver();
 
+		/// Get how many Nodes it took to solve the problem.
+		inline int getNodeCount()
+		{
+			return Derived->getNodeCount();
+		}
+
 	protected:
 		property ::OsiCbcSolverInterface * Derived 
 		{
