@@ -96,6 +96,15 @@ namespace Sonnet
         {
             return new Objective(1.0 * x);
         }
+
+        /// <summary>
+        /// Returns a copy of the expression of this objective.
+        /// </summary>
+        /// <returns>A new expression</returns>
+        public Expression CopyExpression()
+        {
+            return new Expression(this.expression);
+        }
         /// <summary>
         /// Removes all elements from the Objective.
         /// </summary>

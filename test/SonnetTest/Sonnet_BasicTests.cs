@@ -2793,7 +2793,6 @@ namespace SonnetTest
             
             solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
 
-            osiCbc.Model.setObjValue(225035.0);
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
@@ -2805,10 +2804,17 @@ namespace SonnetTest
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-
             int nodes2 = osiCbc.getNodeCount();
-
             Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+
+            solver.UnGenerate();
+
+            osiCbc.Model.setCutoff(125035.0);
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes3 = osiCbc.getNodeCount();
+            Assert.IsTrue(nodes1 > nodes3, "Providing a cutoff value must result in improved performance, but number of nodes went from {nodes1} to {nodes3}.");
         }
     }
 }

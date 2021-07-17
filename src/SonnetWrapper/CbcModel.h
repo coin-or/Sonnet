@@ -311,6 +311,26 @@ namespace COIN
 		}
 
 		/// <summary>
+		/// Set cutoff bound on the objective function.
+		/// When using strict comparison, the bound is adjusted by a tolerance to
+		/// avoid accidentally cutting off the optimal solution.
+		/// </summary>
+		/// <param name="value"></param>
+		inline void setCutoff(double value)
+		{
+			Base->setCutoff(value);
+		}
+
+		/// <summary>
+		/// Get the cutoff bound on the objective function - always as minimize
+		/// </summary>
+		/// <returns></returns>
+		inline double getCutoff()
+		{ 
+			return Base->getCutoff();
+		}
+
+		/// <summary>
 		/// Final status of problem - 0 finished, 1 stopped, 2 difficulties
 		/// </summary>
 		/// <returns>0 finished, 1 stopped, 2 difficulties</returns>
