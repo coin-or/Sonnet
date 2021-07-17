@@ -55,22 +55,29 @@ namespace COIN
 			return ::callCbc(input2s, *(babSolver->Base));
 		}
 
+		/// <summary>
+		/// Call underlying CbcMain0 and CbcMain1, including native callback (not dummy).
+		/// </summary>
+		/// <param name="args">The arguments for the solve</param>
+		/// <param name="cbcModel">The CbcModel instance</param>
+		/// <returns>The return code</returns>
 		static int CbcMain(array<System::String ^> ^args, CbcModel ^ cbcModel)
 		{
 			marshal_context^ context = gcnew marshal_context();
 			int argc = 0;
 			if (args != nullptr) argc = args->Length;
-			
-			const char **argv = new const char *[argc];
-			for(int i = 0; i < argc; i++)
-			{
-				argv[i] = context->marshal_as<const char *>(args[i]);
-//				(char*)Marshal::StringToHGlobalAnsi(args[i]).ToPointer();
-			}
 
-			int result = ::CbcMain(argc, argv, *(cbcModel->Base));
+			const char** argv = new const char* [argc];
+			for (int i = 0; i < argc; i++)
+			{
+				argv[i] = context->marshal_as<const char*>(args[i]);
+			}
+			CbcSolverUsefulData cbcData;
+			cbcData.noPrinting_ = false;
+			::CbcMain0(*(cbcModel->Base), cbcData);
+			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), NativeCallBackProxy, cbcData);
 			delete context;
-			delete []argv;
+			delete[]argv;
 
 			return result;
 		}

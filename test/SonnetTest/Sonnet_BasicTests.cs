@@ -2692,30 +2692,30 @@ namespace SonnetTest
 
             // Allow also better solutions, but not worse. The problem is minimization.
             // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
-            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 12310.70, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 12310.70");
+            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 12465, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 12465");
         }
 
         private static int SonnetTest42numSolutions = 0;
         public static CbcAction SonnetTest42EventHandler(CbcModel model, CbcEvent cbcevent)
         {
             // This is an example EventHandler for CbcModel, invoked at events such as a solution was found, etc.
+            // This depends on the heuristics applied during the solving, so the solutions found can be different.
             if (cbcevent == CbcEvent.solution)
             {
                 SonnetTest42numSolutions++;
+
+                Assert.IsTrue(model.getBestPossibleObjValue() >= 10482.79 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10482.79 and 11801.18 (opt)");
+                Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14372.88, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14372.88");
+                // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
+                // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
+                // If this assert fails, then the best solution found so far (by heuristics or on the tree) is worse than expected.
                 if (SonnetTest42numSolutions == 1)
                 {
-                    Assert.IsTrue(model.getBestPossibleObjValue() >= 10482.79 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10482.79 and 11801.18 (opt)");
-                    Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14372.88, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14372.88");
-                    // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
-                    // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
                     return CbcAction.noAction;
                 }
-                else if (SonnetTest42numSolutions == 2)
+                else if (SonnetTest42numSolutions == 5)
                 {
-                    Assert.IsTrue(model.getBestPossibleObjValue() >= 10593.32 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10593.32 and 11801.18 (opt)");
-                    Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14168.34, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14168.34");
-                    // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
-                    // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
+                    // Note: the action to Stop is not always respected by Cbc, for example, during heuristics.
                     return CbcAction.stop;
                 }
             }
@@ -2757,7 +2757,7 @@ namespace SonnetTest
 
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
-            Assert.IsTrue(SonnetTest42numSolutions == 2, "should have found two solutions by now");
+            Assert.IsTrue(SonnetTest42numSolutions >= 2, "should have found at least two solutions by now");
             Assert.IsTrue(SonnetTest42NumCalls == 5);
 
             // Allow also better solutions, but not worse. The problem is minimization.
