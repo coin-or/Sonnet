@@ -26,3 +26,5 @@ app.aps
 /MSVisualStudio/v16/Sonnet/Properties/launchSettings.json
 /MSVisualStudio/v16/SonnetExamples/Properties/launchSettings.json
 /MSVisualStudio/v16/SonnetTest/Properties/launchSettings.json
+
+.idea
