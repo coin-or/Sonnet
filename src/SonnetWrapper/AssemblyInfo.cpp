@@ -12,7 +12,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyDescriptionAttribute(VER_FILECOMMENTS)] ;
 [assembly:AssemblyConfigurationAttribute(L"")] ;
 [assembly:AssemblyCompanyAttribute(L"")] ;
-[assembly:AssemblyProductAttribute(L"SONNET")] ;
+[assembly:AssemblyProductAttribute(L"Sonnet")] ;
 [assembly:AssemblyCopyrightAttribute(VER_COPYRIGHT)] ;
 [assembly:AssemblyTrademarkAttribute(VER_TRADEMARK)] ;
 [assembly:AssemblyCultureAttribute(L"")] ;

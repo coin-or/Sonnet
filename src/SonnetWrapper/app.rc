@@ -26,7 +26,7 @@ BEGIN
 			VALUE "LegalCopyright", VER_COPYRIGHT
             VALUE "LegalTrademarks", VER_TRADEMARK
             VALUE "OriginalFilename", VER_FILENAME
-            VALUE "ProductName", "SONNET"
+            VALUE "ProductName", "Sonnet"
             VALUE "ProductVersion", VER_PRODUCTVERSION_STR
         END
     END

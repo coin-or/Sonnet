@@ -15,6 +15,21 @@ namespace SonnetTest
     {
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
         [TestMethod]
+        public void SonnetTest0(Type solverType)
+        {
+            Console.WriteLine("SonnetTest0 - Testing the README.md example");
+
+            Model model = new Model();
+            Variable x = new Variable();
+            Variable y = new Variable();
+            model.Add(2 * x + 3 * y <= 10);
+            model.Objective = 3 * x + y;
+            Solver solver = new Solver(model, typeof(OsiClpSolverInterface));
+            solver.Maximise();
+        }
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod]
         public void SonnetTest1(Type solverType)
         {
             Console.WriteLine("SonnetTest1");
@@ -2727,10 +2742,10 @@ namespace SonnetTest
         [TestMethod, TestCategory("Cbc")]
         public void SonnetTest42(Type solverType)
         {
-	    // TODO fix this test that fails on final Assert for value.
-	    Console.WriteLine("SonnetTest42 - SKIPPING Test CbcModel Event Handler");
-	    return;
-	
+            // TODO fix this test that fails on final Assert for value.
+            Console.WriteLine("SonnetTest42 - SKIPPING Test CbcModel Event Handler");
+            return;
+
             if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
             Console.WriteLine("SonnetTest42 - Test CbcModel Event Handler");
 
@@ -2794,7 +2809,7 @@ namespace SonnetTest
             osiCbc.AddCbcSolverArgs("-strong", "0");
             osiCbc.AddCbcSolverArgs("-heurist", "off");
             osiCbc.AddCbcSolverArgs("-cuts", "off");
-            
+
             solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
 
             solver.Solve();
@@ -2803,7 +2818,7 @@ namespace SonnetTest
             int nodes1 = osiCbc.getNodeCount();
 
             solver.UnGenerate();
-            
+
             osiCbc.Model.setObjValue(125035.0);
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());

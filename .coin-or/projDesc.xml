@@ -4,14 +4,14 @@
 	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	     xsi:schemaLocation="coin-or.org http://www.coin-or.org/projects/autoGen.xsd">
   <projectBasics>
-    <projectName>SONNET</projectName>
-    <projectRepo>SONNET</projectRepo>
+    <projectName>Sonnet</projectName>
+    <projectRepo>Sonnet</projectRepo>
     <projectDescription>A wrapper for COIN-OR mixed integer linear programming via OSI to Microsoft .NET
     </projectDescription>
     <projectShortDescription>Microsoft .NET wrapper for COIN-OR Open Solver Interface
     </projectShortDescription>
     <projectManager>Jan-Willem Goossens</projectManager>
-    <projectHomePage>https://github.com/coin-or/SONNET</projectHomePage>
+    <projectHomePage>https://github.com/coin-or/Sonnet</projectHomePage>
     <projectLicense>Eclipse Public License - v 2.0</projectLicense>
     <projectLicenseURL>https://opensource.org/licenses/EPL-2.0</projectLicenseURL>
     <coinLinkedProjects>
@@ -42,9 +42,9 @@
     </projectCategories>
   </projectBasics>
   <leftMenuLinks>
-    <documentation>https://github.com/coin-or/SONNET</documentation>
-    <sourceCodeDownload>https://github.com/coin-or/SONNET</sourceCodeDownload>
-    <binaryDownload>https://github.com/coin-or/SONNET/tree/master/bin</binaryDownload>
+    <documentation>https://github.com/coin-or/Sonnet</documentation>
+    <sourceCodeDownload>https://github.com/coin-or/Sonnet</sourceCodeDownload>
+    <binaryDownload>https://github.com/coin-or/Sonnet/tree/master/bin</binaryDownload>
     <mailingList>http://list.coin-or.org/mailman/listinfo/sonnet</mailingList>
   </leftMenuLinks>
 </projectData>

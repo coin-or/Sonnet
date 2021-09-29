@@ -130,7 +130,7 @@ namespace SonnetTest
             get
             {
 #if NETCOREAPP
-                #warning "SONNET: TODO Implement AvailableMemoryGb for .NET Core."
+                #warning "Sonnet: TODO Implement AvailableMemoryGb for .NET Core."
                 return 1.0;
 #else
                 var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
