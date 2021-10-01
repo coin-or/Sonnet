@@ -97,14 +97,29 @@ namespace Sonnet
             return new Objective(1.0 * x);
         }
 
+
+        /// <summary>
+        /// Returns a copy of the expression of the given obj.
+        /// Usage:
+        /// Expression ex = 10.0 + (Expression)obj;
+        /// </summary>
+        /// <param name="obj">The objective to be used</param>
+        public static explicit operator Expression(Objective obj)
+        {
+            return obj.Expression();
+        }
+
         /// <summary>
         /// Returns a copy of the expression of this objective.
+        /// We must not allow external access to the internal expression to prevent changes.
+        /// Therefore, also no implicit conversion to internal expression.
         /// </summary>
         /// <returns>A new expression</returns>
-        public Expression CopyExpression()
+        public Expression Expression()
         {
             return new Expression(this.expression);
         }
+
         /// <summary>
         /// Removes all elements from the Objective.
         /// </summary>

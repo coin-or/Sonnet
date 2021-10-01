@@ -64,6 +64,20 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Initializes a new instance of the Solver class with the given name and model.
+        /// Use OsiCbcSolverInterface for underlying solver.
+        /// </summary>
+        /// <param name="model">The model used in this solver.</param>
+        /// <param name="name">The name for this solver.</param>
+        public Solver(Model model, string name = null)
+        {
+            Ensure.NotNull(model, nameof(model));
+
+            OsiSolverInterface solver = new OsiCbcSolverInterface();
+            GutsOfConstructor(model, solver, name);
+        }
+
+        /// <summary>
         /// DEPRECATED. Use Solver(model, typeof(OsixxxSolverInterface), "SomeName");
         /// Initializes a new instance of the Solver class with the given name and model,
         /// for using a to be constructed instance of the given type derived from OsiSolverInterface.
@@ -136,6 +150,38 @@ namespace Sonnet
             set { solver.setIntParam(OsiIntParam.OsiNameDiscipline, value); }
         }
 
+        /// <summary>
+        /// Sets the current model variable values as starting solution for the solver.
+        /// Default does not check whether the solution is actually feasible.
+        /// </summary>
+        public void SetMIPStart()
+        {
+            Ensure.Supported(IsMIP, "Only supported for MIP");
+
+            SetMIPStart(false);
+        }
+
+        /// <summary>
+        /// Sets the current model variable values as starting solution for the solver.
+        /// </summary>
+        /// <param name="check">If true, check whether the solution is actually feasible.</param>
+        public void SetMIPStart(bool check)
+        {
+            Ensure.Supported(IsMIP, "Only supported for MIP");
+
+            if (solver is OsiCbcSolverInterface osiCbc)
+            {
+                // DONT use setmipstart since it works based on variable names
+                double[] solution = this.GetSolution();
+                double objectiveValue = this.objective.Value;
+                osiCbc.Model.setBestSolution(solution, solution.Length, objectiveValue, check);
+                Ensure.IsTrue(!check || this.IsFeasible());
+
+                return;
+            }
+
+            Ensure.NotSupported($"Not supported for solver type {OsiSolverFullName}");
+        }
         /// <summary>
         /// Get the Infinity of the current solver
         /// </summary>
@@ -1231,6 +1277,7 @@ namespace Sonnet
 
         /// <summary>
         /// Ungenerate the model.
+        /// If you're looking to reset the solver, simply create a new instance of solver.
         /// </summary>
         public void UnGenerate()
         {
@@ -1455,6 +1502,15 @@ namespace Sonnet
 
         #endregion
 
+        /// <summary>
+        /// Get the current variable values as an array.
+        /// </summary>
+        /// <returns></returns>
+        private double[] GetSolution()
+        {
+            var solution = from v in variables select v.Value;
+            return solution.ToArray();
+        }
 
         /// <summary>
         /// Get the element index (offset) of the constraint in this model. An exception is thrown if no offset found.

@@ -2789,7 +2789,7 @@ namespace SonnetTest
         public void SonnetTest43(Type solverType)
         {
             if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest43 - Test CbcModel setObjValue");
+            Console.WriteLine("SonnetTest43 - Test CbcModel setObjValue and setCutoff for Minimization");
 
             // This test check the improvement of solving when a good solution obj value is given in advance.
             // This should help most if the relaxation bound is tight.
@@ -2805,19 +2805,24 @@ namespace SonnetTest
 
             Solver solver = new Solver(model, solverType);
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.AddCbcSolverArgs("-preproc", "off");
+            osiCbc.AddCbcSolverArgs("-preprocess", "off");
             osiCbc.AddCbcSolverArgs("-strong", "0");
             osiCbc.AddCbcSolverArgs("-heurist", "off");
             osiCbc.AddCbcSolverArgs("-cuts", "off");
 
-            solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
+            solver.Solve();
 
+            // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
+            // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve() so we wouldnt getNodeCount, etc. for the solve
+            solver.AutoResetMIPSolve = false;
+
+            solver.ResetAfterMIPSolve();
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
             int nodes1 = osiCbc.getNodeCount();
 
-            solver.UnGenerate();
+            solver.ResetAfterMIPSolve();
 
             osiCbc.Model.setObjValue(125035.0);
             solver.Solve();
@@ -2826,14 +2831,83 @@ namespace SonnetTest
             int nodes2 = osiCbc.getNodeCount();
             Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
 
-            solver.UnGenerate();
-
-            osiCbc.Model.setCutoff(125035.0);
+            solver.ResetAfterMIPSolve();
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes3 = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 > nodes3, "Providing a cutoff value must result in improved performance, but number of nodes went from {nodes1} to {nodes3}.");
+            int nodes1b = osiCbc.getNodeCount();
+            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
+
+            // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
+        }
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetTest44(Type solverType)
+        {
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest44 - Test CbcModel setObjValue for Maximization");
+            SonnetLog.Default.LogLevel = 4;
+            // This test check the improvement of solving when a good solution obj value is given in advance.
+            // This should help most if the relaxation bound is tight.
+
+            Model model = Model.New("mip-124725.mps");
+            Assert.IsTrue(model != null);
+            Assert.IsTrue(model.ObjectiveSense == ObjectiveSense.Minimise);
+
+            model.Objective = new Objective(-1.0 * (Expression)model.Objective);
+            model.ObjectiveSense = ObjectiveSense.Maximise;
+
+            Solver solver = new Solver(model, solverType);
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            osiCbc.AddCbcSolverArgs("-preprocess", "off");
+            osiCbc.AddCbcSolverArgs("-strong", "0");
+            osiCbc.AddCbcSolverArgs("-heurist", "off");
+            osiCbc.AddCbcSolverArgs("-cuts", "off");
+
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+
+            // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
+            solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
+            
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes1 = osiCbc.getNodeCount();
+            double objValue1 = model.Objective.Value;
+
+            solver.ResetAfterMIPSolve();
+
+            osiCbc.Model.setObjValue(-125035.0);
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes2 = osiCbc.getNodeCount();
+            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+
+            solver.ResetAfterMIPSolve();
+            
+            solver.Solve();
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes1b = osiCbc.getNodeCount();
+            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
+
+            // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
+
+        }
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetTest45(Type solverType)
+        {
+            Assert.IsFalse(false, "TODO: Write test cases for solver.SetMipStart");
         }
     }
 }
