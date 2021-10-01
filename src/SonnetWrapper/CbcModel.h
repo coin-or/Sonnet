@@ -269,6 +269,15 @@ namespace COIN
 		}
 
 		/// <summary>
+		/// Get objective function sense (1 for min (default), -1 for max)
+		/// </summary>
+		/// <returns></returns>
+		inline double getObjSense() 
+		{
+			return Base->getObjSense();
+		}
+
+		/// <summary>
 		/// Get best possible objective function value.
 		/// This is better of best possible left on tree and best solution found.
 		/// If called from within branch and cut may be optimistic.
@@ -311,9 +320,81 @@ namespace COIN
 		}
 
 		/// <summary>
+		/// User callable setBestSolution
+		/// 
+		/// Sets the best solution and best objective value.
+		/// If check false (default) does not check valid
+		/// If true then sees if feasible and warns if objective value
+		///	worse than given(so just set to COIN_DBL_MAX if you don't care).
+		///	If check true then does not save solution if not feasible. 
+		/// (If check true then the solution is checked by fixing the bounds of the integer variables and solving
+		/// the relaxation. If that problem is feasible and integer, then consider the solution OK.)
+		/// </summary>
+		/// <param name="solution">The solution as array of column values</param>
+		/// <param name="numberColumns">The number of columns in this solution</param>
+		/// <param name="objectiveValue">The objective value of this solution</param>
+		/// <param name="check">If check true then does not save solution if not feasible.</param>
+		inline void setBestSolutionUnsafe(const double* solution, int numberColumns, double objectiveValue, bool check /*= false*/)
+		{
+			Base->setBestSolution(solution, numberColumns, objectiveValue, check);
+		}
+
+		/// <summary>
+		/// User callable setBestSolution
+		/// 
+		/// Sets the best solution and best objective value.
+		/// If check false (default) does not check valid
+		/// If true then sees if feasible and warns if objective value
+		///	worse than given(so just set to COIN_DBL_MAX if you don't care).
+		///	If check true then does not save solution if not feasible. 
+		/// (If check true then the solution is checked by fixing the bounds of the integer variables and solving
+		/// the relaxation. If that problem is feasible and integer, then consider the solution OK.)
+		/// </summary>
+		/// <param name="solution">The solution as array of column values</param>
+		/// <param name="numberColumns">The number of columns in this solution</param>
+		/// <param name="objectiveValue">The objective value of this solution</param>
+		/// <param name="check">If check true then does not save solution if not feasible.</param>
+		inline void setBestSolution(array<double> ^solution, int numberColumns, double objectiveValue, bool check /*= false*/)
+		{
+			pin_ptr<double> solutionPinned = GetPinablePtr(solution);
+			this->setBestSolutionUnsafe(solutionPinned, numberColumns, objectiveValue, check);
+		}
+
+		/// <summary>
+		/// User callable setBestSolution.
+		///
+		/// Sets the best solution and best objective value.
+		/// Does not check valid.
+		/// </summary>
+		/// <param name="solution">The solution as array of column values</param>
+		/// <param name="numberColumns">The number of columns in this solution</param>
+		/// <param name="objectiveValue">The objective value of this solution</param>
+		inline void setBestSolutionUnsafe(const double* solution, int numberColumns, double objectiveValue)
+		{
+			Base->setBestSolution(solution, numberColumns, objectiveValue);
+		}
+
+		/// <summary>
+		/// User callable setBestSolution.
+		///
+		/// Sets the best solution and best objective value.
+		/// Does not check valid.
+		/// </summary>
+		/// <param name="solution">The solution as array of column values</param>
+		/// <param name="numberColumns">The number of columns in this solution</param>
+		/// <param name="objectiveValue">The objective value of this solution</param>
+		inline void setBestSolution(array<double>^ solution, int numberColumns, double objectiveValue)
+		{
+			pin_ptr<double> solutionPinned = GetPinablePtr(solution);
+			this->setBestSolutionUnsafe(solutionPinned, numberColumns, objectiveValue);
+		}
+
+		/// <summary>
 		/// Set cutoff bound on the objective function.
 		/// When using strict comparison, the bound is adjusted by a tolerance to
 		/// avoid accidentally cutting off the optimal solution.
+		///
+		/// WARNING: Unexplainable results for max.
 		/// </summary>
 		/// <param name="value"></param>
 		inline void setCutoff(double value)

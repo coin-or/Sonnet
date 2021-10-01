@@ -309,6 +309,16 @@ namespace Sonnet
 
 
         /// <summary>
+        /// Throws a NotSupportedException with the given message if b is false.
+        /// </summary>
+        /// <param name="b">The boolean value to be tested.</param>
+        /// <param name="message">The message to be included</param>
+        public static void Supported(bool b, string message = null)
+        {
+            if (!b) throw new NotSupportedException(message);
+        }
+
+        /// <summary>
         /// Throws a NotSupportedException (always), with the given message.
         /// </summary>
         /// <param name="message">The message to be included</param>

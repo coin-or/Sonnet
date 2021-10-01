@@ -76,6 +76,7 @@ namespace COIN
 	{
 		::CbcModel* cbcModel = Base->getModelPtr();
 
+		//cbcModel->resetModel();
 		cbcModel->resetToReferenceSolver();
 
 		// TODO: this resets very well, but need to copy hints etc.
