@@ -53,7 +53,7 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
-                        //if (method.Name != nameof(Sonnet_BasicTests.SonnetTest44)) continue;
+                        //if (method.Name != nameof(Sonnet_BasicTests.SonnetTest45)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)
