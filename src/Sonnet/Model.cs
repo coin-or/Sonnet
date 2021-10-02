@@ -249,10 +249,9 @@ namespace Sonnet
         
         /// <summary>
         /// Creates a new model from the given file.
-        /// Supported file extensions: .mps only.
         /// </summary>
-        /// <param name="fileName">The mps file to be imported.</param>
-        /// <returns>The new model, or null if an error occurred.</returns>
+        /// <param name="fileName">The mps or lp file to be imported.</param>
+        /// <returns>The new model, or an exception if error occurred.</returns>
         public static Model New(string fileName)
         {
             Variable[] variables;
@@ -261,11 +260,10 @@ namespace Sonnet
 
         /// <summary>
         /// Creates a new model from the given file.
-        /// Supported file extensions: .mps only.
         /// </summary>
-        /// <param name="fileName">The mps file to be imported.</param>
+        /// <param name="fileName">The mps or lp file to be imported.</param>
         /// <param name="variables">The full array of variables created for this new model.</param>
-        /// <returns>The new model, or null if an error occurred.</returns>
+        /// <returns>The new model, or an exception if an error occurred.</returns>
         public static Model New(string fileName, out Variable[] variables)
         {
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
@@ -325,6 +323,13 @@ namespace Sonnet
             else
             {
                 string message = string.Format("Cannot import file {0} : unknown extension '{1}'.", fileName, extension);
+                SonnetLog.Default.Error(message);
+                throw new SonnetException(message);
+            }
+            
+            if (model == null)
+            {
+                string message = $"An error occured while importing {fileName}. No model created.";
                 SonnetLog.Default.Error(message);
                 throw new SonnetException(message);
             }

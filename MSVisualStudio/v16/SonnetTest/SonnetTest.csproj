@@ -31,6 +31,7 @@
     <Compile Include="..\..\..\examples\Example6b.cs" Link="Examples\Example6b.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Program.cs" Link="Program.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" Link="Sonnet_BasicTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcTests.cs" Link="Sonnet_CbcTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" Link="Sonnet_ExampleTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" Link="Sonnet_QuadraticTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_StressTests.cs" Link="Sonnet_StressTests.cs" />

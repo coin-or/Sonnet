@@ -2006,7 +2006,6 @@ namespace SonnetTest
             if (solverType != typeof(OsiCbcSolverInterface)) return;
 
             Model model = Model.New("egout.mps");
-            Assert.IsTrue(model != null);
             Solver solver = new Solver(model, solverType);
 
             solver.Generate();
@@ -2034,7 +2033,6 @@ namespace SonnetTest
             if (solverType != typeof(OsiCbcSolverInterface)) return;
 
             Model model = Model.New("egout.mps");
-            Assert.IsTrue(model != null);
             Solver solver = new Solver(model, solverType);
             var osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
             if (osiCbc != null)
@@ -2310,8 +2308,6 @@ namespace SonnetTest
             {
                 Model model = Model.New(filename);
                 Solver solver = new Solver(model, solverType);
-
-                Assert.IsTrue(model != null);
                 solver.Solve(true);
 
                 WarmStart warmStart = solver.GetWarmStart();
@@ -2416,71 +2412,10 @@ namespace SonnetTest
         {
             Console.WriteLine("SonnetTest34 - testing objective values");
 
-            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always"
-            Assert.IsTrue(model != null);
+            Model model = Model.New("MIP-124725.mps");
             Solver solver = new Solver(model, solverType);
             solver.Minimise();
             Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest35(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest35 - Cbc test set CbcStrategyNull and addCutGenerator");
-
-            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always";
-            Assert.IsTrue(model != null);
-            Solver solver = new Solver(model, solverType);
-
-            OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
-            Assert.IsTrue(osisolver != null);
-
-            CbcModel cbcModel = osisolver.getModelPtr();
-            cbcModel.setStrategy(new CbcStrategyNull());
-            cbcModel.addCutGenerator(new CglProbing());
-            Assert.IsTrue(cbcModel.numberCutGenerators() == 1);
-            //cbcModel.cutGenerators();
-
-            solver.Minimise();
-
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-            //Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 104713.12807881772));
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest36(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-
-            Console.WriteLine("SonnetTest36 - Cbc set CbcStrategyDefault");
-
-            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always"
-            Assert.IsTrue(model != null);
-
-            Solver solver = new Solver(model, solverType);
-            model.ObjectiveSense = ObjectiveSense.Minimise;
-
-            OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
-            Assert.IsTrue(osisolver != null);
-
-            CbcModel cbcModel = osisolver.getModelPtr();
-            cbcModel.setStrategy(new CbcStrategyDefault(1, 5, 5));
-            //cbcModel.strategy().setupCutGenerators(cbcModel);
-
-            solver.AutoResetMIPSolve = true;
-            solver.Minimise();
-
-            string message = "Used cut generators: " + string.Join(", ", cbcModel.cutGenerators().Select(generator => generator.generator().GetType().Name));
-
-            Console.WriteLine(message);
-
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-
-            solver.Solve(true);
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 104713.12807881772));
         }
 
         [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
@@ -2576,9 +2511,8 @@ namespace SonnetTest
             else { Console.WriteLine("Skipping test for export/import LP"); }
         }
 
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
         [TestMethod, TestCategory("Extensions")]
-        public void SonnetTest39(Type solverType)
+        public void SonnetTest39()
         {
             Console.WriteLine("SonnetTest39 - Test ForAll extensions for constraint sets");
 
@@ -2657,298 +2591,6 @@ namespace SonnetTest
             Console.WriteLine(" - Testing ForAllDo and ToMap for variable names");
             toys.ForAllDo(t => Assert.IsTrue(y[t].Name == "y_" + t));
         }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc"), TestCategory("Logging")]
-        public void SonnetTest40(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest40 - Test log message handler vs CbcMain");
-
-            Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always";
-            Assert.IsTrue(model != null);
-            Solver solver = new Solver(model, solverType);
-            SonnetLog.Default.LogLevel = 2;
-
-            OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
-            //SonnetLog.Default.PassToSolver(osisolver);
-            Assert.IsTrue(osisolver != null);
-
-            CbcModel cbcModel = osisolver.getModelPtr();
-            solver.Minimise();
-            Ensure.IsTrue(SonnetLog.Default.LogLevel == 2, "Somehow the SonnetLog LogLevel changed!");
-
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest41(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest41 - Test CbcModel with args to stop after solution");
-
-            SonnetLog.Default.LogLevel = 0;
-            SonnetLog.Default.Debug("Log Debug");
-            SonnetLog.Default.Info("Log Info");
-            SonnetLog.Default.Warn("Log Warn");
-            SonnetLog.Default.Error("Log Error");
-
-            Model model = Model.New("mas74.mps");
-            Assert.IsTrue(model != null);
-
-            Solver solver = new Solver(model, solverType);
-            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.AddCbcSolverArgs("-secni", "5"); // Stop if no improvement in the best solution within 5 seconds after a solution
-            solver.Solve();
-
-            Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
-            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet (unless solver got a lot better)");
-
-            // Allow also better solutions, but not worse. The problem is minimization.
-            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
-            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 12465, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 12465");
-        }
-
-        private static int SonnetTest42numSolutions = 0;
-        public static CbcAction SonnetTest42EventHandler(CbcModel model, CbcEvent cbcevent)
-        {
-            // This is an example EventHandler for CbcModel, invoked at events such as a solution was found, etc.
-            // This depends on the heuristics applied during the solving, so the solutions found can be different.
-            if (cbcevent == CbcEvent.solution)
-            {
-                SonnetTest42numSolutions++;
-
-                Assert.IsTrue(model.getBestPossibleObjValue() >= 10482.79 && model.getBestPossibleObjValue() <= 11801.18, $"Dual bound is ${model.getBestPossibleObjValue()} but should be between 10482.79 and 11801.18 (opt)");
-                Assert.IsTrue(model.getObjValue() >= 11801.18 && model.getObjValue() <= 14372.88, $"Best minimization solution of mas74 until now is ${model.getObjValue()} but should be between 11801.18 (opt) and 14372.88");
-                // If either of these asserts fail, it might be that the underlying CbcSolver improved with better cuts, etc.
-                // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
-                // If this assert fails, then the best solution found so far (by heuristics or on the tree) is worse than expected.
-                if (SonnetTest42numSolutions == 1)
-                {
-                    return CbcAction.noAction;
-                }
-                else if (SonnetTest42numSolutions == 5)
-                {
-                    // Note: the action to Stop is not always respected by Cbc, for example, during heuristics.
-                    return CbcAction.stop;
-                }
-            }
-
-            return CbcAction.noAction;
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest42(Type solverType)
-        {
-            // TODO fix this test that fails on final Assert for value.
-            Console.WriteLine("SonnetTest42 - SKIPPING Test CbcModel Event Handler");
-            return;
-
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest42 - Test CbcModel Event Handler");
-
-            SonnetLog.Default.LogLevel = 4;
-            SonnetLog.Default.Debug("Log Debug");
-            SonnetLog.Default.Info("Log Info");
-            SonnetLog.Default.Warn("Log Warn");
-            SonnetLog.Default.Error("Log Error");
-
-            Model model = Model.New("mas74.mps");
-            Assert.IsTrue(model != null);
-
-            Solver solver = new Solver(model, solverType);
-            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            var args = osiCbc.GetCbcSolverArgs().ToList();
-            args.Add("-secni");
-            args.Add("5");
-            osiCbc.SetCbcSolverArgs(args.ToArray());
-
-            CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) { return CbcAction.noAction; };
-            handler += new CbcEventHandler(SonnetTest42EventHandler); // will stop after 2nd solution
-            osiCbc.Model.passInEventHandler(handler); //
-
-            int SonnetTest42NumCalls = 0;
-            CbcSolver.CallBack = delegate (CbcModel m, int whereFrom) { SonnetTest42NumCalls++; return 0; };
-            solver.Solve();
-            // DONT use the cbcModel after solver.Solve() because of ResetAfterMIPSolveInternal at the end of Solve()
-
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
-            Assert.IsTrue(SonnetTest42numSolutions >= 2, "should have found at least two solutions by now");
-            Assert.IsTrue(SonnetTest42NumCalls == 5);
-
-            // Allow also better solutions, but not worse. The problem is minimization.
-            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
-            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 14168.34, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 14168.34");
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest43(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest43 - Test CbcModel setObjValue and setCutoff for Minimization");
-
-            // This test check the improvement of solving when a good solution obj value is given in advance.
-            // This should help most if the relaxation bound is tight.
-
-            SonnetLog.Default.LogLevel = 4;
-            SonnetLog.Default.Debug("Log Debug");
-            SonnetLog.Default.Info("Log Info");
-            SonnetLog.Default.Warn("Log Warn");
-            SonnetLog.Default.Error("Log Error");
-
-            Model model = Model.New("mip-124725.mps");
-            Assert.IsTrue(model != null);
-
-            Solver solver = new Solver(model, solverType);
-            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.AddCbcSolverArgs("-preprocess", "off");
-            osiCbc.AddCbcSolverArgs("-strong", "0");
-            osiCbc.AddCbcSolverArgs("-heurist", "off");
-            osiCbc.AddCbcSolverArgs("-cuts", "off");
-
-            solver.Solve();
-
-            // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
-            // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve() so we wouldnt getNodeCount, etc. for the solve
-            solver.AutoResetMIPSolve = false;
-
-            solver.ResetAfterMIPSolve();
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes1 = osiCbc.getNodeCount();
-
-            solver.ResetAfterMIPSolve();
-
-            osiCbc.Model.setObjValue(125035.0);
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes2 = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
-
-            solver.ResetAfterMIPSolve();
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes1b = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
-
-            // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest44(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest44 - Test CbcModel setObjValue for Maximization");
-            SonnetLog.Default.LogLevel = 4;
-            // This test check the improvement of solving when a good solution obj value is given in advance.
-            // This should help most if the relaxation bound is tight.
-
-            Model model = Model.New("mip-124725.mps");
-            Assert.IsTrue(model != null);
-            Assert.IsTrue(model.ObjectiveSense == ObjectiveSense.Minimise);
-
-            model.Objective = new Objective(-1.0 * (Expression)model.Objective);
-            model.ObjectiveSense = ObjectiveSense.Maximise;
-
-            Solver solver = new Solver(model, solverType);
-            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.AddCbcSolverArgs("-preprocess", "off");
-            osiCbc.AddCbcSolverArgs("-strong", "0");
-            osiCbc.AddCbcSolverArgs("-heurist", "off");
-            osiCbc.AddCbcSolverArgs("-cuts", "off");
-
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-
-            // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
-            solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
-
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes1 = osiCbc.getNodeCount();
-            double objValue1 = model.Objective.Value;
-
-            solver.ResetAfterMIPSolve();
-
-            osiCbc.Model.setObjValue(-125035.0);
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes2 = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
-
-            solver.ResetAfterMIPSolve();
-
-            solver.Solve();
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes1b = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
-
-            // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
-
-        }
-
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
-        [TestMethod, TestCategory("Cbc")]
-        public void SonnetTest45(Type solverType)
-        {
-            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
-            Console.WriteLine("SonnetTest45 - Test solver.SetMIPStart");
-            SonnetLog.Default.LogLevel = 4;
-
-            Model model = Model.New("mip-124725.mps");
-            var objLimit = model.Add((Expression)model.Objective >= 125035.0);
-
-            // try get the intermediate solution with value 125035 by adding a constraint and then solving
-            Solver solver = new Solver(model, solverType);
-            solver.Solve();
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 125035));
-            // Now the Variable Values represent the solution 125035
-
-            // To see the benefit, disable preprocessing etc.
-            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.AddCbcSolverArgs("-preprocess", "off");
-            osiCbc.AddCbcSolverArgs("-strong", "0");
-            osiCbc.AddCbcSolverArgs("-heurist", "off");
-            osiCbc.AddCbcSolverArgs("-cuts", "off");
-
-            solver.AutoResetMIPSolve = false;
-            objLimit.Enabled = false; // disable the artificial constraint on objective value
-            solver.SetMIPStart(true); // take the Variable Values
-            
-            solver.Solve();
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            Assert.IsTrue(solver.IsFeasible());
-            int nodes1 = osiCbc.getNodeCount(); // nodes using setMIPStart
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-
-            solver.ResetAfterMIPSolve();
-            //objLimit.Enabled = true;
-            //objLimit.Enabled = false;
-            solver.Solve();
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            Assert.IsTrue(solver.IsFeasible());
-            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
-            int nodes2 = osiCbc.getNodeCount(); // nodes using setMIPStart
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
-
-            Assert.IsTrue(nodes1 < nodes2, "Providing a feasible solution must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
-        }
-    } 
+    }
 }
+

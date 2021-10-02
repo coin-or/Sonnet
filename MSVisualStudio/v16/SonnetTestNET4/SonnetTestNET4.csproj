@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\test\SonnetTest\Program.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_StressTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" />
