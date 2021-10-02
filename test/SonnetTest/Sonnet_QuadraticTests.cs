@@ -112,17 +112,12 @@ namespace SonnetTest
 
         }
 
-        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
         [TestMethod, TestCategory("Cbc"), TestCategory("Quadratic")]
-        public void SonnetTestQuad3(Type solverType)
+        public void SonnetTestQuad3()
         {
             Console.WriteLine("SonnetTestQuad3 - Integer linear model with quad objective");
 
-            if (solverType != typeof(COIN.OsiCbcSolverInterface))
-            {
-                Console.WriteLine("Skipping for " + solverType.Name);
-                return;
-            }
+            // MIQP doesnt work using Clp, only Cbc.
 
             // See https://www.inverseproblem.co.nz/OPTI/index.php/Probs/MIQP
             //  min 0.5 x1^2 + x2^2 - x1x2 - 2x1 - 6x2
@@ -162,6 +157,13 @@ namespace SonnetTest
             Assert.IsTrue(Utils.CompareDouble(obj.Level(), -7.5) == 0);
             Assert.IsTrue(Utils.CompareDouble(obj.Value, -7.5) == 0);
             Assert.IsTrue(Utils.CompareDouble(x1.Value, 1.0) == 0 && Utils.CompareDouble(x2.Value, 1.0) == 0);
+
+            Model model2 = Model.New("testmiqp.mps");
+            string model1string = model.ToString();
+            string model2string = model2.ToString();
+            
+
+
         }
 
     }

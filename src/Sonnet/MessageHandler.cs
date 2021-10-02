@@ -91,6 +91,16 @@ namespace Sonnet
         }
 
         /// <summary>
+        /// Pass this message handler to the given ClpModel.
+        /// Warning: The ClpModel will use the handler for all components. This likely has unintended consequences.
+        /// </summary>
+        /// <param name="clpModel"></param>
+        public void PassToClpModel(COIN.ClpModel clpModel)
+        {
+            clpModel.passInMessageHandler(messageHandler);
+        }
+
+        /// <summary>
         /// Pass this message handler to the given CoinMpsIO instance.
         /// </summary>
         /// <param name="obj">The CoinMpsIO instance to pass this message handler to.</param>
