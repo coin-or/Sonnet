@@ -2875,7 +2875,7 @@ namespace SonnetTest
 
             // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
             solver.AutoResetMIPSolve = false; // dont reset after mip solve, otherwise CbcModel has been reset after solver.Solve()
-            
+
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
@@ -2892,7 +2892,7 @@ namespace SonnetTest
             Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
 
             solver.ResetAfterMIPSolve();
-            
+
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
@@ -2907,7 +2907,48 @@ namespace SonnetTest
         [TestMethod, TestCategory("Cbc")]
         public void SonnetTest45(Type solverType)
         {
-            Assert.IsFalse(false, "TODO: Write test cases for solver.SetMipStart");
+            if (solverType != typeof(COIN.OsiCbcSolverInterface)) return;
+            Console.WriteLine("SonnetTest45 - Test solver.SetMIPStart");
+            SonnetLog.Default.LogLevel = 4;
+
+            Model model = Model.New("mip-124725.mps");
+            var objLimit = model.Add((Expression)model.Objective >= 125035.0);
+
+            // try get the intermediate solution with value 125035 by adding a constraint and then solving
+            Solver solver = new Solver(model, solverType);
+            solver.Solve();
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 125035));
+            // Now the Variable Values represent the solution 125035
+
+            // To see the benefit, disable preprocessing etc.
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            osiCbc.AddCbcSolverArgs("-preprocess", "off");
+            osiCbc.AddCbcSolverArgs("-strong", "0");
+            osiCbc.AddCbcSolverArgs("-heurist", "off");
+            osiCbc.AddCbcSolverArgs("-cuts", "off");
+
+            solver.AutoResetMIPSolve = false;
+            objLimit.Enabled = false; // disable the artificial constraint on objective value
+            solver.SetMIPStart(true); // take the Variable Values
+            
+            solver.Solve();
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            Assert.IsTrue(solver.IsFeasible());
+            int nodes1 = osiCbc.getNodeCount(); // nodes using setMIPStart
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
+
+            solver.ResetAfterMIPSolve();
+            //objLimit.Enabled = true;
+            //objLimit.Enabled = false;
+            solver.Solve();
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
+            int nodes2 = osiCbc.getNodeCount(); // nodes using setMIPStart
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
+
+            Assert.IsTrue(nodes1 < nodes2, "Providing a feasible solution must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
         }
-    }
+    } 
 }

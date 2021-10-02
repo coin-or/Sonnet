@@ -162,7 +162,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Sets the current model variable values as starting solution for the solver.
+        /// Sets the starting solution for the solver using the current variable values of the model.
         /// </summary>
         /// <param name="check">If true, check whether the solution is actually feasible.</param>
         public void SetMIPStart(bool check)
@@ -387,7 +387,7 @@ namespace Sonnet
                     }
 
                     isSolving = true;
-                    if (AutoResetMIPSolve) SaveBeforeMIPSolveInternal();
+                    SaveBeforeMIPSolveInternal(); // save anyway, to allow manual reset
 
                     if (solver is OsiCbcSolverInterface cbcSolver)
                     {
@@ -503,11 +503,14 @@ namespace Sonnet
             for (int i = 0; i < n; i++)
             {
                 Constraint aCon = constraints[i];
-                if (!aCon.IsFeasible())
-                {
-                    log.Debug(aCon.ToLevelString());
-                    feasible = false;
-                    hasInfeasibleConstraints = true;
+                if (aCon.Enabled)
+                {   // only check Enabled constraints, not disabled ones
+                    if (!aCon.IsFeasible())
+                    {
+                        log.Debug(aCon.ToLevelString());
+                        feasible = false;
+                        hasInfeasibleConstraints = true;
+                    }
                 }
             }
 
