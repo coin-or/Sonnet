@@ -55,7 +55,7 @@ namespace SonnetTest
                     {
                         // This Program.cs is ONLY used for debugging
                         // Automated tests do not use Program.cs
-                        //if (method.Name != nameof(Sonnet_CbcTests.SonnetCbcTest5)) continue;
+                        if (method.Name != nameof(Sonnet_QuadraticTests.SonnetTestQuad3)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)

@@ -1791,7 +1791,7 @@ namespace Sonnet
                     var.Assign(this, col, values[col], mipSolve?0.0:reducedCost[col]);
                     if (IsProvenOptimal)
                     {
-                        if (!values[col].IsBetween(var.Lower, var.Upper))
+                        if (!var.IsFeasible())
                         {
                             log.DebugFormat("Solution is optimal, but variable value {0} is outside of bounds [{1},{2}] ", var, var.Lower, var.Upper);
                         }

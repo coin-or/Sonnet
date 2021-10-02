@@ -270,6 +270,7 @@ namespace Sonnet
             string extension = Path.GetExtension(fileName).ToLower();
 
             Model model = null;
+
             if (extension.Equals(".mps"))
             {
                 #region New Model from .mps file
@@ -278,12 +279,18 @@ namespace Sonnet
 
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
+                //TODO: To read MPS with QUAD info use ClpModel or CoinModel readMps. 
+                ClpModel
+                //CoinModel 
+                //ClpModel m = new ClpModel();
+                //log.PassToClpModel(m);
+               
                 CoinMpsIO m = new CoinMpsIO();
                 log.PassToCoinMpsIO(m);
-
                 m.setInfinity(MathUtils.Infinity);
-                
-                int numberErrors = m.readMps(fullPathWithoutExtension);
+
+                int numberErrors = m.readMps(fileName);
+                //int numberErrors = m.readMps(fullPathWithoutExtension, true, false);
                 if (numberErrors != 0)
                 {
                     string message = string.Format("Errors occurred when reading the mps file '{0}'.", fileName);
@@ -292,7 +299,10 @@ namespace Sonnet
                 }
 
                 // set objective function offest
-                // setDblParam(OsiObjOffset,m.objectiveOffset()); // WHAT IS THIS??
+                // Skip this: setDblParam(OsiObjOffset,m.objectiveOffset())
+                
+                //ClpModel  has ClpObjective which may be an implementatin of ClpQuadObjective.
+                // This can be found by obj->type() == 2 (QuadCoef)
 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.getObjectiveName(), m.getObjCoefficients(),
@@ -337,7 +347,7 @@ namespace Sonnet
             return model;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Privage member and by design")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Private member and by design")]
         private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
             double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers)
         {
