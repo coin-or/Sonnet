@@ -280,11 +280,12 @@ namespace Sonnet
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
                 //TODO: To read MPS with QUAD info use ClpModel or CoinModel readMps. 
-                ClpModel
+                //ClpModel m;
+                //m.ma
                 //CoinModel 
                 //ClpModel m = new ClpModel();
                 //log.PassToClpModel(m);
-               
+                ClpModel 
                 CoinMpsIO m = new CoinMpsIO();
                 log.PassToCoinMpsIO(m);
                 m.setInfinity(MathUtils.Infinity);
