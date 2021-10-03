@@ -102,6 +102,84 @@ namespace COIN
 			return result;
 		}
 
+		bool isInteger(int columnNumber)
+		{
+			return Base->isInteger(columnNumber);
+		}
+
+		/// Row names
+		inline String^ rowName(int index)
+		{
+			String^ result = gcnew String(Base->rowName(index));
+			return result;
+		}
+
+		/// Column names
+		inline String^ columnName(int index)
+		{
+			String^ result = gcnew String(Base->columnName(index));
+			return result;
+		}
+
+		/// Direction of optimization (1 - minimize, -1 - maximize, 0 - ignore
+		inline double getObjSense()
+		{
+			return Base->getObjSense();
+		}
+
+		const array<double>^ getRowLower()
+		{
+			int n = Base->getNumRows();
+			if (n == 0) return nullptr;
+
+			double* input = (double*)Base->getRowLower();
+			array<double>^ result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+
+		const array<double>^ getRowUpper()
+		{
+			int n = Base->getNumRows();
+			if (n == 0) return nullptr;
+
+			double* input = (double*)Base->getRowUpper();
+			array<double>^ result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+
+		const array<double>^ getColLower()
+		{
+			int n = Base->getNumCols();
+			if (n == 0) return nullptr;
+
+			double* input = (double*)Base->getColLower();
+			array<double>^ result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+		
+		const array<double>^ getColUpper()
+		{
+			int n = Base->getNumCols();
+			if (n == 0) return nullptr;
+
+			double* input = (double*)Base->getColUpper();
+			array<double>^ result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+
+		/// Matrix (if not ClpPackedmatrix be careful about memory leak
+		//TODO
+		inline CoinPackedMatrix* matrix() const
+		{
+			if (matrix_ == NULL)
+				return NULL;
+			else
+				return matrix_->getPackedMatrix();
+		}
 
 		/// <summary>
 		/// Pass in Message handler (not deleted at end)
