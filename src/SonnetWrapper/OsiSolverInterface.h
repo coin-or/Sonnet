@@ -206,6 +206,37 @@ namespace COIN
 			setColUpperUnsafe(inputPinned);
 		}
 
+		/// <summary>
+		/// Get a pointer to an array[getNumRows()] of row constraint senses.
+		///  'L': <= constraint
+		///  'E' : = constraint
+		///  'G' : >= constraint
+		///  'R' : ranged constraint
+		///  'N' : free constraint
+		/// </summary>
+		/// <returns>Array of row constraint senses</returns>
+		const char* getRowSenseUnsafe()
+		{
+			return Base->getRowSense();
+		}
+
+		/// <summary>
+		/// Get a pointer to an array[getNumRows()] of row constraint senses.
+		///  'L': <= constraint
+		///  'E' : = constraint
+		///  'G' : >= constraint
+		///  'R' : ranged constraint
+		///  'N' : free constraint
+		/// </summary>
+		/// <returns>Array of row constraint senses</returns>
+		array<__wchar_t>^ getRowSense()
+		{
+			int n = Base->getNumRows();
+			if (n == 0) return gcnew array<__wchar_t>(n);
+			String^ result = gcnew String(Base->getRowSense(), 0, n);
+			return result->ToCharArray();
+		}
+
 		const double *getColSolutionUnsafe();
 		array<double> ^ getColSolution();
 		void setColSolutionUnsafe(const double *colsol);

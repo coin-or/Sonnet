@@ -5,7 +5,8 @@
 #include "OsiSolverInterface.h"
 #include "CoinError.h"
 
-#include "OsiDerivedSolverInterfaces.h"
+#include "OsiClpSolverInterface.h"
+#include "OsiCbcSolverInterface.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;

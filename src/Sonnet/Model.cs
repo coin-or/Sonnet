@@ -279,9 +279,17 @@ namespace Sonnet
 
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
-                //TODO: To read MPS with QUAD info use ClpModel or CoinModel readMps. 
-                ClpModel m = new ClpModel();
+                //TODO:
+                // CoinMpsIO doesnt read quad info.
+                // To read MPS with QUAD info use ClpModel or CoinModel readMps. 
+                // ClpModel doesnt do row Sense needed for here, only lb / ub.
+                // OsiClp can create row sense from lb / ub, but OsiClp uses CoinMpsIO, so cannot read Quad
+                // CoinModel we havent Wrapped yet at all, so more work.
+
+                ClpSimplex m = new ClpSimplex();
+                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m); 
                 log.PassToClpModel(m);
+
                 //CoinMpsIO m = new CoinMpsIO();
                 //log.PassToCoinMpsIO(m);
                 //m.setInfinity(MathUtils.Infinity);
@@ -300,10 +308,10 @@ namespace Sonnet
                 
                 //ClpModel  has ClpObjective which may be an implementatin of ClpQuadObjective.
                 // This can be found by obj->type() == 2 (QuadCoef)
-
+                
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
-                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
+                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
                 
                 model.Name = fileNameWithoutExtension;
                 #endregion
