@@ -69,7 +69,7 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.h">
+    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiClpSolverInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.h">
@@ -82,6 +82,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcEventHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,7 +140,7 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\Helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.cpp">
+    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiClpSolverInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\SonnetWrapper\CbcEventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

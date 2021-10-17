@@ -9,7 +9,7 @@
 #include <msclr\marshal_cppstd.h> // for string ^ to std::string via marshal_as
 
 #include "CbcModel.h"
-#include "OsiDerivedSolverInterfaces.h"
+#include "OsiCbcSolverInterface.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;

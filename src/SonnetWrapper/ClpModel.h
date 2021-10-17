@@ -372,5 +372,14 @@ namespace COIN
 				throw gcnew CoinError(err);
 			}
 		}
+
+	protected:
+		property ::ClpSimplex* Derived
+		{
+			::ClpSimplex* get()
+			{
+				return (::ClpSimplex*)(Base);
+			}
+		}
 	};
 }
