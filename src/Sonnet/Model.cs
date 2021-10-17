@@ -280,15 +280,11 @@ namespace Sonnet
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
                 //TODO: To read MPS with QUAD info use ClpModel or CoinModel readMps. 
-                //ClpModel m;
-                //m.ma
-                //CoinModel 
-                //ClpModel m = new ClpModel();
-                //log.PassToClpModel(m);
-                ClpModel 
-                CoinMpsIO m = new CoinMpsIO();
-                log.PassToCoinMpsIO(m);
-                m.setInfinity(MathUtils.Infinity);
+                ClpModel m = new ClpModel();
+                log.PassToClpModel(m);
+                //CoinMpsIO m = new CoinMpsIO();
+                //log.PassToCoinMpsIO(m);
+                //m.setInfinity(MathUtils.Infinity);
 
                 int numberErrors = m.readMps(fileName);
                 //int numberErrors = m.readMps(fullPathWithoutExtension, true, false);
@@ -306,7 +302,7 @@ namespace Sonnet
                 // This can be found by obj->type() == 2 (QuadCoef)
 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
-                    m.getColLower(), m.getColUpper(), m.getObjectiveName(), m.getObjCoefficients(),
+                    m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
                     m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
                 
                 model.Name = fileNameWithoutExtension;
