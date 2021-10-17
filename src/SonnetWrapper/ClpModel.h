@@ -107,18 +107,35 @@ namespace COIN
 			return Base->isInteger(columnNumber);
 		}
 
+		inline String^ problemName()
+		{
+			return gcnew String(Base->problemName().c_str());
+		}
+
 		/// Row names
 		inline String^ rowName(int index)
 		{
-			String^ result = gcnew String(Base->rowName(index));
+			String^ result = gcnew String(Base->rowName(index).c_str());
 			return result;
 		}
 
 		/// Column names
 		inline String^ columnName(int index)
 		{
-			String^ result = gcnew String(Base->columnName(index));
+			String^ result = gcnew String(Base->columnName(index).c_str());
 			return result;
+		}
+
+		/// Number of rows
+		inline int getNumRows()
+		{
+			return Base->getNumRows();
+		}
+
+		/// Number of columns
+		inline int getNumCols()
+		{
+			return Base->getNumCols();
 		}
 
 		/// Direction of optimization (1 - minimize, -1 - maximize, 0 - ignore
@@ -171,7 +188,7 @@ namespace COIN
 			return result;
 		}
 
-		/// Matrix (if not ClpPackedmatrix be careful about memory leak
+/*		/// Matrix (if not ClpPackedmatrix be careful about memory leak
 		//TODO
 		inline CoinPackedMatrix* matrix() const
 		{
@@ -180,7 +197,7 @@ namespace COIN
 			else
 				return matrix_->getPackedMatrix();
 		}
-
+*/
 		/// <summary>
 		/// Pass in Message handler (not deleted at end)
 		/// </summary>
