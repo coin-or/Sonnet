@@ -286,15 +286,15 @@ namespace Sonnet
                 // OsiClp can create row sense from lb / ub, but OsiClp uses CoinMpsIO, so cannot read Quad
                 // CoinModel we havent Wrapped yet at all, so more work.
 
-                ClpSimplex m = new ClpSimplex();
-                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m); 
-                log.PassToClpModel(m);
-
                 //CoinMpsIO m = new CoinMpsIO();
                 //log.PassToCoinMpsIO(m);
                 //m.setInfinity(MathUtils.Infinity);
 
-                int numberErrors = m.readMps(fileName);
+                ClpSimplex m = new ClpSimplex();
+                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m); 
+                log.PassToClpModel(m);
+
+                int numberErrors = m.readMps(fileName, true, false);
                 //int numberErrors = m.readMps(fullPathWithoutExtension, true, false);
                 if (numberErrors != 0)
                 {
@@ -311,8 +311,9 @@ namespace Sonnet
                 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
-                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
-                
+                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
+                TODO: Now read the quad info too
+
                 model.Name = fileNameWithoutExtension;
                 #endregion
             }
