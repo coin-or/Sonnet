@@ -9,6 +9,7 @@
 
 #include "OsiSolverInterface.h"
 #include "ClpModel.h"
+#include "CoinPackedMatrix.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -53,6 +54,18 @@ namespace COIN
 		ClpSimplex^ getModelPtr()
 		{
 			return gcnew ClpSimplex(Base->getModelPtr());
+		}
+
+		/// Get pointer to row-wise copy of matrix
+		CoinPackedMatrix^ getMatrixByRow()
+		{
+			return gcnew CoinPackedMatrix(Base->getMatrixByRow());
+		}
+
+		/// Get pointer to column-wise copy of matrix
+		CoinPackedMatrix^ getMatrixByCol()
+		{
+			return gcnew CoinPackedMatrix(Base->getMatrixByCol());
 		}
 	};
 
