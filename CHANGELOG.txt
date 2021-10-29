@@ -4,6 +4,7 @@ Note that Sonnet and SonnetWrapper have different version numbers.
 Below are mentioned "[File Version] Product  Assembly Version".
 The File Version numbers change with every release. In contrast, the Assembly Version numbers are more stable.
 
+
 [TODO]
  - Resolve OsiCbc maintenance issues. OsiCbc is no longer maintained, but still used by Sonnet.
     Could remove Osi, but then we'll have to invent something else like Osi (..)
