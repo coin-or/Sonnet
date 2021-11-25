@@ -4,7 +4,6 @@
 
 environment:
   sonar_token:
-    #secure: eCh/77iS58Bemvt+AEb7gJO5PKHN+DfvYR4yRCC9Hcw+PXE1+81Nqi8JVIH6+gmc
     secure: GHaPt+XpyKpioRGIrDn/oDzDF/5F/tc4U7aA7H2sWAnDi37kkzGcPFKaKSY24kfm
   github_auth_token:
     secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
@@ -132,6 +131,7 @@ after_test:
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.dll package\x64\net5.0\.
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.xml package\x64\net5.0\.
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\SonnetWrapper.dll package\x64\net5.0\.
+  - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Ijwhost.dll package\x64\net5.0\.
   - if not "%RELEASE_TYPE%"=="ci" mkdir package\x64\net40
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net40\.
   - if not "%RELEASE_TYPE%"=="ci" copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net40\.
@@ -141,6 +141,7 @@ after_test:
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.dll package\x86\net5.0\.
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.xml package\x86\net5.0\.
   - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\SonnetWrapper.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Ijwhost.dll package\x86\net5.0\.
   - mkdir package\x86\net40
   - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.dll package\x86\net40\.
   - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.xml package\x86\net40\.
