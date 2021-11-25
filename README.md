@@ -30,7 +30,9 @@ In particular, the latest binary release:
 https://github.com/coin-or/Sonnet/releases
 
 Simply add the x86 or x64 libraries of `Sonnet.dll` and `SonnetWrapper.dll` to your References in Visual Studio.  
-Requires .NET Framework 4.x or .NET 5.
+Requires .NET Framework 4.x or .NET 5. 
+
+Note: If you use the .NET 5 libraries, then also include `Ijwhost.dll` in your project and set this file to Always Copy to Output folder to prevent runtime errors of `System.BadImageFormatException`.
 
 
 ## Building from source
