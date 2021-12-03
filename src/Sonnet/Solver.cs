@@ -1179,8 +1179,6 @@ namespace Sonnet
                     {
                         log.Debug("Using CLP-specific quadratic objective loading.");
 
-                        if (isMip) log.Warn("Only experimantal support for MIQP!");
-
                         ClpSimplex clpSimplex = osiClp.getModelPtr();
                         
                         clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);

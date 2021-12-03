@@ -5,27 +5,65 @@
 
 #include <ClpModel.hpp>
 #include <ClpQuadraticObjective.hpp>
+#include <ClpLinearObjective.hpp>
+#include <CoinPackedMatrix.hpp>
 
 #include "Helpers.h"
+#include "CoinPackedMatrix.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
 namespace COIN
 {
-	public ref class ClpObjective : WrapperBase<::ClpObjective>
+	public ref class ClpObjective : WrapperAbstractBase<::ClpObjective>
 	{
 	internal:
-		ClpObjective(::ClpObjective* obj)
-			: WrapperBase(obj)
+		ClpObjective(const ::ClpObjective* obj)
+			: WrapperAbstractBase(obj)
 		{
 		}
 	};
 
-	public ref class ClpQuadraticObjective : ClpObjective
+	public ref class ClpQuadraticObjective : public ClpObjective
+	{
+	public:
+		/// <summary>
+		/// Get the quadraticObjective of the base
+		/// </summary>
+		/// <returns></returns>
+		CoinPackedMatrix^ quadraticObjective()
+		{
+			return gcnew CoinPackedMatrix(Base->quadraticObjective());
+		}
+
+	protected:
+		/// <summary>
+		/// Wrapping constructor
+		/// </summary>
+		/// <param name="obj">Base to be used</param>
+		ClpQuadraticObjective(const ::ClpQuadraticObjective* obj)
+			: ClpObjective(obj)
+		{
+		}
+
+	internal:
+		/// <summary>
+		/// Overloaded Base property
+		/// </summary>
+		property ::ClpQuadraticObjective* Base
+		{
+			::ClpQuadraticObjective* get()
+			{
+				return dynamic_cast<::ClpQuadraticObjective*>(ClpObjective::Base);
+			}
+		}
+	};
+
+	public ref class ClpLinearObjective : public ClpObjective
 	{
 	internal:
-		ClpQuadraticObjective(::ClpQuadraticObjective* obj)
+		ClpLinearObjective(const ::ClpLinearObjective* obj)
 			: ClpObjective(obj)
 		{
 		}

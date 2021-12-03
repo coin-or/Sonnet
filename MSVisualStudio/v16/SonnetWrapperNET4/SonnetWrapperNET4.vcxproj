@@ -38,7 +38,8 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinUtils.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\CoinWarmStart.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\Helpers.cpp" />
-    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.cpp" />
+    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.cpp" />
+    <ClCompile Include="..\..\..\src\SonnetWrapper\OsiClpSolverInterface.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.cpp" />
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.cpp" />
   </ItemGroup>
@@ -62,7 +63,8 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinUtils.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinWarmStart.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\Helpers.h" />
-    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.h" />
+    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.h" />
+    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiClpSolverInterface.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.h" />
   </ItemGroup>

@@ -312,6 +312,7 @@ namespace Sonnet
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
                     m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
+                    
                 TODO: Now read the quad info too
 
                 model.Name = fileNameWithoutExtension;
@@ -353,9 +354,28 @@ namespace Sonnet
             return model;
         }
 
+        /// <summary>
+        /// Create new model from given arrays.
+        /// </summary>
+        /// <param name="variables"></param>
+        /// <param name="isIntegerFunc"></param>
+        /// <param name="columnNameFunc"></param>
+        /// <param name="rowNameFunc"></param>
+        /// <param name="colLower"></param>
+        /// <param name="colUpper"></param>
+        /// <param name="objName"></param>
+        /// <param name="objCoefs"></param>
+        /// <param name="numberVariables"></param>
+        /// <param name="numberConstraints"></param>
+        /// <param name="rowSenses"></param>
+        /// <param name="rowMatrix"></param>
+        /// <param name="rowLowers"></param>
+        /// <param name="rowUppers"></param>
+        /// <param name="quadraticObjective">Quadratic objective. Can be null.</param>
+        /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Private member and by design")]
         private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
-            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers)
+            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers, CoinPackedMatrix quadraticObjective)
         {
             Model model = new Model();
             variables = new Variable[numberVariables];
@@ -381,6 +401,14 @@ namespace Sonnet
                 var.Type = (isInteger) ? VariableType.Integer : VariableType.Continuous;
 
                 objExpr.Add(objCoefs[i], var);
+            }
+
+            if (quadraticObjective != null)
+            {
+                // Read the elements of CoinPackedMatrix of quadraticObjective
+                // and add these to the objExpr in quadratic form
+                objExpr.Add(
+                
             }
 
             model.Objective = new Objective(objName, objExpr);
