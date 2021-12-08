@@ -309,9 +309,13 @@ namespace Sonnet
                 //ClpModel  has ClpObjective which may be an implementatin of ClpQuadObjective.
                 // This can be found by obj->type() == 2 (QuadCoef)
                 
+                ClpObjective clpObjective = m.objectiveAsObject();
+                ClpQuadraticObjective clpQuadObjective = null;
+                if (clpObjective.type() == 2) clpQuadObjective = (ClpQuadraticObjective)clpObjective;
+
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
-                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
+                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), null);
                     
                 TODO: Now read the quad info too
 
@@ -332,7 +336,7 @@ namespace Sonnet
                 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName, 
                     m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(), 
-                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper());
+                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), null);
 
                 model.Name = fileNameWithoutExtension;
                 #endregion
