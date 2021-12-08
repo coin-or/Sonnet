@@ -18,14 +18,51 @@ namespace COIN
 {
 	public ref class ClpObjective : WrapperAbstractBase<::ClpObjective>
 	{
+	public:
+		/// <summary>
+		/// Returns type (above 63 is extra information)
+		/// </summary>
+		/// <returns>The type of the objective as integer with 1 for linear, 2 for quadratic.</returns>
+		inline int type()
+		{
+			return Base->type();
+		}
+
 	internal:
 		ClpObjective(const ::ClpObjective* obj)
 			: WrapperAbstractBase(obj)
 		{
 		}
+
+		static ClpObjective ^ CreateDerived(const ::ClpObjective* derived);
 	};
 
-	public ref class ClpQuadraticObjective : public ClpObjective
+	template<class T>
+	public ref class ClpObjectiveGeneric : ClpObjective
+	{
+	protected:
+		ClpObjectiveGeneric()
+		{
+			// DONT USE COPY-CONSTRUCTOR (that would make as not-deleteBase)
+			Base = new T();
+		}
+
+		ClpObjectiveGeneric(const T* base)
+			: ClpObjective(base)
+		{
+		}
+
+	protected:
+		property T* Base
+		{
+			T* get()
+			{
+				return dynamic_cast<T*>(ClpObjective::Base);
+			}
+		}
+	};
+
+	public ref class ClpQuadraticObjective : public ClpObjectiveGeneric<::ClpQuadraticObjective>
 	{
 	public:
 		/// <summary>
@@ -37,34 +74,26 @@ namespace COIN
 			return gcnew CoinPackedMatrix(Base->quadraticObjective());
 		}
 
-	protected:
+	internal:
 		/// <summary>
 		/// Wrapping constructor
 		/// </summary>
 		/// <param name="obj">Base to be used</param>
 		ClpQuadraticObjective(const ::ClpQuadraticObjective* obj)
-			: ClpObjective(obj)
+			: ClpObjectiveGeneric(obj)
 		{
-		}
-
-	internal:
-		/// <summary>
-		/// Overloaded Base property
-		/// </summary>
-		property ::ClpQuadraticObjective* Base
-		{
-			::ClpQuadraticObjective* get()
-			{
-				return dynamic_cast<::ClpQuadraticObjective*>(ClpObjective::Base);
-			}
 		}
 	};
 
-	public ref class ClpLinearObjective : public ClpObjective
+	public ref class ClpLinearObjective : public ClpObjectiveGeneric<::ClpLinearObjective>
 	{
 	internal:
+		/// <summary>
+		/// Wrapping constructor
+		/// </summary>
+		/// <param name="obj">Base to be used</param>
 		ClpLinearObjective(const ::ClpLinearObjective* obj)
-			: ClpObjective(obj)
+			: ClpObjectiveGeneric(obj)
 		{
 		}
 	};

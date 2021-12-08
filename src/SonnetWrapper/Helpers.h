@@ -19,6 +19,12 @@ namespace COIN
 	{
 	internal:
 		bool deleteBase; 
+
+		/// <summary>
+		/// Transfer the Base object to elsewhere, including the responsibility to eventually delete the base object.
+		/// The current object will not delete the base.
+		/// </summary>
+		/// <returns>The underlying Base object</returns>
 		T* TransferBase()
 		{
 			deleteBase = false;
@@ -34,6 +40,12 @@ namespace COIN
 			}
 		
 			protected:
+
+			/// <summary>
+			/// Sets the base to the given value. 
+			/// If a base already existed, then delete that object unless base was transferred.
+			/// </summary>
+			/// <param name="value">The new base</param>
 			void set(T* value)
 			{
 				if (!base) DeleteBase();
@@ -57,6 +69,11 @@ namespace COIN
 			disposed = 0;
 		}
 
+		/// <summary>
+		/// Construct a wrapper for an existing base object.
+		/// The existing base object will not be deleted here.
+		/// </summary>
+		/// <param name="copy">The existing base object to be used</param>
 		WrapperAbstractBase(const T* copy)
 		{
 			base = (T*) copy;
@@ -64,6 +81,14 @@ namespace COIN
 			disposed = 0;
 		}
 	
+		/// <summary>
+		/// Create a derived wrapper from an existing derived base object.
+		/// To be implemented.
+		/// </summary>
+		/// <param name="derived">The derived base object to be used</param>
+		/// <returns>The derived wrapper</returns>
+		//static WrapperAbstractBase^ CreateDerived(const T* derived) = 0;
+
 	private:
 		int disposed;
 		T* base;
@@ -94,13 +119,19 @@ namespace COIN
 	public ref class WrapperBase : public WrapperAbstractBase<T>
 	{
 	protected:
+		/// <summary>
+		/// Construct a wrapper and a new underlying base object.
+		/// </summary>
 		WrapperBase() : WrapperAbstractBase()
 		{
-			// for (abstract) base classes, constructing here DOESNT make sense
-			// for other classes, it would be nice to "new T()" here
 			Base = new T(); 
 		}
 
+		/// <summary>
+		/// Construct a wrapper for an existing base object.
+		/// The existing base object will not be deleted here.
+		/// </summary>
+		/// <param name="copy">The existing base object to be used</param>
 		WrapperBase(const T* copy) : WrapperAbstractBase(copy)
 		{
 		}

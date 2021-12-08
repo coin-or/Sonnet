@@ -86,7 +86,7 @@ namespace COIN
 
 		ClpObjective^ objectiveAsObject()
 		{
-			return gcnew ClpObjective(Base->objectiveAsObject());
+			return ClpObjective::CreateDerived(Base->objectiveAsObject());
 		}
 		
 		//void setObjective(ClpObjective^ objective);
