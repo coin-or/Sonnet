@@ -66,12 +66,21 @@ namespace COIN
 	{
 	public:
 		/// <summary>
-		/// Get the quadraticObjective of the base
+		/// Get the quadraticObjective
 		/// </summary>
 		/// <returns></returns>
 		CoinPackedMatrix^ quadraticObjective()
 		{
 			return gcnew CoinPackedMatrix(Base->quadraticObjective());
+		}
+
+		/// <summary>
+		/// If a full or half matrix
+		/// </summary>
+		/// <returns></returns>
+		inline bool fullMatrix()
+		{
+			return Base->fullMatrix();
 		}
 
 	internal:
