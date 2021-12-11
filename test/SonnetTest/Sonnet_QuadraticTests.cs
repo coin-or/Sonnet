@@ -147,23 +147,15 @@ namespace SonnetTest
             if (solver.OsiSolver is COIN.OsiCbcSolverInterface) ((COIN.OsiCbcSolverInterface)solver.OsiSolver).SetCbcSolverArgs("-branchAndBound");
 
             solver.Export("testmiqp.mps");
-            solver.Solve();
-
-            Assert.IsTrue(solver.IsProvenOptimal);
-            Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
-            Assert.IsTrue(!solver.IsProvenDualInfeasible);
-
-            //     what about changes to osicbc mps file ClpDefau?
-            Assert.IsTrue(Utils.CompareDouble(obj.Level(), -7.5) == 0);
-            Assert.IsTrue(Utils.CompareDouble(obj.Value, -7.5) == 0);
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 1.0) == 0 && Utils.CompareDouble(x2.Value, 1.0) == 0);
 
             Model model2 = Model.New("testmiqp.mps");
             string model1string = model.ToString();
             string model2string = model2.ToString();
-            
+            // some renaming: we use the file name as model name, and use the Name (ClpDefau) as objective name.
+            model2string = model2string.Replace("Model 'testmiqp'", $"Model '{model.Name}'");
+            model2string = model2string.Replace("Objective OBJROW", $"Objective {model.Objective.Name}");
 
-
+            Assert.IsTrue(Utils.EqualsString(model1string, model2string));
         }
 
     }

@@ -246,7 +246,7 @@ namespace Sonnet
 
         //Let's move this to Solver, or move it out all together.
         // Like, Model.FromFile(..)
-        
+
         /// <summary>
         /// Creates a new model from the given file.
         /// </summary>
@@ -259,7 +259,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Creates a new model from the given file.
+        /// Creates a new model from the given file. The name of the model will be the filename.
         /// </summary>
         /// <param name="fileName">The mps or lp file to be imported.</param>
         /// <param name="variables">The full array of variables created for this new model.</param>
@@ -279,23 +279,19 @@ namespace Sonnet
 
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
-                //TODO:
-                // CoinMpsIO doesnt read quad info.
+                // Previously, CoinMpsIO was used but that doesnt read quad info.
                 // To read MPS with QUAD info use ClpModel or CoinModel readMps. 
-                // ClpModel doesnt do row Sense needed for here, only lb / ub.
-                // OsiClp can create row sense from lb / ub, but OsiClp uses CoinMpsIO, so cannot read Quad
                 // CoinModel we havent Wrapped yet at all, so more work.
-
-                //CoinMpsIO m = new CoinMpsIO();
-                //log.PassToCoinMpsIO(m);
-                //m.setInfinity(MathUtils.Infinity);
+                // ClpModel (ClpSimplex) doesnt do row Sense needed for here, only lb / ub.
+                // ClpModel also doesnt save the Objective name.
+                // OsiClp can create row sense from lb / ub, but OsiClp uses CoinMpsIO, so cannot read Quad from OsiClp
+                // So we use ClpSimplex to read the file, but use an OsiClp of it for rowsense 
 
                 ClpSimplex m = new ClpSimplex();
-                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m); 
+                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m);
                 log.PassToClpModel(m);
 
                 int numberErrors = m.readMps(fileName, true, false);
-                //int numberErrors = m.readMps(fullPathWithoutExtension, true, false);
                 if (numberErrors != 0)
                 {
                     string message = string.Format("Errors occurred when reading the mps file '{0}'.", fileName);
@@ -305,19 +301,23 @@ namespace Sonnet
 
                 // set objective function offest
                 // Skip this: setDblParam(OsiObjOffset,m.objectiveOffset())
-                
+
                 //ClpModel  has ClpObjective which may be an implementatin of ClpQuadObjective.
                 // This can be found by obj->type() == 2 (QuadCoef)
-                
+
+                bool fullQuadraticMatrix = false;
+                CoinPackedMatrix quadraticObjective = null;
                 ClpObjective clpObjective = m.objectiveAsObject();
-                ClpQuadraticObjective clpQuadObjective = null;
-                if (clpObjective.type() == 2) clpQuadObjective = (ClpQuadraticObjective)clpObjective;
+                if (clpObjective is ClpQuadraticObjective clpQuadraticObjective)
+                {
+                    Ensure.IsTrue(clpObjective.type() == 2, $"Quadratic Objective must be type 2 but is {clpObjective.type()}.");
+                    fullQuadraticMatrix = clpQuadraticObjective.fullMatrix();
+                    quadraticObjective = clpQuadraticObjective.quadraticObjective();
+                }
 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
-                    m.getColLower(), m.getColUpper(), m.problemName(), m.getObjCoefficients(),
-                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), null);
-                    
-                TODO: Now read the quad info too
+                    m.getColLower(), m.getColUpper(), "OBJROW", m.getObjCoefficients(),
+                    m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), fullQuadraticMatrix, quadraticObjective);
 
                 model.Name = fileNameWithoutExtension;
                 #endregion
@@ -333,10 +333,10 @@ namespace Sonnet
                 // a maximization problem, the objective function is immediadtly 
                 // flipped to get a minimization problem.  
                 m.readLp(fileName);
-                
-                model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName, 
-                    m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(), 
-                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), null);
+
+                model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
+                    m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(),
+                    m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), false, null);
 
                 model.Name = fileNameWithoutExtension;
                 #endregion
@@ -347,7 +347,7 @@ namespace Sonnet
                 SonnetLog.Default.Error(message);
                 throw new SonnetException(message);
             }
-            
+
             if (model == null)
             {
                 string message = $"An error occured while importing {fileName}. No model created.";
@@ -379,15 +379,14 @@ namespace Sonnet
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Private member and by design")]
         private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
-            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers, CoinPackedMatrix quadraticObjective)
+            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers, bool fullQuadraticMatrix, CoinPackedMatrix quadraticObjective)
         {
             Model model = new Model();
             variables = new Variable[numberVariables];
 
             Expression objExpr = new Expression();
 
-            int i = 0;
-            for (i = 0; i < numberVariables; i++)
+            for (int i = 0; i < numberVariables; i++)
             {
                 Variable var = new Variable();
                 variables[i] = var;
@@ -411,8 +410,28 @@ namespace Sonnet
             {
                 // Read the elements of CoinPackedMatrix of quadraticObjective
                 // and add these to the objExpr in quadratic form
-                objExpr.Add(
-                
+                // Check if the quadratic elements are given in full matrix or not--to prevent double counting.
+                for (int i = 0; i < numberVariables; i++)
+                {
+                    var vector = quadraticObjective.getVector(i);
+                    int nElements = vector.getNumElements();
+                    var indices = vector.getIndices(); // returns the column index
+                    var elements = vector.getElements();
+                    for (int e = 0; e < nElements; e++)
+                    {
+                        int j = indices[e];
+
+                        if (!fullQuadraticMatrix)
+                        {   // ! full matrix = only diagonal and one half
+                            if (i != j) objExpr.Add(elements[e], variables[i], variables[j]);
+                            else objExpr.Add(0.5 * elements[e], variables[i], variables[j]);
+                        }
+                        else
+                        {
+                            objExpr.Add(0.5 * elements[e], variables[i], variables[j]);
+                        }
+                    }
+                }
             }
 
             model.Objective = new Objective(objName, objExpr);
@@ -443,7 +462,7 @@ namespace Sonnet
                 string name = rowNameFunc.Invoke(j);
                 string conName;
                 if (!string.IsNullOrEmpty(name)) conName = name;
-                else conName = string.Concat("CON", i);
+                else conName = string.Concat("CON", j);
 
                 switch (rowSenses[j])
                 {
