@@ -97,6 +97,9 @@ namespace SonnetTest
             SonnetLog.Default.Error("Log Error");
 
             Model model = Model.New("mas74.mps");
+            Expression obj = (Expression)model.Objective;
+            obj.Add(10000.0); // check that the objective constant is taken into account.
+            model.Objective = obj;
 
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
@@ -105,10 +108,17 @@ namespace SonnetTest
 
             Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
             Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet (unless solver got a lot better)");
+            Assert.IsTrue(model.Objective.Bound < model.Objective.Value, "Bound must be less than current solution.");
 
-            // Allow also better solutions, but not worse. The problem is minimization.
-            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
-            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 12465, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 12465");
+            // The problem is minimization.
+            // Allow also better solutions, but not worse. 
+            // If your machine is significantly slower, the solution value will be worse (higher) and this test will fail--but can be ignored.
+            Assert.IsTrue(model.Objective.Value >= 21801.18 && model.Objective.Value <= 22465, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 21801.18 (opt) and 22465");
+            
+            // bound is expected to be 20482 on the reference machine.
+            // If your machine is slower, the bound will be worse (lower)
+            // If your machine is faster, the bound could be better (higher)
+            Assert.IsTrue(model.Objective.Bound >= 20300.0 && model.Objective.Bound <= 20700.0, $"Bound (Gap) is now ${model.Objective.Bound} but should be betweeen 20300 and 20700");
         }
 
         private static int SonnetCbcTest5numSolutions = 0;

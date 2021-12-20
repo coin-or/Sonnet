@@ -711,8 +711,8 @@ namespace Sonnet
             // these changes have to be passed on to all registered models.
             obj.Assemble();
             obj.Register(this);
-            obj.Assign(this, 0.0); // immediately also STORE!
-
+            obj.Assign(this, 0.0, double.NaN); // immediately also STORE!
+       
             GenerateVariables(obj.Coefficients);
 
             GenerateVariables(obj.QuadCoefficients);
@@ -1796,8 +1796,8 @@ namespace Sonnet
                     }
                 }
             } // unsafe
-
-            objective.Assign(this, solver.getObjValue() + objective.Constant);
+            
+            objective.Assign(this, solver.getObjValue() + objective.Constant, IsMIP?(solver.Bound() + objective.Constant): double.NaN);
 
             if (IsProvenOptimal)
             {
