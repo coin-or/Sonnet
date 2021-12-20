@@ -127,13 +127,15 @@ namespace SonnetTest
 
                     string rowName = "MyConstraint(" + m + ")";
                     RangeConstraint con = (RangeConstraint)model.Add(rowName,
-                        -model.Infinity <= expr <= available);
-
+                        -model.Infinity <= expr <= 0.5*Z);
                     expr.Assemble();
                     Assert.IsTrue(expr.NumberOfCoefficients == Z + 1);
 
                     expr.Clear();
                 }
+
+                model.Objective = vars.Sum();
+                model.ObjectiveSense = ObjectiveSense.Maximise;
 
                 Console.WriteLine(string.Format("Thread {0}: Start Generate... (this can take a while)", threadid));
 

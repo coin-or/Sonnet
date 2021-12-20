@@ -160,7 +160,7 @@ namespace Sonnet
         }
 
         /// <summary>
-        /// Gets the level of this objective. This should be equal to the Value.
+        /// Calculates the level of this objective, i.e. fill in the values of the variable in expression of this objective. This should be equal to the Value.
         /// See Level of the Expression class.
         /// </summary>
         /// <returns>The level.</returns>
@@ -168,6 +168,18 @@ namespace Sonnet
         {
             Ensure.IsTrue(Assigned, "No solver not set!");
             return expression.Level();
+        }
+
+        /// <summary>
+        /// Gets the current Bound of this objective for MIP.
+        /// If the current solution is Optimal, then Objective Bound equals Objective Value.
+        /// If not yet optimal, then Bound is best relaxation bound of all nodes left on the search tree.
+        /// This value is set (AssignSolution) after the optimisation.
+        /// This value is not available for all solvers.
+        /// </summary>
+        public double Bound 
+        { 
+            get { return bound; } 
         }
 
         /// <summary>
@@ -203,14 +215,16 @@ namespace Sonnet
         }
         
         /// <summary>
-        /// Assigns the given solver, and set the Value of this objective.
+        /// Assigns the given solver, and set the Value and Bound of this objective.
         /// </summary>
         /// <param name="solver">The solver to be assigned.</param>
         /// <param name="value">The new Value of this objective.</param>
-        internal void Assign(Solver solver, double value)
+        /// <param name="bound"">The new Bound of this objective.</param>
+        internal void Assign(Solver solver, double value, double bound)
         {
             base.Assign(solver, -1);
             this.value = value;
+            this.bound = bound;
         }
 
         /// <summary>
@@ -273,5 +287,6 @@ namespace Sonnet
         private static int numberOfObjectives = 0;
         private Expression expression;
         private double value;
+        private double bound;
     }
 }

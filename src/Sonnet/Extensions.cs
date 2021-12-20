@@ -330,5 +330,30 @@ namespace Sonnet
             return Expression.ScalarProduct(coefs, variables);
         }
 
+        /// <summary>
+        /// Gets the current bound for MIP.
+        /// If the current solution is Optimal, then Bound equals objective Value.
+        /// If not yet optimal, then Bound is best relaxation bound of all nodes left on the search tree.
+        /// This value is not available for all solvers.
+        /// </summary>
+        /// <param name="solver">The solver. Only available for OsiCbc.</param>
+        /// <returns>The current bound</returns>
+        internal static double Bound(this COIN.OsiSolverInterface solver)
+        {
+            Ensure.NotNull(solver, "solver");
+
+            if (solver.isProvenOptimal())
+            {
+                return solver.getObjValue();
+            }
+
+            // not optimal, so depends per solver
+            if (solver is COIN.OsiCbcSolverInterface osiCbc)
+            {
+                return osiCbc.Model.getBestPossibleObjValue();
+            }
+
+            throw new NotImplementedException($"Bound is not implemented for OsiSolverInterface type {solver.GetType()}");
+        }
     }
 }
