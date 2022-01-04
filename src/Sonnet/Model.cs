@@ -375,6 +375,7 @@ namespace Sonnet
         /// <param name="rowMatrix"></param>
         /// <param name="rowLowers"></param>
         /// <param name="rowUppers"></param>
+        /// <param name="fullQuadraticMatrix">Whether or not the given quadratic objective matrix is full (true) or only half (false).</param>
         /// <param name="quadraticObjective">Quadratic objective. Can be null.</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Private member and by design")]

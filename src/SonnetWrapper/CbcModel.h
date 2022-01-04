@@ -412,6 +412,25 @@ namespace COIN
 		}
 
 		/// <summary>
+		/// Set the CbcModel::CbcMaximumSeconds maximum number of seconds desired.
+		/// </summary>
+		/// <param name="value">The maximum number of seconds</param>
+		/// <returns>True (always)</returns>
+		inline bool setMaximumSeconds(double value)
+		{
+			return Base->setMaximumSeconds(value);
+		}
+
+		/// <summary>
+		/// Get the CbcModel::CbcMaximumSeconds maximum number of seconds desired.
+		/// </summary>
+		/// <returns>The maximum number of seconds</returns>
+		inline double getMaximumSeconds()
+		{
+			return Base->getMaximumSeconds();
+		}
+
+		/// <summary>
 		/// Final status of problem - 0 finished, 1 stopped, 2 difficulties
 		/// </summary>
 		/// <returns>0 finished, 1 stopped, 2 difficulties</returns>

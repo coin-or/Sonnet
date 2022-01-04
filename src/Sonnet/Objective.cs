@@ -219,7 +219,7 @@ namespace Sonnet
         /// </summary>
         /// <param name="solver">The solver to be assigned.</param>
         /// <param name="value">The new Value of this objective.</param>
-        /// <param name="bound"">The new Bound of this objective.</param>
+        /// <param name="bound">The new Bound of this objective.</param>
         internal void Assign(Solver solver, double value, double bound)
         {
             base.Assign(solver, -1);

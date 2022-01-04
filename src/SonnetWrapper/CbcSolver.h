@@ -37,24 +37,6 @@ namespace COIN
 	public ref class CbcSolver //: WrapperBase<::CbcSolver>
 	{
 	public:
-		static int callCbc(System::String ^ input2)
-		{
-			std::string input2s = marshal_as<std::string>(input2);
-			return ::callCbc(input2s);
-		}
-
-		static int callCbc(System::String ^ input2, OsiClpSolverInterface ^ solver1)
-		{
-			std::string input2s = marshal_as<std::string>(input2);
-			return ::callCbc(input2s, *(solver1->Base));
-		}
-
-		static int callCbc(System::String ^ input2, CbcModel ^ babSolver)
-		{
-			std::string input2s = marshal_as<std::string>(input2);
-			return ::callCbc(input2s, *(babSolver->Base));
-		}
-
 		/// <summary>
 		/// Call underlying CbcMain0 and CbcMain1, including native callback (not dummy).
 		/// </summary>
@@ -72,8 +54,8 @@ namespace COIN
 			{
 				argv[i] = context->marshal_as<const char*>(args[i]);
 			}
-			CbcSolverUsefulData cbcData;
-			cbcData.noPrinting_ = false;
+			CbcParameters cbcData;
+			cbcData.enablePrinting();
 			::CbcMain0(*(cbcModel->Base), cbcData);
 			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), NativeCallBackProxy, cbcData);
 			delete context;

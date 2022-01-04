@@ -41,7 +41,7 @@ namespace SonnetTest
                 foreach (var testType in types)
                 {
                     // Use the following line to only run one TestClass
-                    //if (testType != typeof(Sonnet_ExampleTests)) continue;
+                    //if (testType != typeof(Sonnet_CbcTests)) continue;
                     //if (testType == typeof(Sonnet_StressTests)) continue;
                     
                     object testInstance = null;
