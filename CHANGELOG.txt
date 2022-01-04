@@ -8,7 +8,7 @@ The File Version numbers change with every release. In contrast, the Assembly Ve
  - Resolve OsiCbc maintenance issues. OsiCbc is no longer maintained, but still used by Sonnet.
     Could remove Osi, but then we'll have to invent something else like Osi (..)
  - MIQP. Quadratic objective for MIP. Wait for next release of Cbc to finalize--in Cbc 2.10.5 results are not stable.
-
+  
 [1.4.0.0-dev]
 Latest update: 8 FEB 2021 
 Sonnet: 
