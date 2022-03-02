@@ -416,6 +416,7 @@ namespace COIN
 		/// </summary>
 		/// <param name="value">The maximum number of seconds</param>
 		/// <returns>True (always)</returns>
+		[System::Obsolete("Setting MaximumSeconds parameters via CbcModel may not work as expected. See Cbc #567.")]
 		inline bool setMaximumSeconds(double value)
 		{
 			return Base->setMaximumSeconds(value);

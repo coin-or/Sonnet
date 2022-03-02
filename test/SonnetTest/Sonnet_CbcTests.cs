@@ -103,7 +103,9 @@ namespace SonnetTest
 
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.getModelPtr().setMaximumSeconds(5.0); // Stop within 5 seconds
+            // Stop within 5 seconds. 
+            osiCbc.AddCbcSolverArgs("-sec", "5");
+            //osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567
             solver.Solve();
 
             Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
@@ -163,7 +165,9 @@ namespace SonnetTest
             Model model = Model.New("mas74.mps");
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
-            osiCbc.getModelPtr().setMaximumSeconds(5.0); // Stop within 5 seconds
+            // Stop within 5 seconds. 
+            osiCbc.AddCbcSolverArgs("-sec", "5");
+            //osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567
 
             CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) { return CbcAction.noAction; };
             handler += new CbcEventHandler(SonnetCbcTest5EventHandler); // will stop after 2nd solution
