@@ -1,6 +1,6 @@
 # Sonnet
 
-Sonnet is a modelling API and wrapper for COIN-OR mixed integer linear programming classes for the Microsoft .NET.
+Sonnet is a modelling API and wrapper for COIN-OR mixed integer linear programming classes for the Microsoft .NET on **Windows** platforms.
 
 Sonnet uses a wrapper to make the COIN-OR C++ classes available in .NET.  
 COIN-OR projects included in the wrapper: 
@@ -31,6 +31,10 @@ https://github.com/coin-or/Sonnet/releases
 
 Simply add the x86 or x64 libraries of `Sonnet.dll` and `SonnetWrapper.dll` to your References in Visual Studio.  
 Requires .NET Framework 4.x or .NET 5. 
+
+Sonnet can only be used on **Windows** platforms. While, in principle, [.NET 5 supports cross-platform use](https://docs.microsoft.com/en-us/dotnet/core/introduction), this 
+[does not include the mixed C++/CLI](https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli) of SonnetWrapper, 
+where the native C++ of the COIN-OR C++ is mixed with C++/CLI.
 
 Note: If you use the .NET 5 libraries, then also include `Ijwhost.dll` in your project and set this file to Always Copy to Output folder to prevent runtime errors of `System.BadImageFormatException`.
 
