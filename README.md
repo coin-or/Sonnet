@@ -19,7 +19,12 @@ Model model = new Model();
 Variable x = new Variable();
 Variable y = new Variable();
 model.Add(2 * x + 3 * y <= 10);
-model.Objective = 3 * x + y;
+
+var expr = new Expression(); // Useful in for-loops
+expr.Add(3.0, x);
+expr.Add(y);
+model.Objective = expr; // 3*x + y
+
 Solver solver = new Solver(model);
 solver.Maximise();
 ```
