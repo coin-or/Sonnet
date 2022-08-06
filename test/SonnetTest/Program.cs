@@ -42,7 +42,7 @@ namespace SonnetTest
                 {
                     // Use the following line to only run one TestClass
                     //if (testType != typeof(Sonnet_CbcTests)) continue;
-                    //if (testType == typeof(Sonnet_StressTests)) continue;
+                    //if (testType != typeof(Sonnet_CbcNativeTests)) continue;
                     
                     object testInstance = null;
                     var methods = testType.GetMethods()
@@ -55,7 +55,7 @@ namespace SonnetTest
                     {
                         // This Program.cs is ONLY used for debugging
                         // Automated tests do not use Program.cs
-                        //if (method.Name != nameof(Sonnet_QuadraticTests.SonnetTestQuad3)) continue;
+                        //if (method.Name != nameof(Sonnet_CbcNativeTests.SonnetCbcNativeTest3)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)
@@ -132,8 +132,9 @@ namespace SonnetTest
             get
             {
 #if NETCOREAPP
-                #warning "Sonnet: TODO Implement AvailableMemoryGb for .NET Core."
-                return 1.0;
+                double memoryGB = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1073741824.0;
+                // TotalAvailableMemoryBytes is far more than availablephysicalmemory (below), but we ignore that.
+                return memoryGB;
 #else
                 var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
                 //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much

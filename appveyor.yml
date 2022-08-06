@@ -66,6 +66,9 @@ install:
         git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b master C:\projects\CoinUtils
         git clone --depth 1 https://github.com/coin-or/Osi.git -b master C:\projects\Osi
       }
+      git clone --depth 1 https://github.com/coin-or-tools/Data-Sample -b master C:\projects\Data-Sample
+      git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master C:\projects\Data-miplib3
+      7z x -oC:\projects\Data-miplib3 C:\projects\Data-miplib3\*.gz
   - set RELEASE_TYPE=undefined
   - set RELEASE_NAME=undefined
   # be careful of trailing white spaces in env values!

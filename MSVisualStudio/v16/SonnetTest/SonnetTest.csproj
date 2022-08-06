@@ -29,8 +29,10 @@
     <Compile Include="..\..\..\examples\Example5.cs" Link="Examples\Example5.cs" />
     <Compile Include="..\..\..\examples\Example6.cs" Link="Examples\Example6.cs" />
     <Compile Include="..\..\..\examples\Example6b.cs" Link="Examples\Example6b.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Program.cs" Link="Program.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" Link="Sonnet_BasicTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcNativeTests.cs" Link="Sonnet_CbcNativeTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcTests.cs" Link="Sonnet_CbcTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" Link="Sonnet_ExampleTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" Link="Sonnet_QuadraticTests.cs" />

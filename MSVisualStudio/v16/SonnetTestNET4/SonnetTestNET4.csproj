@@ -111,6 +111,7 @@
       <Link>Examples\Example6b.cs</Link>
     </Compile>
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcNativeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\test\brandy.mps">
