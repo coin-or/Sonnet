@@ -36,7 +36,9 @@ namespace SonnetTest
         public Sonnet_CbcNativeTests()
         {
             SampleDir = Environment.GetEnvironmentVariable("SONNET_SAMPLEDIR");
+            if (SampleDir != null) SampleDir = SampleDir.Trim('"').Trim('\'');
             MipLibDir = Environment.GetEnvironmentVariable("SONNET_MIPLIBDIR");
+            if (MipLibDir != null) MipLibDir = MipLibDir.Trim('"').Trim('\'');
 
 #if NETCOREAPP
             // By default, the executable will be one directory deeper in NET5 compared to NET4
