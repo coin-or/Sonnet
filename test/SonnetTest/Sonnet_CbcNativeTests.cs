@@ -58,7 +58,6 @@ namespace SonnetTest
         public void SonnetCbcNativeTest1()
         {
             Console.WriteLine("SonnetCbcNativeTest1: GamsTest");
-
             Assert.IsTrue(CbcNativeTests.RunGamsTest() == 0);
         }
 
@@ -69,12 +68,14 @@ namespace SonnetTest
         [TestMethod, TestCategory("CbcNative")]
         public void SonnetCbcNativeTest2()
         {
+#if NETCOREAPP
             Console.WriteLine("SonnetCbcNativeTest2: osiUnitTest.exe -mpsDir=" + SampleDir);
-            Console.WriteLine("Skipping osiUnitTest because of issue in buildExmip1Mtx");
-            return;
-
-            //Assert.IsTrue(System.IO.Directory.Exists(SampleDir), "SampleDir not found at " + SampleDir);
-            //Assert.IsTrue(CbcNativeTests.RunOsiUnitTest(SampleDir) == 0);
+            Assert.IsTrue(System.IO.Directory.Exists(SampleDir), "SampleDir not found at " + SampleDir);
+            Assert.IsTrue(CbcNativeTests.RunOsiUnitTest(SampleDir) == 0);
+#else
+            Console.WriteLine("SonnetCbcNativeTest2: Skipping osiUnitTest because of issue in buildExmip1Mtx for .NET Framework");
+            Assert.Inconclusive();
+#endif
         }
 
         /// <summary>
