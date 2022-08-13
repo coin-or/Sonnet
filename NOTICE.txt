@@ -1,0 +1,16 @@
+Sonnet
+Copyright (C) Jan-Willem Goossens 
+See https://github.com/coin-or/sonnet
+
+Sonnet includes a number of subcomponents with separate copyright 
+notices and license terms. Sonnet does not necessarily use 
+all the subcomponents referred to below. 
+
+This software includes libraries developed as part of the
+Computational Infrastructure for Operations Research (https://www.coin-or.org/). In particular, this software includes the COIN-OR libraries BuildTools, Cbc, Cgl, Clp, CoinUtils and Osi (https://github.com/coin-or)
+
+If built for parallel branch and cut, then this software includes 
+the library pthread-win32 for Windows from GerHobbelt (https://github.com/GerHobbelt/pthread-win32)
+
+The binaries of Sonnet are built and tested on AppVeyor.com (https://ci.appveyor.com/project/coin-or/sonnet)
+

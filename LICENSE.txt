@@ -242,3 +242,28 @@ rights in the Program not expressly granted under this Agreement are reserved.
 Nothing in this Agreement is intended to be enforceable by any entity that is
 not a Contributor or Recipient. No third-party beneficiary rights are created
 under this Agreement.
+
+
+END OF ECLIPSE PUBLIC LICENSE AGREEMENT
+
+
+SONNET SUBCOMPONENTS:
+
+Sonnet includes a number of subcomponents with separate copyright notices and 
+license terms. Sonnet does not necessarily use all the subcomponents referred 
+to below. Your use of these subcomponents is subject to the terms and
+conditions of the following licenses.
+
+The COIN-OR BuildTools library is licensed under the Eclipse Public License v2.0. See COIN-OR BuildTools section in THIRD-PARTY-LICENSE.txt
+
+The COIN-OR Cbc library is licensed under the Eclipse Public License v2.0. See COIN-OR Cbc section in THIRD-PARTY-LICENSE.txt
+
+The COIN-OR Cgl library is licensed under the Eclipse Public License v2.0. See COIN-OR Cgl section in THIRD-PARTY-LICENSE.txt
+
+The COIN-OR Clp library is licensed under the Eclipse Public License v2.0. See COIN-OR Clp section in THIRD-PARTY-LICENSE.txt
+
+The COIN-OR CoinUtils library is licensed under the Eclipse Public License v2.0. See COIN-OR CoinUtils section in THIRD-PARTY-LICENSE.txt
+
+The COIN-OR Osi library is licensed under the Eclipse Public License v2.0. See COIN-OR Osi section in THIRD-PARTY-LICENSE.txt
+
+If built for parallel branch and cut, then the library pthread-win32 for Windows from GerHobbelt is licensed under the Apache License v2.0. See pthread-win32 for Windows section in THIRD-PARTY-LICENSE.txt
