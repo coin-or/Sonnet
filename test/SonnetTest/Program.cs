@@ -91,6 +91,7 @@ namespace SonnetTest
             }
 
             System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
+            System.GC.WaitForPendingFinalizers();
 
             double endMemoryGb = Utils.AvailableMemoryGb;
             Console.WriteLine("Rudimentary memory leak check:");

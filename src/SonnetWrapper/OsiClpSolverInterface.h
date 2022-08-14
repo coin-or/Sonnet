@@ -59,6 +59,14 @@ namespace COIN
 		/// Get pointer to row-wise copy of matrix
 		CoinPackedMatrix^ getMatrixByRow()
 		{
+			// Careful! At this point, the returned object is a wrapper around the native child object
+			// without any further reference to the original managed parent (this). Therefore, the GC
+			// may decide that the managed parent object (this) can be disposed if there are no other references to it!
+			// However, that would also dispose the wrapped native parent object, and also the native child object
+			// And thus, the returned managed object here would be illegally referring to a native child object.
+			// To prevent this, either explicity GC.KeepAlive(this), or maintain a managed 
+			// reference to the managed parent, such that GC knows not to dispose the parent (this).
+			// This caused a crash when running in Release build in Model.NewHelper.
 			return gcnew CoinPackedMatrix(Base->getMatrixByRow());
 		}
 

@@ -254,20 +254,58 @@ namespace Sonnet
         /// <returns>The new model, or an exception if error occurred.</returns>
         public static Model New(string fileName)
         {
+            Ensure.NotNullOrWhiteSpace(fileName, "fileName cannot be empty");
+
             Variable[] variables;
             return Model.New(fileName, out variables);
         }
 
         /// <summary>
-        /// Creates a new model from the given file. The name of the model will be the filename.
+        /// Creates a new model from the given file, assuming the file is of fileType mps, or lp.
+        /// The filename will be the model name.
         /// </summary>
-        /// <param name="fileName">The mps or lp file to be imported.</param>
+        /// <param name="fileName">The mps or lp file to be imported</param>
+        /// <param name="fileType">File type, like mps, .mps, lp or .lp.</param>
+        /// <returns>The new model, or an exception if an error occurred.</returns>
+        public static Model New(string fileName, string fileType)
+        {
+            Ensure.NotNullOrWhiteSpace(fileName, "fileName cannot be empty");
+            Ensure.NotNullOrWhiteSpace(fileType, "fileType cannot be empty");
+
+            Variable[] variables;
+            return Model.New(fileName, fileType, out variables);
+        }
+
+        /// <summary>
+        /// Creates a new model from the given file. The filename will be the model name.
+        /// The filename must have a valid extension.
+        /// </summary>
+        /// <param name="fileName">The name of the file with extension mps or lp imported.</param>
         /// <param name="variables">The full array of variables created for this new model.</param>
         /// <returns>The new model, or an exception if an error occurred.</returns>
         public static Model New(string fileName, out Variable[] variables)
         {
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            Ensure.NotNullOrWhiteSpace(fileName, "fileName cannot be empty");
             string extension = Path.GetExtension(fileName).ToLower();
+
+            return Model.New(fileName, extension, out variables);
+        }
+
+        /// <summary>
+        /// Creates a new model from the given file, assuming the file is of fileType mps, or lp.
+        /// The filename will be the model name.
+        /// </summary>
+        /// <param name="fileName">The mps or lp file to be imported</param>
+        /// <param name="fileType">File type, like mps, .mps, lp or .lp.</param>
+        /// <param name="variables">The full array of variables created for this new model.</param>
+        /// <returns>The new model, or an exception if an error occurred.</returns>
+        public static Model New(string fileName, string fileType, out Variable[] variables)
+        {
+            Ensure.NotNullOrWhiteSpace(fileName, "fileName cannot be empty");
+            Ensure.NotNullOrWhiteSpace(fileType, "fileType cannot be empty");
+
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            string extension = "." + fileType.TrimStart('.').ToLower();
 
             Model model = null;
 
@@ -319,6 +357,10 @@ namespace Sonnet
                     m.getColLower(), m.getColUpper(), "OBJROW", m.getObjCoefficients(),
                     m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), fullQuadraticMatrix, quadraticObjective);
 
+                // Ensure osiClp is not disposed right after a shallow copy of getMatrixByRow was taken for NewHelper call.
+                GC.KeepAlive(osiClp);
+                GC.KeepAlive(m);
+
                 model.Name = fileNameWithoutExtension;
                 #endregion
             }
@@ -337,6 +379,8 @@ namespace Sonnet
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
                     m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(),
                     m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), false, null);
+
+                GC.KeepAlive(m);
 
                 model.Name = fileNameWithoutExtension;
                 #endregion

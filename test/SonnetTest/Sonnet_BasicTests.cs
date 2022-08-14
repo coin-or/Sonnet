@@ -2591,6 +2591,25 @@ namespace SonnetTest
             Console.WriteLine(" - Testing ForAllDo and ToMap for variable names");
             toys.ForAllDo(t => Assert.IsTrue(y[t].Name == "y_" + t));
         }
+
+        [TestMethod, TestCategory("Import")]
+        public void SonnetTest40()
+        {
+            Console.WriteLine("SonnetTest40 - Load large MPS");
+
+            // A bug was found in Model.New (load MPS) when the garbage collector finalized osiClp earlier than expected. 
+            // This tests that scenario.
+
+            SonnetLog.Default.LogLevel = 4;
+
+            Sonnet_CbcNativeTests cbcNative = new Sonnet_CbcNativeTests();
+            string mpsfile = cbcNative.MipLibDir + "\\" + "nw04";
+
+            Model model = Model.New(mpsfile, ".mps");
+
+            Assert.IsNotNull(model, $"Model file {mpsfile} failed to load.");
+        }
+
     }
 }
 
