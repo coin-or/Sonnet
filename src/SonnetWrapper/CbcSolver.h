@@ -86,6 +86,25 @@ namespace COIN
 		}
 
 		/// <summary>
+		/// Property whether or not multithreaded Cbc is supported. (CBC_THREAD)
+		/// Use the "-threads X" parameter to actually use multiple threads during Cbc solving.
+		/// Note that this requires the pthread library.
+		/// </summary>
+		/// <returns>True if multithreaded Cbc is supported. False otherwise.</returns>
+		/// 
+		static property bool SupportsThreads
+		{
+			bool get()
+			{
+#ifdef CBC_THREAD
+				return true;
+#else
+				return false;
+#endif // CBC_THREAD
+			}
+		}
+
+		/// <summary>
 		/// The CallBack to delegate to be invoked.
 		/// If you add multiple delegates, all will be invoked, 
 		/// but the return value will come from the last one.

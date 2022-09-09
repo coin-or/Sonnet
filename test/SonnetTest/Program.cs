@@ -30,6 +30,8 @@ namespace SonnetTest
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
+            System.GC.WaitForPendingFinalizers();
             double startMemoryGb = Utils.AvailableMemoryGb;
             {
                 AssemblyInit(null);

@@ -120,7 +120,7 @@ namespace SonnetTest
             // bound is expected to be 20482 on the reference machine.
             // If your machine is slower, the bound will be worse (lower)
             // If your machine is faster, the bound could be better (higher)
-            Assert.IsTrue(model.Objective.Bound >= 20300.0 && model.Objective.Bound <= 20700.0, $"Bound (Gap) is now ${model.Objective.Bound} but should be betweeen 20300 and 20700");
+            Assert.IsTrue(model.Objective.Bound >= 20300.0, $"Bound (Gap) is now ${model.Objective.Bound} but should be above 20300 by now.");
         }
 
         private static int SonnetCbcTest5numSolutions = 0;
@@ -209,7 +209,7 @@ namespace SonnetTest
             osiCbc.AddCbcSolverArgs("-strong", "0");
             osiCbc.AddCbcSolverArgs("-heurist", "off");
             osiCbc.AddCbcSolverArgs("-cuts", "off");
-
+            if (CbcSolver.SupportsThreads) osiCbc.AddCbcSolverArgs("-threads", "1");
             solver.Solve();
 
             // but use at least one solve (or generate and savebefore) to ensure there's something to reset to
@@ -229,14 +229,15 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
             int nodes2 = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+            Assert.IsTrue(nodes1 > nodes2, $"Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
 
             solver.ResetAfterMIPSolve();
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
             int nodes1b = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
+
+            Assert.IsTrue(nodes1 == nodes1b, $"Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
 
             // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
         }
@@ -261,6 +262,7 @@ namespace SonnetTest
             osiCbc.AddCbcSolverArgs("-strong", "0");
             osiCbc.AddCbcSolverArgs("-heurist", "off");
             osiCbc.AddCbcSolverArgs("-cuts", "off");
+            if (CbcSolver.SupportsThreads) osiCbc.AddCbcSolverArgs("-threads", "1");
 
             solver.Solve();
             Assert.IsTrue(solver.IsFeasible());
@@ -286,7 +288,7 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
             int nodes2 = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 > nodes2, "Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+            Assert.IsTrue(nodes1 > nodes2, $"Providing a feasible obj value must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
 
             solver.ResetAfterMIPSolve();
 
@@ -294,7 +296,7 @@ namespace SonnetTest
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsTrue(solver.IsProvenOptimal, "should be optimal");
             int nodes1b = osiCbc.getNodeCount();
-            Assert.IsTrue(nodes1 == nodes1b, "Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
+            Assert.IsTrue(nodes1 == nodes1b, $"Number of nodes should be equal to original but {nodes1} != {nodes1b}.");
 
             // Not advised to use osiCbc.Model.setCutoff  Unreliable results especially for Maximisation
 
@@ -343,7 +345,41 @@ namespace SonnetTest
             int nodes2 = osiCbc.getNodeCount(); // nodes using setMIPStart
             Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, 124725));
 
-            Assert.IsTrue(nodes1 < nodes2, "Providing a feasible solution must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+            Assert.IsTrue(nodes1 < nodes2, $"Providing a feasible solution must result in improved performance, but number of nodes went from {nodes1} to {nodes2}.");
+        }
+
+        private static int SonnetCbcTest9MaxThreadId = 0;
+
+        [TestMethod, TestCategory("Cbc")]
+        public void SonnetCbcTest9()
+        {
+            Console.WriteLine("SonnetCbcTest9 - Test CbcModel Event Handler with multiple threads");
+
+            // skip this test if threads are not supported.
+            if (!CbcSolver.SupportsThreads) return;
+
+            Model model = Model.New("mas74.mps");
+            Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
+            OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
+            osiCbc.AddCbcSolverArgs("-sec", "15"); // Stop within 15 seconds. 
+            osiCbc.AddCbcSolverArgs("-threads", "6"); // Use 6 threads
+
+            CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) {
+                // no special action in this handler, just checking the ManagedThreadId
+                int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+                if (threadId > SonnetCbcTest9MaxThreadId) SonnetCbcTest9MaxThreadId = threadId;
+                return CbcAction.noAction; 
+            };
+            osiCbc.Model.passInEventHandler(handler); 
+            solver.Solve();
+
+            Assert.IsTrue(solver.IsFeasible());
+            Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
+            Assert.IsTrue(SonnetCbcTest9MaxThreadId >= 8, "should have used at least 8 threads by now."); // Expected: (threads + 2)
+
+            // Allow also better solutions, but not worse. The problem is minimization.
+            // If you machine is significantly slower, the solution will be worse and this test will fail--but can be ignored.
+            Assert.IsTrue(model.Objective.Value >= 11801.18 && model.Objective.Value <= 14168.34, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 11801.18 (opt) and 14168.34");
         }
     }
 }

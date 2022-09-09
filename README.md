@@ -89,13 +89,26 @@ Separate builds are required for x86 or x64, in particular for `SonnetWrapper.dl
 Since the C++/CLI of `SonnetWraper.dll` has no "AnyCPU" equivalent, it is *NOT* possible to use
 the x86 and/or x64 `Sonnet.dll` and `SonnetWrapper.dll` in an "AnyCPU" project. The project *has* to target x86 or x64.
 
+### Parallel version of Cbc
+For Windows builds of Cbc, the standard method to build Sonnet and dependencies will build a single threaded Cbc. However, Cbc can also run with parallel threads to speed up the search. 
+Rudimentary steps how to build a parallel version of Cbc in Windows are available [in the Cbc README](https://github.com/coin-or/Cbc/#with-microsoft-visual-studio). 
+Here I'll describe the steps in more detail, assuming you already have a setup where you can build Sonnet etc. in Visual Studio 2019.
 
-### Strongly naming / Signing assemblies
+Several pthread for Windows libraries are available. Sonnet was succesfully tested to work with [GerHobbelt/pthread-win32](https://github.com/GerHobbelt/pthread-win32).
+To build Sonnet with pthread, all necessary project settings are available in the respective ReleaseParallel configurations of libCbc, libCbcSolver and SonnetWrapper:
+- Solution: Use the ReleaseParallel configuration.
+- Define: CBC_THREAD is defined by the projects
+- Include: "pthreads" include folder is expected at one level above the Sonnet root folder, so _not_ besides BuildTools, etc., but one level above.
+- Linker: SonnetWrapper links to pthread_static_lib.lib that is expected in the lib\Win32 or lib\x64 folder at the root of Sonnet folder. You have to build this first, below.
+ 
+Start by cloning the pthread repo, and opening the solution in VS2019. You can decide to build the pthread dll or the pthread static lib. 
+Build the Release configurmation for either the x64 or Win32 platform, depending on your needs.
+Within Cbc, the only projects that actually use pthread are libCbc and libCbcSolver.
+Since these come together in SonnetWrapper, SonnetWrapper also links to the pthread library in the ReleaseParallel configuration.
 
-To strongly name (sign) the `Sonnet.dll` and `SonnetWrapper.dll` there are two options:
-1) Build the source code using your own key, or
-2) Use [ILMerge](https://github.com/dotnet/ILMerge/blob/master/ilmerge-manual.md):
-   `ilmerge Weak.dll /keyfile:key.snk /out:Strong.dll`  
+SonnetWrapper has been configured to use the pthread_static_lib.lib, which looks for in the Sonnet/lib folder.
+Should you want to use pthread as a DLL instead, then copy the pthread.lib to Sonnet/lib and change the SonnetWrapper property for Linker -> Input to pthread.lib instead of pthread_static_lib.lib and ensure that the pthread.dll is copied to the output directory.
+Note: cbc (cbc.exe) project has been configured to use the pthread.lib and pthread.dll, but this project is not used by Sonnet.
 
 
 ### Additional functionality

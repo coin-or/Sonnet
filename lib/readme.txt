@@ -1,0 +1,1 @@
+For parallel Cbc, put "pthread_static_lib.lib" here in Win32 or x64 folder.

@@ -410,6 +410,22 @@ namespace Sonnet
                             else
                             {
                                 args.AddRange(cbcMainArgs);
+                                // if threads are supported, and no user override, then set threads equal to processor count
+                                // For servers, this may well be too high, since you might not want all processors to be running for Cbc
+                                // In such cases, it is advised to manually add "-threads" "n" arguments
+                                if (CbcSolver.SupportsThreads)
+                                {
+                                    if (!args.Contains("-threads"))
+                                    {
+                                        args.Add("-threads");
+                                        args.Add($"{Environment.ProcessorCount}");
+                                    }
+                                }
+                                else 
+                                {
+                                    // If not SupportsThreads, then no -threads argument shall be used!
+                                    Ensure.IsFalse(args.Contains("-threads"), "Cannot use threads since CbcSolver is not built to SupportThreads.");
+                                }
                                 args.Add("-solve");
                             }
                             args.Add("-quit");
