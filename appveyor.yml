@@ -147,7 +147,7 @@ test_script:
 #  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net5.0\SonnetTest.exe
 #  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\Release\net5.0\SonnetTest.exe
   - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe /Logger:Appveyor
-  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\Release\SonnetTest.exe /Logger:Appveyor
+#  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\Release\SonnetTest.exe /Logger:Appveyor
 
 after_test:
   - echo -- after_test
