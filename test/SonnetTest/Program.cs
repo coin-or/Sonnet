@@ -39,6 +39,7 @@ namespace SonnetTest
                 Assembly assembly = typeof(Program).Assembly;
                 var types = assembly.GetTypes()
                     .Where(t => t.GetCustomAttributes(typeof(TestClassAttribute), false).Length > 0)
+                    .OrderBy(t => t.Name)
                     .ToArray();
                 foreach (var testType in types)
                 {
@@ -49,6 +50,7 @@ namespace SonnetTest
                     object testInstance = null;
                     var methods = testType.GetMethods()
                             .Where(m => m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
+                            .OrderBy(m => m.Name)
                             .ToArray();
 
                     // If there are any TestMethods found, then create an instance of the TestClass

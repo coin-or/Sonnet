@@ -15,6 +15,10 @@ namespace SonnetExamples.Example6
     /// T W O 
     /// E A N
     /// N B E
+    /// or
+    /// T E N
+    /// W A B
+    /// O N E
     /// </summary>
     public class Example
     {

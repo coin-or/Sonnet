@@ -69,6 +69,9 @@ install:
       git clone --depth 1 https://github.com/coin-or-tools/Data-Sample -b master C:\projects\Data-Sample
       git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master C:\projects\Data-miplib3
       7z x -bso0 -oC:\projects\Data-miplib3 C:\projects\Data-miplib3\*.gz
+
+      git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master c:\pthread
+
   - set SONNET_SAMPLEDIR=C:\projects\Data-Sample
   - set SONNET_MIPLIBDIR=C:\projects\Data-miplib3
   - set RELEASE_TYPE=undefined
@@ -120,8 +123,16 @@ before_build:
 
 build_script:
   - echo -- Build_script
-  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x64
-  - MSBuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=Release;Platform=x86
+  - echo Build pthread-win32 as static library for Win32 and x64
+  - msbuild c:\pthread\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=Win32
+  - msbuild c:\pthread\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=x64
+  - mkdir c:\projects\sonnet\lib\Win32
+  - mkdir c:\projects\sonnet\lib\x64	
+  - copy c:\pthread\windows\VS2019\bin\Release-Unicode-32bit-x86\pthread_static_lib.lib c:\projects\sonnet\lib\Win32\.
+  - copy c:\pthread\windows\VS2019\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
+  - echo Build Sonnet for x86 and x64
+  - msbuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=ReleaseParallel;Platform=x64
+  - msbuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=ReleaseParallel;Platform=x86
 
 after_build:
   - echo -- After_build
@@ -132,36 +143,38 @@ after_build:
 # instead, test via test script
 
 test_script:
-  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net5.0\SonnetTest.exe
+  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\ReleaseParallel\net5.0\SonnetTest.exe
 # Disable because of missing SDK
-#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\Release\net5.0\SonnetTest.exe
-  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe /Logger:Appveyor
-  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\Release\SonnetTest.exe /Logger:Appveyor
+#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\ReleaseParallel\net5.0\SonnetTest.exe
+  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\ReleaseParallel\SonnetTest.exe /Logger:Appveyor
+  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\ReleaseParallel\SonnetTest.exe /Logger:Appveyor
 
 after_test:
   - echo -- after_test
   - mkdir package\x64\net5.0
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.dll package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.xml package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\SonnetWrapper.dll package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Ijwhost.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Sonnet.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Sonnet.xml package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\SonnetWrapper.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Ijwhost.dll package\x64\net5.0\.
   - mkdir package\x64\net40
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.dll package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.xml package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\SonnetWrapper.dll package\x64\net40\.
   - mkdir package\x86\net5.0
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.dll package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.xml package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\SonnetWrapper.dll package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Ijwhost.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Sonnet.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Sonnet.xml package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\SonnetWrapper.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Ijwhost.dll package\x86\net5.0\.
   - mkdir package\x86\net40
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.dll package\x86\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.xml package\x86\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\SonnetWrapper.dll package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\Sonnet.dll package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\Sonnet.xml package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\SonnetWrapper.dll package\x86\net40\.
   - copy AUTHORS.txt package\.
   - copy CHANGELOG.txt package\.
   - copy LICENSE.txt package\.
+  - copy NOTICE.txt package\.
   - copy README.md package\.
+  - copy THIRD-PARTY-LICENSE.txt package\.
   - copy examples\Example5.cs package\.
   - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" package\*
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%" )
