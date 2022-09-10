@@ -143,32 +143,32 @@ after_build:
 # instead, test via test script
 
 test_script:
-  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\ReleaseParallel\net5.0\SonnetTest.exe
+  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net5.0\SonnetTest.exe
 # Disable because of missing SDK
-#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\ReleaseParallel\net5.0\SonnetTest.exe
-  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\ReleaseParallel\SonnetTest.exe /Logger:Appveyor
-  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\ReleaseParallel\SonnetTest.exe /Logger:Appveyor
+#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\Release\net5.0\SonnetTest.exe
+  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe /Logger:Appveyor
+  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\Release\SonnetTest.exe /Logger:Appveyor
 
 after_test:
   - echo -- after_test
   - mkdir package\x64\net5.0
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Sonnet.dll package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Sonnet.xml package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\SonnetWrapper.dll package\x64\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x64\ReleaseParallel\net5.0\Ijwhost.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Sonnet.xml package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\SonnetWrapper.dll package\x64\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x64\Release\net5.0\Ijwhost.dll package\x64\net5.0\.
   - mkdir package\x64\net40
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.dll package\x64\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.xml package\x64\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\ReleaseParallel\SonnetWrapper.dll package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net40\.
   - mkdir package\x86\net5.0
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Sonnet.dll package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Sonnet.xml package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\SonnetWrapper.dll package\x86\net5.0\.
-  - copy MSVisualStudio\v16\Sonnet\bin\x86\ReleaseParallel\net5.0\Ijwhost.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Sonnet.xml package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\SonnetWrapper.dll package\x86\net5.0\.
+  - copy MSVisualStudio\v16\Sonnet\bin\x86\Release\net5.0\Ijwhost.dll package\x86\net5.0\.
   - mkdir package\x86\net40
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\Sonnet.dll package\x86\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\Sonnet.xml package\x86\net40\.
-  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\ReleaseParallel\SonnetWrapper.dll package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.dll package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\Sonnet.xml package\x86\net40\.
+  - copy MSVisualStudio\v16\SonnetNET4\bin\x86\Release\SonnetWrapper.dll package\x86\net40\.
   - copy AUTHORS.txt package\.
   - copy CHANGELOG.txt package\.
   - copy LICENSE.txt package\.
