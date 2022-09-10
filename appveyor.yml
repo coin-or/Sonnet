@@ -70,7 +70,7 @@ install:
       git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master C:\projects\Data-miplib3
       7z x -bso0 -oC:\projects\Data-miplib3 C:\projects\Data-miplib3\*.gz
 
-      git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master c:\pthread
+      git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master c:\pthreads
 
   - set SONNET_SAMPLEDIR=C:\projects\Data-Sample
   - set SONNET_MIPLIBDIR=C:\projects\Data-miplib3
@@ -124,12 +124,12 @@ before_build:
 build_script:
   - echo -- Build_script
   - echo Build pthread-win32 as static library for Win32 and x64
-  - msbuild c:\pthread\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=Win32
-  - msbuild c:\pthread\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=x64
+  - msbuild c:\pthreads\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=Win32
+  - msbuild c:\pthreads\windows\VS2019\pthread_lib.2019.vcxproj /p:Configuration=Release;Platform=x64
   - mkdir c:\projects\sonnet\lib\Win32
   - mkdir c:\projects\sonnet\lib\x64	
-  - copy c:\pthread\windows\VS2019\bin\Release-Unicode-32bit-x86\pthread_static_lib.lib c:\projects\sonnet\lib\Win32\.
-  - copy c:\pthread\windows\VS2019\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
+  - copy c:\pthreads\windows\VS2019\bin\Release-Unicode-32bit-x86\pthread_static_lib.lib c:\projects\sonnet\lib\Win32\.
+  - copy c:\pthreads\windows\VS2019\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
   - echo Build Sonnet for x86 and x64
   - msbuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=ReleaseParallel;Platform=x64
   - msbuild MSVisualStudio\v16\Sonnet.sln /p:Configuration=ReleaseParallel;Platform=x86
