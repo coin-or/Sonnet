@@ -23,10 +23,10 @@ jobs:
       - name: Setup VSTest
         uses: darenm/Setup-VSTest@v1
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6
+     # - name: Setup dotnet
+     #   uses: actions/setup-dotnet@v3
+     #   with:
+     #     dotnet-version: 6
 
       - name: Checkout Sonnet source
         uses: actions/checkout@v2
@@ -35,7 +35,6 @@ jobs:
 
       - name: Checkout dependenies sources
         run: |
-          Write-Host "For dependencies, use coin-or repos"
           git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master 
           git clone --depth 1 https://github.com/coin-or/Cbc.git -b master
           git clone --depth 1 https://github.com/coin-or/Clp.git -b master
@@ -46,13 +45,15 @@ jobs:
           git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master
           7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
 
+      - name: Prepare for build
+        run: nuget restore Sonnet\MSVisualStudio\v16\Sonnet.sln
+
       - name: Build
-        run: |
-          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m
+        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m
 
       - name: Test with vstest
         run: vstest.console Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
 
       - name: Test with dotnet
-        run: dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
+        run: dotnet test Sonnet\MSVisualStudio\v16\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
      
