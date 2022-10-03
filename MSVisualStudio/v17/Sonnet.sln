@@ -90,6 +90,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{53EB451D-0B1
 		..\..\lib\readme.txt = ..\..\lib\readme.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{AF32B005-0FCD-4760-BAB6-27DDC66D2E17}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\windows-ci.yml = ..\..\.github\workflows\windows-ci.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -372,6 +377,7 @@ Global
 		{E62F88EE-DC76-489A-99A8-8070099D9D4F} = {D7A6A624-56FF-4177-9382-DEBFDA33E5B5}
 		{FCF90EF8-93AE-482A-9B55-018B8338B99D} = {D7A6A624-56FF-4177-9382-DEBFDA33E5B5}
 		{53EB451D-0B18-4046-9038-1CDD196DDF33} = {F48F0304-01B7-4EF7-93B3-85F297B15C44}
+		{AF32B005-0FCD-4760-BAB6-27DDC66D2E17} = {F48F0304-01B7-4EF7-93B3-85F297B15C44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C418B8B-47F5-4DF0-B50B-4F5FBAEE968D}

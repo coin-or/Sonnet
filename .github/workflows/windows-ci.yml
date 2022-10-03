@@ -1,0 +1,58 @@
+---
+name: Windows build and test
+on:
+  push:
+    branches:
+      - 'master'
+      - 'stable/*'
+  pull_request:
+    branches:
+      - '**'
+  release:
+    types:
+      - created
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Sonnet source
+        uses: actions/checkout@v2
+        with:
+          path: Sonnet
+
+      - name: Checkout dependenies sources
+        run: |
+          Write-Host "For dependencies, use coin-or repo (default, unless use fork is mentioned in the commit message)"
+          git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master 
+          git clone --depth 1 https://github.com/coin-or/Cbc.git -b master
+          git clone --depth 1 https://github.com/coin-or/Clp.git -b master
+          git clone --depth 1 https://github.com/coin-or/Cgl.git -b master
+          git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b master
+          git clone --depth 1 https://github.com/coin-or/Osi.git -b master
+          git clone --depth 1 https://github.com/coin-or-tools/Data-Sample -b master
+          git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master
+          7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
+
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6
+
+      - name: Build
+        run: |
+          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Test with vstest
+        uses: microsoft/vstest@1
+        testAssembly: Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
+
+      - name: Test with vstest
+        run: vstest.console Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
+
+      - name: Test with dotnet
+        run: dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
+     
