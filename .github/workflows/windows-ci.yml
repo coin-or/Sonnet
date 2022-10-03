@@ -48,7 +48,8 @@ jobs:
 
       - name: Test with vstest
         uses: microsoft/vstest@1
-        testAssembly: Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
+        with:
+          testAssembly: Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
 
       - name: Test with vstest
         run: vstest.console Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
