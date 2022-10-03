@@ -24,7 +24,7 @@ jobs:
 
       - name: Checkout dependenies sources
         run: |
-          Write-Host "For dependencies, use coin-or repo (default, unless use fork is mentioned in the commit message)"
+          Write-Host "For dependencies, use coin-or repos"
           git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master 
           git clone --depth 1 https://github.com/coin-or/Cbc.git -b master
           git clone --depth 1 https://github.com/coin-or/Clp.git -b master
@@ -42,8 +42,8 @@ jobs:
         uses: darenm/Setup-VSTest@v1
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v2
-        with:
+          uses: actions/setup-dotnet@v3
+      with:
           dotnet-version: 6
 
       - name: Build

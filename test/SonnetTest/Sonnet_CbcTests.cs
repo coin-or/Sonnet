@@ -175,8 +175,8 @@ namespace SonnetTest
 
             int numCalls = 0;
             CbcSolver.CallBack = delegate (CbcModel m, int whereFrom) { numCalls++; return 0; };
-            // DONT use the cbcModel after solver.Solve() because of ResetAfterMIPSolveInternal at the end of Solve()
             solver.Solve();
+            // DONT use the cbcModel after solver.Solve() because of ResetAfterMIPSolveInternal at the end of Solve()
 
             Assert.IsTrue(solver.IsFeasible());
             Assert.IsFalse(solver.IsProvenOptimal, "should not be optimal yet");
@@ -370,11 +370,10 @@ namespace SonnetTest
                 // no special action in this handler, just checking the ManagedThreadId
                 int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                 if (threadId > SonnetCbcTest9MaxThreadId) SonnetCbcTest9MaxThreadId = threadId;
-                if (SonnetCbcTest9MaxThreadId >= 8) return CbcAction.noAction;
                 return CbcAction.noAction; 
             };
 
-            when run with vstest console or dotnet test, the sec timelimit is not honored if handlers keep returning noAction.
+            // TODO: when run with vstest console or dotnet test, the sec timelimit is not honored if handlers keep returning noAction.
             osiCbc.Model.passInEventHandler(handler); 
             solver.Solve();
 
