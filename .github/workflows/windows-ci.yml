@@ -49,7 +49,7 @@ jobs:
         run: nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
-        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m /fs
+        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m -fs
 
       - name: Test with vstest
         run: vstest.console Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
