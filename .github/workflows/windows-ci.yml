@@ -46,14 +46,14 @@ jobs:
           7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
 
       - name: Prepare for build
-        run: nuget restore Sonnet\MSVisualStudio\v16\Sonnet.sln
+        run: nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
         run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m
 
       - name: Test with vstest
-        run: vstest.console Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
+        run: vstest.console Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
 
       - name: Test with dotnet
-        run: dotnet test Sonnet\MSVisualStudio\v16\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
+        run: dotnet test Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
      
