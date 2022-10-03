@@ -68,13 +68,9 @@ namespace SonnetTest
         [TestMethod, TestCategory("CbcNative")]
         public void SonnetCbcNativeTest2()
         {
-#if NETCOREAPP
             Console.WriteLine("SonnetCbcNativeTest2: osiUnitTest.exe -mpsDir=" + SampleDir);
             Assert.IsTrue(System.IO.Directory.Exists(SampleDir), "SampleDir not found at " + SampleDir);
             Assert.IsTrue(CbcNativeTests.RunOsiUnitTest(SampleDir) == 0);
-#else
-            Console.WriteLine("SonnetCbcNativeTest2: Skipping osiUnitTest because of issue in buildExmip1Mtx for .NET Framework");
-#endif
         }
 
         /// <summary>

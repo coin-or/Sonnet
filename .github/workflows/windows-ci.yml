@@ -37,6 +37,10 @@ jobs:
 
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
+
+      - name: Setup VSTest
+        uses: darenm/Setup-VSTest@v1
+
       - name: Setup dotnet
         uses: actions/setup-dotnet@v2
         with:
@@ -45,11 +49,6 @@ jobs:
       - name: Build
         run: |
           msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release /p:Platform=x64 /m
-
-      - name: Test with vstest
-        uses: microsoft/vstest@1
-        with:
-          testAssembly: Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
 
       - name: Test with vstest
         run: vstest.console Sonnet\MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
