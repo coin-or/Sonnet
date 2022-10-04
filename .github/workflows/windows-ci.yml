@@ -51,7 +51,7 @@ jobs:
       - name: Run tests for net4 framework
         run: Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
   
-  test_net6.0:
+  test_net60:
     name: Run tests for net6.0
     needs: build
     runs-on: windows-2022
