@@ -49,7 +49,10 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Run tests for net4 framework
-        run: Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
+          .\SonnetTest.exe 
   
   test_net60:
     name: Run tests for net6.0
@@ -57,5 +60,8 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Run tests for net6.0
-        run: Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
+          .\SonnetTest.exe
      
