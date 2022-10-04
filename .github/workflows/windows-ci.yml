@@ -13,8 +13,8 @@ on:
       - created
 
 jobs:
-  build_and_test:
-    name: Build and Test
+  build:
+    name: Build
     runs-on: windows-2022
     steps:
       - name: Setup msbuild
@@ -43,9 +43,19 @@ jobs:
       - name: Build
         run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64
 
+  test_net4:
+    name: Run tests for net4 framework
+    needs: build
+    runs-on: windows-2022
+    steps:
       - name: Run tests for net4 framework
         run: Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe 
-
+  
+  test_net6.0:
+    name: Run tests for net6.0
+    needs: build
+    runs-on: windows-2022
+    steps:
       - name: Run tests for net6.0
         run: Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe
      
