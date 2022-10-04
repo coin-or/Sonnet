@@ -41,7 +41,7 @@ jobs:
         run: nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
-        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64
+        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
 
   test_net4:
     name: Run tests for net4 framework
