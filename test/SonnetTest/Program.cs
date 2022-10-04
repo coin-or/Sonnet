@@ -57,9 +57,7 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
-                        // This Program.cs is ONLY used for debugging
-                        // Automated tests do not use Program.cs
-                        if (method.Name != nameof(Sonnet_CbcTests.SonnetCbcTest9)) continue;
+                        //if (method.Name != nameof(Sonnet_CbcTests.SonnetCbcTest9)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)
