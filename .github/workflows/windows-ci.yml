@@ -13,7 +13,7 @@ on:
       - created
 
 jobs:
-  build:
+  build_and_test:
     name: Build
     runs-on: windows-2022
     steps:
@@ -43,22 +43,12 @@ jobs:
       - name: Build
         run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
 
-  test_net4:
-    name: Run tests for net4 framework
-    needs: build
-    runs-on: windows-2022
-    steps:
       - name: Run tests for net4 framework
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
           .\SonnetTest.exe 
   
-  test_net60:
-    name: Run tests for net6.0
-    needs: build
-    runs-on: windows-2022
-    steps:
       - name: Run tests for net6.0
         shell: cmd
         run: |
