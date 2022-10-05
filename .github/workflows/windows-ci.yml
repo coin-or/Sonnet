@@ -59,6 +59,7 @@ jobs:
           vstest.console SonnetTest.exe 
   
       - name: Run tests for net6.0
+        if: always()
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
