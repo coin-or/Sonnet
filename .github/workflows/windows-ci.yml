@@ -70,6 +70,7 @@ jobs:
         if: always()
         with:
           name: DotNET Tests
+          working-directory: Sonnet
           path: "**/test-net60-results.trx"                            
           reporter: dotnet-trx
           fail-on-error: true
