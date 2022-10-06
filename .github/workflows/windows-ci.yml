@@ -55,21 +55,30 @@ jobs:
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
-          erase expect-feasible.mps
-          vstest.console SonnetTest.exe 
+          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
+
+      - name: Test Report for net4 framework
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Report for net4 framework
+          working-directory: Sonnet
+          path: "**/test-net4-results.trx"                            
+          reporter: dotnet-trx
+          fail-on-error: true
   
-      - name: Run tests for net6.0
+      - name: Run tests for net60
         if: always()
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
           dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net60-results.trx"
 
-      - name: Test Report
+      - name: Test Report for net60
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: DotNET Tests
+          name:  Test Report for net60
           working-directory: Sonnet
           path: "**/test-net60-results.trx"                            
           reporter: dotnet-trx
