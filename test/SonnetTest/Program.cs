@@ -45,7 +45,7 @@ namespace SonnetTest
                 {
                     // Use the following line to only run one TestClass
                     //if (testType != typeof(Sonnet_CbcTests)) continue;
-                    //if (testType != typeof(Sonnet_CbcNativeTests)) continue;
+                    //if (testType != typeof(Sonnet_CoinNativeTests)) continue;
                     
                     object testInstance = null;
                     var methods = testType.GetMethods()
@@ -57,7 +57,7 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
-                        //if (method.Name != nameof(Sonnet_CbcTests.SonnetCbcTest9)) continue;
+                        //if (method.Name != nameof(Sonnet_CoinNativeTests.SonnetCoinNativeTest2)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)

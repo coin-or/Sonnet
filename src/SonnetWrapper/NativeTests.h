@@ -9,19 +9,26 @@
 
 #undef main
 #define main mainGamsTest
-#include <GamsTest.cpp>
+#include <Cbc\test\GamsTest.cpp>
 
 #undef main
-#define main mainOsiUnitTest
-#include <osiUnitTest.cpp>
-#include <OsiCbcSolverInterfaceTest.cpp>
+#define main mainOsiCbcUnitTest
+#include <cbc\test\osiUnitTest.cpp>
+#include <cbc\test\OsiCbcSolverInterfaceTest.cpp>
+
+#undef main
+#define main mainOsiClpUnitTest
+#include <clp\test\osiUnitTest.cpp>
+#include <Clp\test\OsiClpSolverInterfaceTest.cpp>
+
+#undef main
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
 namespace COIN
 {
-	public ref class CbcNativeTests
+	public ref class NativeTests
 	{
 	public:
 		/// <summary>
@@ -75,10 +82,10 @@ namespace COIN
 		};
 
 		/// <summary>
-		/// Runs the Cbc test using osiUnitTest.exe and 'Sample' dataset with exmip1 etc.
+		/// Runs the Cbc test osiUnitTest.exe and 'Sample' dataset with exmip1 etc.
 		/// </summary>
 		/// <returns>Return value of main</returns>
-		static int RunOsiUnitTest(String^ mpsDir)
+		static int RunOsiCbcUnitTest(String^ mpsDir)
 		{
 			assert(mpsDir != nullptr);
 
@@ -92,7 +99,26 @@ namespace COIN
 			// osiUnitTest.exe -mpsDir=`cygpath -w C:/projects/dist/share/coin-or-sample`
 
 			const char* argv[2] = { "osiUnitTest.exe", charMpsDir };
-			int result = ::mainOsiUnitTest(2, argv);
+			int result = ::mainOsiCbcUnitTest(2, argv);
+
+			if (charMpsDir != nullptr) Marshal::FreeHGlobal((IntPtr)charMpsDir);
+			return result;
+		};
+
+		/// <summary>
+		/// Runs the Clp test osiUnitTest.exe and 'Sample' dataset with exmip1 etc.
+		/// </summary>
+		/// <returns>Return value of main</returns>
+		static int RunOsiClpUnitTest(String^ mpsDir)
+		{
+			assert(mpsDir != nullptr);
+
+			char* charMpsDir = (char*)Marshal::StringToHGlobalAnsi("-mpsDir=" + mpsDir).ToPointer();
+			// example: "-mpsDir=..\\..\\..\\..\\..\\..\\..\\..\\coin-or-sample"
+			// osiUnitTest.exe -mpsDir=`cygpath -w C:/projects/dist/share/coin-or-sample`
+
+			const char* argv[2] = { "osiUnitTest.exe", charMpsDir };
+			int result = ::mainOsiClpUnitTest(2, argv);
 
 			if (charMpsDir != nullptr) Marshal::FreeHGlobal((IntPtr)charMpsDir);
 			return result;

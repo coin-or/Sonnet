@@ -2602,7 +2602,7 @@ namespace SonnetTest
 
             SonnetLog.Default.LogLevel = 4;
 
-            Sonnet_CbcNativeTests cbcNative = new Sonnet_CbcNativeTests();
+            Sonnet_CoinNativeTests cbcNative = new Sonnet_CoinNativeTests();
             string mpsfile = cbcNative.MipLibDir + "\\" + "nw04";
 
             Model model = Model.New(mpsfile, ".mps");

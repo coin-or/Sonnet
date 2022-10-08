@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="..\..\..\test\SonnetTest\Program.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CoinNativeTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_StressTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" />
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" />
@@ -111,7 +112,6 @@
       <Link>Examples\Example6b.cs</Link>
     </Compile>
     <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" />
-    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcNativeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\test\brandy.mps">
