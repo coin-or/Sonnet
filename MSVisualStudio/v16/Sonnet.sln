@@ -90,6 +90,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{53EB451D-0B1
 		..\..\lib\readme.txt = ..\..\lib\readme.txt
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OsiClpUnitTest", "..\..\..\Clp\MSVisualStudio\v16\OsiClpUnitTest\OsiClpUnitTest.vcxproj", "{75367352-81A3-4707-8560-3005EDC37BBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -344,6 +346,18 @@ Global
 		{FCF90EF8-93AE-482A-9B55-018B8338B99D}.Release|x86.Build.0 = Release|Win32
 		{FCF90EF8-93AE-482A-9B55-018B8338B99D}.ReleaseParallel|x64.ActiveCfg = Release|x64
 		{FCF90EF8-93AE-482A-9B55-018B8338B99D}.ReleaseParallel|x86.ActiveCfg = Release|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Debug|x64.ActiveCfg = Debug|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Debug|x64.Build.0 = Debug|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Debug|x86.ActiveCfg = Debug|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Debug|x86.Build.0 = Debug|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x64.ActiveCfg = Release|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x64.Build.0 = Release|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x86.ActiveCfg = Release|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x86.Build.0 = Release|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x64.ActiveCfg = Release|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x64.Build.0 = Release|x64
+		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x86.ActiveCfg = Release|Win32
+		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -372,6 +386,7 @@ Global
 		{E62F88EE-DC76-489A-99A8-8070099D9D4F} = {D7A6A624-56FF-4177-9382-DEBFDA33E5B5}
 		{FCF90EF8-93AE-482A-9B55-018B8338B99D} = {D7A6A624-56FF-4177-9382-DEBFDA33E5B5}
 		{53EB451D-0B18-4046-9038-1CDD196DDF33} = {F48F0304-01B7-4EF7-93B3-85F297B15C44}
+		{75367352-81A3-4707-8560-3005EDC37BBA} = {D7A6A624-56FF-4177-9382-DEBFDA33E5B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C418B8B-47F5-4DF0-B50B-4F5FBAEE968D}

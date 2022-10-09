@@ -87,7 +87,7 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\SonnetWrapper\CbcNativeTests.h">
+    <ClInclude Include="..\..\..\src\SonnetWrapper\NativeTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -161,7 +161,7 @@
     <ClCompile Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\SonnetWrapper\CbcNativeTests.cpp">
+    <ClCompile Include="..\..\..\src\SonnetWrapper\NativeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
