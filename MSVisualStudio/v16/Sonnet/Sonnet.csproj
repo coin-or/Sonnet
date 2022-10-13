@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net5.0</TargetFrameworks>
@@ -47,6 +47,10 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\src\Sonnet\README.md" Link="README.md" />
   </ItemGroup>
 
   <ItemGroup>

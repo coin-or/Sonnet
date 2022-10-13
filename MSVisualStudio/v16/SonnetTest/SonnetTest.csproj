@@ -63,6 +63,7 @@
     <None Include="..\..\..\test\MIP-124725.mps" Link="MIP-124725.mps">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\..\test\SonnetTest\README.md" Link="README.md" />
   </ItemGroup>
 
   <ItemGroup>

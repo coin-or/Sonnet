@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sonnet</RootNamespace>
     <AssemblyName>Sonnet</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -17,7 +17,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET48</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x64\Debug\Sonnet.xml</DocumentationFile>
     <DebugType>full</DebugType>
@@ -27,7 +27,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET48</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x64\Release\Sonnet.xml</DocumentationFile>
     <Optimize>true</Optimize>
@@ -39,7 +39,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET48;WIN32</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x86\Debug\Sonnet.xml</DocumentationFile>
     <DebugType>full</DebugType>
@@ -49,7 +49,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET48;WIN32</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\x86\Release\Sonnet.xml</DocumentationFile>
     <Optimize>true</Optimize>
@@ -89,14 +89,14 @@
     <Compile Include="..\..\..\src\Sonnet\WarmStart.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\src\Sonnet\ReadMe.txt">
-      <Link>ReadMe.txt</Link>
-    </Content>
     <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml">
       <Link>SonarLint.xml</Link>
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\src\Sonnet\README.md">
+      <Link>README.md</Link>
+    </None>
     <None Include="..\.sonarlint\sonnet-master-cicsharp.ruleset">
       <Link>sonnet-master-cicsharp.ruleset</Link>
     </None>

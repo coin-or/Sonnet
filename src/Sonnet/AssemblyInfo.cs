@@ -15,16 +15,32 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-#if NETCOREAPP
-[assembly: AssemblyTitle("Sonnet (net5.0)")]
+#if NET6_0
+#if WIN32
+[assembly: AssemblyTitle("Sonnet (net6.0, x86)")]
 #else
-[assembly: AssemblyTitle("Sonnet (net40)")]
+[assembly: AssemblyTitle("Sonnet (net6.0, x64)")]
+#endif
+#elif NET5_0
+#if WIN32
+[assembly: AssemblyTitle("Sonnet (net5.0, x86)")]
+#else
+[assembly: AssemblyTitle("Sonnet (net5.0, x64)")]
+#endif
+#elif NET48
+#if WIN32
+[assembly: AssemblyTitle("Sonnet (net48, x86)")]
+#else
+[assembly: AssemblyTitle("Sonnet (net48, x64)")]
+#endif
+#else
+[assembly: AssemblyTitle("Sonnet")]
 #endif
 [assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("See https://github.com/coin-or/sonnet")]
 [assembly: AssemblyProduct("Sonnet")]
-[assembly: AssemblyCopyright("Copyright © 2011-2021")]
+[assembly: AssemblyCopyright("Copyright ©")]
 [assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
 [assembly: AssemblyCulture("")]
 // assembly: TargetFramework will contain .NETFramework or .NETCoreApp

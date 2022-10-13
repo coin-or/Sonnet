@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SonnetTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("See https://github.com/coin-or/sonnet")]
 [assembly: AssemblyProduct("SonnetTest")]
 [assembly: AssemblyCopyright("Copyright ©  2011-2021")]
 [assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
