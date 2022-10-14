@@ -34,14 +34,14 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Sonnet (net48, x64)")]
 #endif
 #else
-[assembly: AssemblyTitle("Sonnet")]
+#error Sonnet AssemblyInfo unclear build
 #endif
 [assembly: AssemblyDescription("Sonnet offers a .NET modelling API for optimization problems.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("See https://github.com/coin-or/sonnet")]
 [assembly: AssemblyProduct("Sonnet")]
-[assembly: AssemblyCopyright("Copyright ©")]
-[assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
+[assembly: AssemblyCopyright("This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0).")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 // assembly: TargetFramework will contain .NETFramework or .NETCoreApp
 

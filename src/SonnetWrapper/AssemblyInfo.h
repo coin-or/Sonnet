@@ -17,8 +17,8 @@
 #define VER_PRODUCTVERSION_STR	L"1.4.0.0"
 #define VER_ASSEMBLYVERSION_STR	L"1.4.0.0" // Can use * but that's what we DONT want to do
 
-#define VER_COPYRIGHT L"Copyright (C)"
-#define VER_TRADEMARK L"This code is licensed under the terms of the Eclipse Public License (EPL)"
+#define VER_COPYRIGHT L"This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0)."
+#define VER_TRADEMARK L""
 
 #if NET6_0
 #ifdef WIN32
@@ -39,11 +39,8 @@
 #define VER_FILEDESCRIPTION L"SonnetWrapper (net48, x64)"
 #endif
 #else
-#ifdef WIN32
-#define VER_FILEDESCRIPTION L"SonnetWrapper (x86)"
-#else
-#define VER_FILEDESCRIPTION L"SonnetWrapper (x64)"
-#endif
+#define VER_FILEDESCRIPTION L"SonnetWrapper (unknown)"
+error "SonnetWrapper AssemblyInfo unclear build."
 #endif
 
 #define VER_FILENAME L"SonnetWrapper.dll"

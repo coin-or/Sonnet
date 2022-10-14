@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Sonnet
 {
@@ -181,6 +182,7 @@ namespace Sonnet
             message.AppendLine(System.Reflection.Assembly.GetExecutingAssembly().FullName);
             message.AppendLine("Framework: " + Environment.Version.ToString());
             message.AppendLine("Assembly runtime version: " + System.Reflection.Assembly.GetExecutingAssembly().ImageRuntimeVersion);
+            message.AppendLine("Framework runtime version: " + RuntimeInformation.FrameworkDescription);
 
             System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.GetPEKind(out System.Reflection.PortableExecutableKinds portableExecutableKinds, out System.Reflection.ImageFileMachine imageFileMachine);
             message.AppendLine("Portable executable kinds: " + portableExecutableKinds.ToString());

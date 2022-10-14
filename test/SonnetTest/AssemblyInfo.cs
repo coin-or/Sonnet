@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("See https://github.com/coin-or/sonnet")]
 [assembly: AssemblyProduct("SonnetTest")]
-[assembly: AssemblyCopyright("Copyright ©  2011-2021")]
-[assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
+[assembly: AssemblyCopyright("This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0).")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
