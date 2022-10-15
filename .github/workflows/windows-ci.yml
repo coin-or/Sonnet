@@ -52,7 +52,7 @@ jobs:
         shell: cmd
         run: |
           call Sonnet\build-third-party-license.bat
-          echo Date: ${{ builddate }} > Sonnet\BUILD-INFO.txt
+          echo Date: ${{ env.builddate }} > Sonnet\BUILD-INFO.txt
           echo Ref: ${{ github.ref }} >> Sonnet\BUILD-INFO.txt
           echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
           echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
