@@ -122,8 +122,14 @@ jobs:
           cd ..
       
       - name: Update latest release
-        uses: softprops/action-gh-release@v1
+        uses: IsaacShelton/update-existing-release@v1.3.1 
         with:
+          release: Sonnet-latest
+          tag: latest
+          draft: false
+          prerelease: true
+          replace: true
+          updateTag: true
           body: |
             Built on: ${{ env.builddate }} 
             The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
@@ -132,32 +138,29 @@ jobs:
             
             Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
             Do not use the 'Source code' assets.
-          draft: false
-          prerelease: true
-          tag_name: latest
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
             Sonnet-${{ github.ref_name }}-CI-bin.zip
      
-      - name: Update latest tag
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}          
-          script: |
-            try {
-                await github.git.deleteRef({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  ref: "tags/latest"
-                })
-            } catch (e) {
-              console.log("The latest tag doesn't exist yet: " + e)
-            }
-            await github.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "refs/tags/latest",
-              sha: context.sha
-            })
+      #- name: Update latest tag
+      #  uses: actions/github-script@v3
+      #  with:
+      #    github-token: ${{secrets.GITHUB_TOKEN}}          
+      #    script: |
+      #      try {
+      #          await github.git.deleteRef({
+      #            owner: context.repo.owner,
+      #            repo: context.repo.repo,
+      #            ref: "tags/latest"
+      #          })
+      #      } catch (e) {
+      #        console.log("The latest tag doesn't exist yet: " + e)
+      #      }
+      #      await github.git.createRef({
+      #        owner: context.repo.owner,
+      #        repo: context.repo.repo,
+      #        ref: "refs/tags/latest",
+      #        sha: context.sha
+      #      })
 
