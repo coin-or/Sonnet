@@ -17,6 +17,10 @@ jobs:
     name: Build and Test
     runs-on: windows-2022
     steps:
+      - name: Setup date
+        run: |
+          echo (-join('"builddate=', (Get-Date).ToString("dd MMM yyyy"),'"')) >> $GITHUB_ENV
+
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
 
@@ -48,7 +52,8 @@ jobs:
         shell: cmd
         run: |
           call Sonnet\build-third-party-license.bat
-          echo Ref: ${{ github.ref }} > Sonnet\BUILD-INFO.txt
+          echo Date: ${{ builddate }} > Sonnet\BUILD-INFO.txt
+          echo Ref: ${{ github.ref }} >> Sonnet\BUILD-INFO.txt
           echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
           echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
           7z a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
@@ -119,8 +124,10 @@ jobs:
       - name: Upload snapshot release
         uses: softprops/action-gh-release@v1
         with:
+          name: Sonnet-snapshot ${{ env.builddate }}
           tag_name: snapshot
           token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: 
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
             Sonnet-${{ github.ref_name }}-CI-bin.zip
