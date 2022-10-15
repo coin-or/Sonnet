@@ -124,7 +124,7 @@ jobs:
       - name: Upload latest release
         uses: softprops/action-gh-release@v1
         with:
-          #name: Sonnet-latest
+          tag_name: latest
           body: |
             Built on: ${{ env.builddate }}
             The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
@@ -133,10 +133,9 @@ jobs:
             
             Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
             Do not use the 'Source code' assets.
-          tag_name: latest
+          draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          #target_commitish: ${{ github.ref }}
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
             Sonnet-${{ github.ref_name }}-CI-bin.zip
