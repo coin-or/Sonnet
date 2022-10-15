@@ -13,6 +13,5 @@ In particular, this software includes the COIN-OR libraries BuildTools, Cbc, Cgl
 If built for parallel branch and cut using COIN-OR Cbc, then this software includes 
 the library pthread-win32 for Windows from GerHobbelt (https://github.com/GerHobbelt/pthread-win32).
 
-
-The binaries of Sonnet are built and tested on AppVeyor.com (https://ci.appveyor.com/project/coin-or/sonnet).
+The binaries of Sonnet are built and tested on GitHub (https://github.com/coin-or/Sonnet/actions) and AppVeyor.com (https://ci.appveyor.com/project/coin-or/sonnet).
 
