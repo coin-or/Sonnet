@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Setup date
         run: |
-          echo "builddate=$((Get-Date).ToString("dd MMM yyyy"))" >> $env:GITHUB_ENV
+          echo "builddate=$((Get-Date).ToString("dd MMM yyyy, HH:MM"))" >> $env:GITHUB_ENV
           
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
@@ -129,6 +129,9 @@ jobs:
             Date: ${{ env.builddate }}
             The Sonnet snapshot builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. The Sonnet snapshot builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet snapshot builds are created automatically at every successful build following a commit to the master branch.
+            
+            Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
+            Do not use the 'Source code' assets.
           tag_name: snapshot
           token: ${{ secrets.GITHUB_TOKEN }}
           target_commitish: ${{ github.ref }}
