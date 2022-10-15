@@ -59,41 +59,41 @@ jobs:
           7z a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
-      #- name: Build
-      #  run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
+      - name: Build
+        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
 
-      #- name: Run tests for net4 framework
-      #  shell: cmd
-      #  run: |
-      #    cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
-      #    dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
+      - name: Run tests for net4 framework
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
+          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
 
-      #- name: Test Report for net4 framework
-      #  uses: dorny/test-reporter@v1
-      #  if: always()
-      #  with:
-      #    name: Test Report for net4 framework
-      #    working-directory: Sonnet
-      #    path: "**/test-net4-results.trx"                            
-      #    reporter: dotnet-trx
-      #    fail-on-error: true
+      - name: Test Report for net4 framework
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Report for net4 framework
+          working-directory: Sonnet
+          path: "**/test-net4-results.trx"                            
+          reporter: dotnet-trx
+          fail-on-error: true
   
-      #- name: Run tests for net60
-      #  if: always()
-      #  shell: cmd
-      #  run: |
-      #    cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
-      #    dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net60-results.trx"
+      - name: Run tests for net60
+        if: always()
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
+          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net60-results.trx"
 
-      #- name: Test Report for net60
-      #  uses: dorny/test-reporter@v1
-      #  if: always()
-      #  with:
-      #    name:  Test Report for net60
-      #    working-directory: Sonnet
-      #    path: "**/test-net60-results.trx"                            
-      #    reporter: dotnet-trx
-      #    fail-on-error: true
+      - name: Test Report for net60
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name:  Test Report for net60
+          working-directory: Sonnet
+          path: "**/test-net60-results.trx"                            
+          reporter: dotnet-trx
+          fail-on-error: true
 
       - name: Create asset package
         shell: cmd
@@ -142,25 +142,3 @@ jobs:
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
             Sonnet-${{ github.ref_name }}-CI-bin.zip
-     
-      #- name: Update latest tag
-      #  uses: actions/github-script@v3
-      #  with:
-      #    github-token: ${{secrets.GITHUB_TOKEN}}          
-      #    script: |
-      #      try {
-      #          await github.git.deleteRef({
-      #            owner: context.repo.owner,
-      #            repo: context.repo.repo,
-      #            ref: "tags/latest"
-      #          })
-      #      } catch (e) {
-      #        console.log("The latest tag doesn't exist yet: " + e)
-      #      }
-      #      await github.git.createRef({
-      #        owner: context.repo.owner,
-      #        repo: context.repo.repo,
-      #        ref: "refs/tags/latest",
-      #        sha: context.sha
-      #      })
-
