@@ -2,6 +2,8 @@
 
 Sonnet is a modelling API and wrapper for COIN-OR mixed integer linear programming classes for the Microsoft .NET on **Windows** platforms.
 
+[![Windows build and test](https://github.com/coin-or/Sonnet/actions/workflows/windows-ci.yml/badge.svg)](https://github.com/coin-or/Sonnet/actions/workflows/windows-ci.yml)
+
 Sonnet uses a wrapper to make the COIN-OR C++ classes available in .NET.  
 COIN-OR projects included in the wrapper: 
 [BuildTools](https://github.com/coin-or-tools/BuildTools), 
@@ -29,30 +31,28 @@ Solver solver = new Solver(model);
 solver.Maximise();
 ```
 
-You can find the latest binaries and sources from CI builds on [AppVeyor](https://ci.appveyor.com/project/coin-or/sonnet/build/artifacts) (if available).
+You can find the latest binaries and sources from CI builds at the [Sonnet-latest](https://github.com/coin-or/Sonnet/releases/tag/latest) pre-release, or on [AppVeyor](https://ci.appveyor.com/project/coin-or/sonnet/build/artifacts) (if available).
 
 In particular, the latest binary release:
 https://github.com/coin-or/Sonnet/releases
 
 Simply add the x86 or x64 libraries of `Sonnet.dll` and `SonnetWrapper.dll` to your References in Visual Studio.  
-Requires .NET Framework 4.x or .NET 5. 
+Sonnet requires .NET Framework 4.8 or .NET 6. 
 
-Sonnet can only be used on **Windows** platforms. While, in principle, [.NET 5 supports cross-platform use](https://docs.microsoft.com/en-us/dotnet/core/introduction), this 
+Sonnet can only be used on **Windows** platforms. While, in principle, [.NET 6 supports cross-platform use](https://docs.microsoft.com/en-us/dotnet/core/introduction), this 
 [does not include the mixed C++/CLI](https://docs.microsoft.com/en-us/dotnet/core/porting/cpp-cli) of SonnetWrapper, 
 where the native C++ of the COIN-OR C++ is mixed with C++/CLI.
 
-Note: If you use the .NET 5 libraries, then also include `Ijwhost.dll` in your project and set this file to Always Copy to Output folder to prevent runtime errors of `System.BadImageFormatException`.
+Note: If you use the .NET 6 libraries, then also include `Ijwhost.dll` in your project and set this file to Always Copy to Output folder to prevent runtime errors of `System.BadImageFormatException`.
 
 
 ## Building from source
 
 ### Getting the source code
 
-#### Option 1: Get the full src.zip artifact from AppVeyor
-The easiest way to get started with Sonnet source code is to use the ..-src.zip artefact (if available) from the latest 
-[AppVeyor build artefacts](https://ci.appveyor.com/project/coin-or/sonnet/build/artifacts). This zip contains the Sonnet sources as well as all the relevant COIN-OR dependencies from their master branch. 
+#### Option 1: Get the full src.zip asset from GitHub Sonnet-latest release
+The easiest way to get started with Sonnet source code is to use the ..-src.zip asset from the [Sonnet-latest](https://github.com/coin-or/Sonnet/releases/tag/latest) pre-release assets. This zip contains the Sonnet sources as well as all the relevant COIN-OR dependencies from their master branch. 
 Simply unzip to have all the sources in the right place.
-Unfortunately, AppVeyor only keeps the artefacts for one month after the build.
 
 #### Option 2: Get sources from GitHub
 The latest Sonnet sources can be downloaded from the [github repository](https://github.com/coin-or/Sonnet).
@@ -73,15 +73,19 @@ The folder structure should look like this:
 └─ Sonnet  
 
 ### Building in Visual Studio
-For Visual Studio 2019, the solution and project files can be found in `Sonnet\MSVisualStudio\v16`.
-Simply open the Sonnet solution in `Sonnet\MSVisualStudio\v16\Sonnet.sln`, and Build. 
+For Visual Studio 2022, the solution and project files can be found in `Sonnet\MSVisualStudio\v17`.
+Simply open the Sonnet solution in `Sonnet\MSVisualStudio\v17\Sonnet.sln`, and Build. 
 
-The Sonnet projects and solution are provided for Visual Studio 2019 (v16).
-The Sonnet solution for Visual Studio 2019 refers to the project files of the relevant COIN-OR libraries.
+The Sonnet projects and solution are provided for Visual Studio 2022 (v17).
+The Sonnet solution refers to the project files of the relevant COIN-OR libraries.
 
 Solution configurations for Debug, Release and ReleaseParallel are defined for the solution, each with x86 and x64 solution platforms.
 
-Older versions of Sonnet projects and solutions files are available for Visual Studio 2010 (v10), but these are not maintained.
+Older versions of Sonnet projects and solutions files are available for Visual Studio 2019 (v16) and 2010 (v10), but these are not maintained.
+
+### Testing
+The Sonnet solution also contains the SonneTest project. This builds the SonneTest.exe which will run Sonnet test and COIN-OR native tests.
+This can also be used with `dotnet test`.
 
 ### Platform target (x64 or Win32/x86)
 
