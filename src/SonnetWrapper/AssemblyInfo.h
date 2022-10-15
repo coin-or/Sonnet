@@ -5,8 +5,8 @@
 
 #pragma once
 
-#define VER_FILEVERSION			1,4,0,0
-#define VER_FILEVERSION_STR		"1.4.0.0"
+#define VER_FILEVERSION			1,4,0,1
+#define VER_FILEVERSION_STR		"1.4.0.1"
 // About Production & Assembly version:
 // Did the interface change? 
 // -> Yes: Are the changes backward compatible?

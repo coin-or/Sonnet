@@ -49,13 +49,16 @@ jobs:
           erase /f Data-miplib3\*.gz
 
       - name: Prepare for build
-        shell: cmd
+        shell: pwsh
         run: |
-          call Sonnet\build-third-party-license.bat
           echo Built on: ${{ env.builddate }} > Sonnet\BUILD-INFO.txt
+          echo Version: 1.4.0.${{ github.run_number }} >> Sonnet\BUILD-INFO.txt
           echo Ref: ${{ github.ref }} >> Sonnet\BUILD-INFO.txt
           echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
           echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
+          Sonnet\build-third-party-license.bat
+          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.4.0.99','1.4.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
+          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.4.0.99','1.4.0.${{ github.run_number }}').Replace('1,4,0,99','1,4,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
           7z a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
@@ -110,13 +113,13 @@ jobs:
           copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
           copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
           copy Sonnet\AUTHORS.txt package\.
+          copy Sonnet\BUILD-INFO.txt package\.
           copy Sonnet\CHANGELOG.txt package\.
           copy Sonnet\LICENSE.txt package\.
           copy Sonnet\NOTICE.txt package\.
           copy Sonnet\README.md package\.
           copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
           copy Sonnet\examples\Example5.cs package\.
-          copy Sonnet\BUILD-INFO.txt package\.
           cd package
           7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" *
           cd ..
@@ -131,7 +134,7 @@ jobs:
           replace: true
           updateTag: true
           body: |
-            Built on: ${{ env.builddate }} 
+            Built on: ${{ env.builddate }} (v1.4.0.${{ github.run_number }} )
             The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
             The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
