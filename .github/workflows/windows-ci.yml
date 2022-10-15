@@ -26,7 +26,7 @@ jobs:
           dotnet-version: 6
 
       - name: Checkout Sonnet source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: Sonnet
 
@@ -121,7 +121,28 @@ jobs:
         with:
           tag_name: snapshot
           token: ${{ secrets.GITHUB_TOKEN }}
-          target_commitish: ${{ github.sha }}
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
             Sonnet-${{ github.ref_name }}-CI-bin.zip
+     
+      - name: Update snapshot tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}          
+          script: |
+            try {
+                await github.git.deleteRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: "tags/snapshot"
+                })
+            } catch (e) {
+              console.log("The snapshot tag doesn't exist yet: " + e)
+            }
+            await github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/snapshot",
+              sha: context.sha
+            })
+
