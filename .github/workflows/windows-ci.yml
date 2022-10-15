@@ -20,9 +20,6 @@ jobs:
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Setup VSTest
-        uses: darenm/Setup-VSTest@v1
-
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
@@ -51,10 +48,10 @@ jobs:
         shell: cmd
         run: |
           call Sonnet\build-third-party-license.bat
-          echo Ref: %GITHUB_REF% > Sonnet\BUILD-INFO.txt]]
-          echo Ref name: %GITHUB_REF_NAME% >> Sonnet\BUILD-INFO.txt
-          echo Commit: %GITHUB_SHA% >> Sonnet\BUILD-INFO.txt
-          7z a -tzip -r -x!.git "Sonnet-%GITHUB_REF_NAME%-CI-src.zip" .\*
+          echo Ref: ${{ env.GITHUB_REF }} > Sonnet\BUILD-INFO.txt]]
+          echo Ref name: ${{ env.GITHUB_REF_NAME }} >> Sonnet\BUILD-INFO.txt
+          echo Commit: ${{ env.GITHUB_SHA }} >> Sonnet\BUILD-INFO.txt
+          7z a -tzip -r -x!.git "Sonnet-${{ env.GITHUB_REF_NAME }}-CI-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       #- name: Build
@@ -116,7 +113,7 @@ jobs:
           copy Sonnet\examples\Example5.cs package\.
           copy Sonnet\BUILD-INFO.txt package\.
           cd package
-          7z a -tzip -r "..\Sonnet-%GITHUB_REF_NAME%-CI-bin.zip" *
+          7z a -tzip -r "..\Sonnet-${{ env.GITHUB_REF_NAME }}-CI-bin.zip" *
           cd ..
       
       - name: Upload snapshot release
@@ -125,5 +122,5 @@ jobs:
           tag_name: snapshot
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            Sonnet-%GITHUB_REF_NAME%-CI-src.zip
-            Sonnet-%GITHUB_REF_NAME%-CI-bin.zip
+            Sonnet-${{ env.GITHUB_REF_NAME }}-CI-src.zip
+            Sonnet-${{ env.GITHUB_REF_NAME }}-CI-bin.zip
