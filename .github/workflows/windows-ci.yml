@@ -34,6 +34,7 @@ jobs:
           path: Sonnet
 
       - name: Checkout dependenies sources
+        shell: cmd
         run: |
           git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master 
           git clone --depth 1 https://github.com/coin-or/Cbc.git -b master
@@ -46,7 +47,13 @@ jobs:
           7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
 
       - name: Prepare for build
-        run: nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
+        shell: cmd
+        run: |
+          call Sonnet\build-third-party-license.bat
+          echo "ref: $GITHUB_REF" > Sonnet\BUILD-INFO.txt
+          echo "commit: $GITHUB_SHA" >> Sonnet\BUILD-INFO.txt
+          7z a -tzip -r -x!.git Sonnet-all-src.zip .\*
+          nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
         run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
@@ -83,3 +90,37 @@ jobs:
           path: "**/test-net60-results.trx"                            
           reporter: dotnet-trx
           fail-on-error: true
+
+      - name: Create asset package
+        shell: cmd
+        run: |
+          mkdir package\x64\net6.0
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Ijwhost.dll package\x64\net6.0\.
+          mkdir package\x64\net48
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
+          copy Sonnet\AUTHORS.txt package\.
+          copy Sonnet\CHANGELOG.txt package\.
+          copy Sonnet\LICENSE.txt package\.
+          copy Sonnet\NOTICE.txt package\.
+          copy Sonnet\README.md package\.
+          copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
+          copy Sonnet\examples\Example5.cs package\.
+          copy Sonnet\BUILD-INFO.txt package\.
+          7z a -tzip -r Sonnet-bin.zip package\*
+      
+      - name: Upload snapshot release
+        uses: pyTooling/Actions/releaser@main
+        with:
+          tag: snapshot
+          rm: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            Sonnet-all-src.zip
+            Sonnet-bin.zip

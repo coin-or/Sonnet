@@ -11,7 +11,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyTitleAttribute(VER_FILENAME)] ;
 [assembly:AssemblyDescriptionAttribute(VER_FILECOMMENTS)] ;
 [assembly:AssemblyConfigurationAttribute(L"")] ;
-[assembly:AssemblyCompanyAttribute(L"See https ://github.com/coin-or/sonnet")] ;
+[assembly:AssemblyCompanyAttribute(L"See https://github.com/coin-or/sonnet")] ;
 [assembly:AssemblyProductAttribute(L"Sonnet")] ;
 [assembly:AssemblyCopyrightAttribute(VER_COPYRIGHT)] ;
 [assembly:AssemblyTrademarkAttribute(VER_TRADEMARK)] ;

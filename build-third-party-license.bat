@@ -1,7 +1,14 @@
 @echo off
 SETLOCAL EnableDelayedExpansion
 
+pushd "%CD%"
+cd /d "%~dp0"
+echo Output to "%~dp0THIRD-PARTY-LICENSE.txt"
 call :DoWork > THIRD-PARTY-LICENSE.txt
+dir "%~dp0THIRD-PARTY-LICENSE.txt" | find "THIRD"
+popd
+
+ENDLOCAL
 goto :eof
 
 :DoWork
