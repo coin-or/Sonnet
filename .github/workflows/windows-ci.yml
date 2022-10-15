@@ -19,7 +19,6 @@ jobs:
     steps:
       - name: Setup date
         run: |
-        run: 
           echo "builddate=$((Get-Date).ToString("dd MMM yyyy"))" >> $env:GITHUB_ENV
           
       - name: Setup msbuild
