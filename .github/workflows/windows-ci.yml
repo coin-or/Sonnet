@@ -76,7 +76,7 @@ jobs:
       - name: Run tests for net4 framework
         shell: cmd
         run: |
-          cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\ReleaseParallel\
+          cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
           dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
 
       - name: Test Report for net4 framework
@@ -93,7 +93,7 @@ jobs:
         if: always()
         shell: cmd
         run: |
-          cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\ReleaseParallel\net6.0\
+          cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
           dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net60-results.trx"
 
       - name: Test Report for net60
@@ -110,16 +110,16 @@ jobs:
         shell: cmd
         run: |
           mkdir package\x64\net6.0
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\ReleaseParallel\net6.0\Sonnet.dll package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\ReleaseParallel\net6.0\Sonnet.xml package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\ReleaseParallel\net6.0\SonnetWrapper.dll package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\ReleaseParallel\net6.0\SonnetWrapper.xml package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\ReleaseParallel\net6.0\Ijwhost.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Ijwhost.dll package\x64\net6.0\.
           mkdir package\x64\net48
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.dll package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\ReleaseParallel\Sonnet.xml package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\ReleaseParallel\SonnetWrapper.dll package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\ReleaseParallel\SonnetWrapper.xml package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
           copy Sonnet\AUTHORS.txt package\.
           copy Sonnet\BUILD-INFO.txt package\.
           copy Sonnet\CHANGELOG.txt package\.
