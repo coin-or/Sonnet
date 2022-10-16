@@ -77,7 +77,7 @@ jobs:
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
-          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
+          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx;verbosity=detailed" 
 
       - name: Test Report for net4 framework
         uses: dorny/test-reporter@v1
