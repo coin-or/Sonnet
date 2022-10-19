@@ -3,8 +3,7 @@ name: Windows build and test
 on:
   push:
     branches:
-      - 'master'
-      - 'stable/*'
+      - '**'
   pull_request:
     branches:
       - '**'
@@ -47,6 +46,7 @@ jobs:
           git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master
           7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
           erase /f Data-miplib3\*.gz
+          git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
 
       - name: Prepare for build
         shell: pwsh
@@ -63,13 +63,21 @@ jobs:
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
-        run: msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
+        shell: cmd
+        run: |
+          echo Build pthread-win32 as static library
+          msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
+          mkdir sonnet\lib\x64	
+          copy ..\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib sonnet\lib\x64\.
+          echo.
+          echo Build Sonnet
+          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=ReleaseParallel -p:Platform=x64 -m
 
       - name: Run tests for net4 framework
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
-          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx" 
+          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx;verbosity=detailed" 
 
       - name: Test Report for net4 framework
         uses: dorny/test-reporter@v1

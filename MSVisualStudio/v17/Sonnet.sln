@@ -336,9 +336,7 @@ Global
 		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x86.ActiveCfg = Release|Win32
 		{75367352-81A3-4707-8560-3005EDC37BBA}.Release|x86.Build.0 = Release|Win32
 		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x64.ActiveCfg = Release|x64
-		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x64.Build.0 = Release|x64
 		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x86.ActiveCfg = Release|Win32
-		{75367352-81A3-4707-8560-3005EDC37BBA}.ReleaseParallel|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

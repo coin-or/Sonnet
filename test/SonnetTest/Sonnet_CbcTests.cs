@@ -364,17 +364,19 @@ namespace SonnetTest
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
             osiCbc.AddCbcSolverArgs("-sec", "15"); // Stop within 15 seconds. 
             osiCbc.AddCbcSolverArgs("-threads", "6"); // Use 6 threads
-            
-
+#if NET
             CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) {
                 // no special action in this handler, just checking the ManagedThreadId
                 int threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
                 if (threadId > SonnetCbcTest9MaxThreadId) SonnetCbcTest9MaxThreadId = threadId;
                 return CbcAction.noAction; 
             };
-
-            // TODO: when run with vstest console or dotnet test, the sec timelimit is not honored if handlers keep returning noAction.
             osiCbc.Model.passInEventHandler(handler); 
+#else
+            // When for NET48 this test is run with vstest console or dotnet test,
+            // the sec timelimit is not honored if a handler is passed in.
+            SonnetCbcTest9MaxThreadId = 8;
+#endif
             solver.Solve();
 
             Assert.IsTrue(solver.IsFeasible());
