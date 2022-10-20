@@ -15,9 +15,12 @@ version: 1.4.0.{build}
 # version: 1.0.{build}-{branch}
 
 # branches to build
-#branches:
-#  only:
-#    - master
+branches:
+  except:
+    - latest
+
+# Do not build on tags (GitHub, Bitbucket, GitLab, Gitea)
+# skip_tags: true
 
 # we dont need the full git history of Sonnet to be part of the clone.
 shallow_clone: true
@@ -141,10 +144,8 @@ after_build:
 
 test_script:
   - echo Disable tests because of missing SDK, AppVeyor time limit and issues with logger.
-#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net5.0\SonnetTest.exe
-#  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x86\Release\net5.0\SonnetTest.exe
-#  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe /Logger:Appveyor
-#  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x86\Release\SonnetTest.exe /Logger:Appveyor
+  - dotnet test MSVisualStudio\v16\SonnetTest\bin\x64\Release\net5.0\SonnetTest.exe
+  - vstest.console MSVisualStudio\v16\SonnetTestNET4\bin\x64\Release\SonnetTest.exe /Logger:Appveyor
 
 after_test:
   - echo -- after_test
