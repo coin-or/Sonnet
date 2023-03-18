@@ -65,12 +65,12 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          echo Build pthread-win32 as static library
+          echo Build pthread-win32 as static library >> %GITHUB_OUTPUT%
           msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
           mkdir sonnet\lib\x64	
           copy ..\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib sonnet\lib\x64\.
-          echo.
-          echo Build Sonnet
+          echo.  >> %GITHUB_OUTPUT%
+          echo Build Sonnet >> %GITHUB_OUTPUT%
           msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=ReleaseParallel -p:Platform=x64 -m
 
       - name: Run tests for net4 framework
@@ -135,7 +135,7 @@ jobs:
       
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
-        uses: IsaacShelton/update-existing-release@v1.3.1 
+        uses: IsaacShelton/update-existing-release@v1.3.2 
         with:
           release: Sonnet-latest
           tag: latest
