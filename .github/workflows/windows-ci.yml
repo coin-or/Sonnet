@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Setup environment
         run: |
-          echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_ENV
+          echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_OUTPUT
           
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
@@ -65,6 +65,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
+          @chcp 65001>nul
           echo Build pthread-win32 as static library >> %GITHUB_OUTPUT%
           msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
           mkdir sonnet\lib\x64	
