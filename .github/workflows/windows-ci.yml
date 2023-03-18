@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Setup environment
         run: |
-          echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_OUTPUT
+          echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_ENV
           
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
@@ -65,13 +65,12 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          @chcp 65001>nul
-          echo Build pthread-win32 as static library >> %GITHUB_OUTPUT%
+          echo Build pthread-win32 as static library
           msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
           mkdir sonnet\lib\x64	
           copy ..\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib sonnet\lib\x64\.
-          echo.  >> %GITHUB_OUTPUT%
-          echo Build Sonnet >> %GITHUB_OUTPUT%
+          echo.  
+          echo Build Sonnet 
           msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=ReleaseParallel -p:Platform=x64 -m
 
       - name: Run tests for net4 framework
