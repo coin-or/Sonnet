@@ -56,7 +56,7 @@ jobs:
           (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.4.0.99','1.4.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
           (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.4.0.99','1.4.0.${{ github.run_number }}').Replace('1,4,0,99','1,4,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
           7z --% a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
-          nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
+          dotnet restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
         shell: cmd
