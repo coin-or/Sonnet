@@ -48,19 +48,23 @@ install:
   # Multi-line batch if ( ) does work, but works in ps
   - echo -- Install
   - ps: |
+      cd c:\projects
       $env:GIT_REDIRECT_STDERR = '2>&1'
-      $deps = Get-Content c:\projects\sonnet\.coin-or\Dependencies |  ConvertFrom-String -Delimiter "\s+" -PropertyNames i,j,k
+      $deps = Get-Content sonnet\.coin-or\Dependencies |  ConvertFrom-String -Delimiter "\s+" -PropertyNames i,j,k
       foreach ($d in $deps)
       { 
+         Write-Host "git clone --depth 1 -b $d.k $d.j"
          git clone --depth 1 -b $d.k $d.j
+         git status
       }
       
-      if (Test-Path -Path 'C:\projects\Data-miplib3') 
+      if (Test-Path -Path 'Data-miplib3') 
       {
-         7z x -bso0 -oC:\projects\Data-miplib3 C:\projects\Data-miplib3\*.gz
+         Write-Host "Found Data-miplib3. Extracting and removing archives."
+         7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
          Remove-Item -Force -Path Data-miplib3\*.gz
       }
-      git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master c:\pthreads
+      git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
 
   - set SONNET_SAMPLEDIR=C:\projects\Data-Sample
   - set SONNET_MIPLIBDIR=C:\projects\Data-miplib3
@@ -108,6 +112,7 @@ before_build:
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
   - echo Creating %RELEASE_NAME%-src.zip artefact from projects folder
+  - cd c:\projects\sonnet
   - 7z a -tzip -r -x!.git "c:\projects\sonnet\%RELEASE_NAME%-src.zip" c:\projects\*
   - nuget restore MSVisualStudio\v17\Sonnet.sln
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=- )
@@ -115,6 +120,7 @@ before_build:
 build_script:
   - echo -- Build_script
   - echo Build pthread-win32 as static library for 
+  - cd c:\projects\sonnet
   - msbuild c:\pthreads\windows\VS2022\pthread_lib.2022.vcxproj /p:Configuration=Release;Platform=x64 /m
   - mkdir c:\projects\sonnet\lib\x64	
   - copy c:\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
@@ -135,32 +141,6 @@ test_script:
   
 after_test:
   - echo -- after_test
-          mkdir package\x64\net6.0
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.dll package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.xml package\x64\net6.0\.
-          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Ijwhost.dll package\x64\net6.0\.
-          mkdir package\x64\net48
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
-          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
-          copy Sonnet\AUTHORS.txt package\.
-          copy Sonnet\BUILD-INFO.txt package\.
-          copy Sonnet\CHANGELOG.txt package\.
-          copy Sonnet\LICENSE.txt package\.
-          copy Sonnet\NOTICE.txt package\.
-          copy Sonnet\README.md package\.
-          copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
-          copy Sonnet\examples\Example5.cs package\.
-          cd package
-          7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" *
-          cd ..
-
-
-
-
   - mkdir package\x64\net6.0
   - copy MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
   - copy MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
