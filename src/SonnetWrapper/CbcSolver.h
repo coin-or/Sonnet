@@ -27,6 +27,7 @@ namespace COIN
 	/// 4 just after branchAndBound(before postprocessing)
 	/// 5 after postprocessing
 	/// 6 after a user called heuristic phase
+	/// Return value: return 0 to continue execution, otherwise stop.
 	/// </summary>
 	public delegate int CbcSolverCallBack(COIN::CbcModel^ model, int whereFrom);
 
@@ -116,6 +117,7 @@ namespace COIN
 		/// 4 just after branchAndBound(before postprocessing)
 		/// 5 after postprocessing
 		/// 6 after a user called heuristic phase
+		/// Return value: return 0 to continue execution, otherwise stop.
 		/// </summary>
 		static CbcSolverCallBack^ CallBack;
 	};
