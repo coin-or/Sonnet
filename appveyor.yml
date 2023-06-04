@@ -53,9 +53,8 @@ install:
       $deps = Get-Content sonnet\.coin-or\Dependencies |  ConvertFrom-String -Delimiter "\s+" -PropertyNames i,j,k
       foreach ($d in $deps)
       { 
-         Write-Host "git clone --depth 1 -b $d.k $d.j"
+         Write-Host "git clone --depth 1 -b" $d.k $d.j
          git clone --depth 1 -b $d.k $d.j
-         git status
       }
       
       if (Test-Path -Path 'Data-miplib3') 
@@ -136,8 +135,13 @@ after_build:
 # instead, test via test script
 
 test_script:
-  - dotnet test MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\SonnetTest.exe
-  - dotnet test MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\SonnetTest.exe 
+  # Some of the sonnet tests assume input files in the current folder, so CD to the test folder.
+  - echo -- Testing for NET4
+  - cd c:\projects\sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
+  - dotnet test SonnetTest.exe
+  - echo -- Testing for NET6.0
+  - cd c:\projects\sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
+  - dotnet test SonnetTest.exe 
   
 after_test:
   - echo -- after_test
