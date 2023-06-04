@@ -2,6 +2,7 @@
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,9 @@ namespace SonnetTest
     [TestClass]
     public static class Program
     {
+        private static int numberOfTests = 0;
+        private static int numberOfPassedTests = 0;
+        private static int numberOfFailedTests = 0;
 
         [AssemblyInitialize]
         public static void AssemblyInit(TestContext context)
@@ -30,6 +34,12 @@ namespace SonnetTest
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            string[] filters = args;
+            if (filters.Length >= 1)
+            {
+                Console.WriteLine($"Filtering on test name contains (case sensitive) one or more of {string.Concat(args)}");
+            }
+
             System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
             System.GC.WaitForPendingFinalizers();
             double startMemoryGb = Utils.AvailableMemoryGb;
@@ -57,14 +67,23 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
+                        bool filterMatch = filters.Length == 0; // if no filters, then match = true. If filters, then start without match
+                        foreach (string filtername in filters)
+                        {
+                            if (method.Name.Contains(filtername))
+                            {
+                                filterMatch = true;
+                                break;
+                            }
+                        }
+                        if (filterMatch == false) continue;
+
                         //if (method.Name != nameof(Sonnet_CoinNativeTests.SonnetCoinNativeTest2)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)
                         {
-                            Console.WriteLine($"Starting test {method.Name} ()");
-                            method.Invoke(testInstance, null);
-                            Console.WriteLine($"Finished test {method.Name}: Passed");
+                            SafeInvoke(method, testInstance, null);
                         }
                         else if (p.Length == 1)
                         {
@@ -80,9 +99,7 @@ namespace SonnetTest
 
                                 foreach (var data in datas)
                                 {
-                                    Console.WriteLine($"Starting test {method.Name} ({string.Join(",", data)})");
-                                    method.Invoke(testInstance, data);
-                                    Console.WriteLine($"Finished test {method.Name} ({string.Join(",", data)}): Passed");
+                                    SafeInvoke(method, testInstance, data);
                                 }
                             }
                             Console.WriteLine($"Finished test {method.Name}: Passed");
@@ -99,6 +116,58 @@ namespace SonnetTest
             Console.WriteLine("Rudimentary memory leak check:");
             Console.WriteLine($"Available Memory at the start of testing: {startMemoryGb} (GB)");
             Console.WriteLine($"Available Memory at the end of testing: {endMemoryGb} (GB)");
+
+            if (filters.Length >= 1)
+            {
+                Console.WriteLine($"Filtered on test name contains (case sensitive) one or more of {string.Concat(args)}");
+            }
+            
+            Console.WriteLine($"Number of tests Run: {numberOfTests}");
+            Console.WriteLine($"Number of tests Passed: {numberOfPassedTests}");
+            Console.WriteLine($"Number of tests Failed: {numberOfFailedTests}");
+
+            Assert.IsTrue(numberOfTests > 0, $"Number of test run is ZERO! This means FAILED!");
+            Assert.IsTrue(numberOfTests == numberOfFailedTests + numberOfPassedTests, $"Number of passed tests {numberOfPassedTests} and failed tests {numberOfFailedTests} does not match the total number of tests run {numberOfTests}");
+            
+            if (numberOfFailedTests == 0)
+            {
+                Console.WriteLine("All tests PASSED!");
+                Environment.Exit(0);
+            }
+            else
+            {
+                Console.WriteLine($"TESTS FAILED! There are {numberOfFailedTests} tests that failed.");
+                Environment.Exit(numberOfFailedTests);
+            }
+        }
+
+        private static object SafeInvoke(MethodInfo method, object obj, object[]parameters)
+        {
+            Ensure.NotNull(method, "Method must not be null");
+            Ensure.NotNull(obj, "Object must not be null");
+
+            numberOfTests++;
+            try
+            {
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Starting test {method.Name} ()");
+                else Console.WriteLine($"Starting test {method.Name} ({string.Join(",", parameters)})");
+
+                object ret = method.Invoke(obj, parameters);
+
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Finished test {method.Name} (): Passed");
+                else Console.WriteLine($"Finished test {method.Name} ({string.Join(",", parameters)}): Passed");
+
+                numberOfPassedTests++;
+                return ret;
+            }
+            catch
+            {
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Finished test {method.Name} (): FAILED");
+                else Console.WriteLine($"Finished test {method.Name} ({string.Join(",", parameters)}): FAILED");
+
+                numberOfFailedTests++;
+                return null;
+            }
         }
     }
     public static class Utils
