@@ -145,6 +145,7 @@ test_script:
   
 after_test:
   - echo -- after_test
+  - cd c:\projects\sonnet
   - mkdir package\x64\net6.0
   - copy MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
   - copy MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
@@ -183,5 +184,5 @@ artifacts:
 #   prerelease: true
 #   auth_token  somethign
 
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
