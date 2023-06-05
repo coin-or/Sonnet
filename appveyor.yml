@@ -158,11 +158,10 @@ after_test:
   - copy MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
   - copy MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
   - copy AUTHORS.txt package\.
-  - copy BUILD-INFO.txt package\.
   - copy CHANGELOG.txt package\.
   - copy LICENSE.txt package\.
   - copy NOTICE.txt package\.
-  - copy README.md package\.
+  - copy README.txt package\.
   - copy THIRD-PARTY-LICENSE.txt package\.
   - copy examples\Example5.cs package\.
   - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" package\*
