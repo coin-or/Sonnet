@@ -159,8 +159,8 @@ after_test:
   - copy MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
   - copy AUTHORS.txt package\.
   - copy CHANGELOG.txt package\.
+  - copy INSTALL.txt package\.
   - copy LICENSE.txt package\.
-  - copy NOTICE.txt package\.
   - copy README.txt package\.
   - copy THIRD-PARTY-LICENSE.txt package\.
   - copy examples\Example5.cs package\.
