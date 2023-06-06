@@ -251,7 +251,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\SonnetWrapper\AssemblyInfo.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcCutGenerator.h" />
-    <ClInclude Include="..\..\..\src\SonnetWrapper\CbcEventHandler.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcModel.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcSolver.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CbcStrategy.h" />
@@ -269,12 +268,9 @@
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinUtils.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\CoinWarmStart.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\Helpers.h" />
-    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiCbcSolverInterface.h" />
-    <ClInclude Include="..\..\..\src\SonnetWrapper\OsiClpSolverInterface.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiDerivedSolverInterfaces.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverInterface.h" />
     <ClInclude Include="..\..\..\src\SonnetWrapper\OsiSolverParameters.h" />
-    <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\SonnetWrapper\AssemblyInfo.cpp" />
