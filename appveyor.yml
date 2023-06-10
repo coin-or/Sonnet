@@ -112,11 +112,11 @@ before_build:
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
   - echo Creating %RELEASE_NAME%-src.zip artefact from projects folder
-  - echo Built on: %date% %time% > Sonnet\BUILD-INFO.txt
-  - echo Version: 1.3.1.%APPVEYOR_BUILD_NUMBER% >> Sonnet\BUILD-INFO.txt
-  - echo Repo: %APPVEYOR_REPO_NAME% >> Sonnet\BUILD-INFO.txt
-  - echo Ref name: %APPVEYOR_REPO_BRANCH% >> Sonnet\BUILD-INFO.txt
-  - echo Commit: %APPVEYOR_REPO_COMMIT% >> Sonnet\BUILD-INFO.txt
+  - echo Built on %date% %time% > Sonnet\BUILD-INFO.txt
+  - echo Version 1.3.1.%APPVEYOR_BUILD_NUMBER% >> Sonnet\BUILD-INFO.txt
+  - echo Repo %APPVEYOR_REPO_NAME% >> Sonnet\BUILD-INFO.txt
+  - echo Ref name %APPVEYOR_REPO_BRANCH% >> Sonnet\BUILD-INFO.txt
+  - echo Commit %APPVEYOR_REPO_COMMIT% >> Sonnet\BUILD-INFO.txt
   - call Sonnet\build-third-party-license.bat
   - 7z a -tzip -r -x!.git "c:\projects\sonnet\%RELEASE_NAME%-src.zip" c:\projects\*
   - nuget restore MSVisualStudio\v17\Sonnet.sln
