@@ -22,10 +22,6 @@ echo conditions of the following licenses.
 echo. 
 echo.
 
-set _componentName=COIN-OR BuildTools
-set _componentLic=..\BuildTools\LICENSE
-call :WriteLicense
-
 set _componentName= COIN-OR Cbc
 set _componentLic=..\Cbc\LICENSE
 call :WriteLicense
@@ -38,12 +34,12 @@ set _componentName=COIN-OR Clp
 set _componentLic=..\Clp\LICENSE
 call :WriteLicense
 
-set _componentName=COIN-OR Clp
-set _componentLic=..\Clp\LICENSE
+set _componentName=COIN-OR Osi
+set _componentLic=..\Osi\LICENSE
 call :WriteLicense
 
-set _componentName=COIN-OR Clp
-set _componentLic=..\Clp\LICENSE
+set _componentName=COIN-OR CoinUtils
+set _componentLic=..\CoinUtils\LICENSE
 call :WriteLicense
 
 set _componentName=pthread-win32 for Windows (if applicable)

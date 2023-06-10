@@ -17,6 +17,8 @@ Patch release of Sonnet, upgrading to Cbc 2.10.10 and support .NET 6.0 and .NET 
  - Support building using AppVeyor and GitHub Actions
 
 [1.3.0.0] Nov 2020
+This release contains the complete assemblies to use SONNET (.NET Framework 4) in x86 and x64 builds.
+Built-in are the necessary COIN-OR libraries based on Cbc 2.10.5 (8 March 2020).
 Sonnet:
  - Quadratic expressions supported. For now, only for objective functions.
  - Quadratic Program (QP) supported via OsiClp. Quadratic objectives via OsiCbc does not work well and is disabled.
