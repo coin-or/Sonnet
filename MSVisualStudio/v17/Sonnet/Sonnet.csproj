@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+    <RootNamespace>Sonnet</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Platforms>x64;x86</Platforms>
+    <CodeAnalysisRuleSet>..\.sonarlint\sonnet-master-cicsharp.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\src\Sonnet\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\src\Sonnet\CoefVector.cs" Link="CoefVector.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Constraint.cs" Link="Constraint.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Exceptions.cs" Link="Exceptions.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Expression.cs" Link="Expression.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Extensions.cs" Link="Extensions.cs" />
+    <Compile Include="..\..\..\src\Sonnet\MessageHandler.cs" Link="MessageHandler.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Model.cs" Link="Model.cs" />
+    <Compile Include="..\..\..\src\Sonnet\ModelEntity.cs" Link="ModelEntity.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Objective.cs" Link="Objective.cs" />
+    <Compile Include="..\..\..\src\Sonnet\RangeConstraint.cs" Link="RangeConstraint.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Solver.cs" Link="Solver.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Utils.cs" Link="Utils.cs" />
+    <Compile Include="..\..\..\src\Sonnet\Variable.cs" Link="Variable.cs" />
+    <Compile Include="..\..\..\src\Sonnet\WarmStart.cs" Link="WarmStart.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\sonnet-master-ci\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SonnetWrapper\SonnetWrapper.vcxproj" />
+  </ItemGroup>
+
+</Project>

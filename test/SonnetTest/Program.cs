@@ -1,16 +1,297 @@
-﻿using System;
+﻿// Copyright (C) Jan-Willem Goossens 
+// This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0).
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sonnet;
 
 namespace SonnetTest
 {
-    class Program
+    [TestClass]
+    public static class Program
     {
-        static void Main(string[] args)
+        private static int numberOfTests = 0;
+        private static int numberOfPassedTests = 0;
+        private static int numberOfFailedTests = 0;
+
+        [AssemblyInitialize]
+        public static void AssemblyInit(TestContext context)
         {
-            SonnetTest test = new SonnetTest();
-			test.TestMain(args);
+            // Executes once before the test run. (Optional)
+            // Change to Invariant Culture, mainly for decimal point etc.
+            // Many of the tests do string comparing with "." as decimal symbol obtained in InvariantCulture
+            // So tests must be run in InvariantCulture to pass.
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+        }
+
+        /// <summary>
+        /// This is a very rudimentary way to run the test self-contained without framework.
+        /// </summary>
+        /// <param name="args"></param>
+        public static void Main(string[] args)
+        {
+            string[] filters = args;
+            if (filters.Length >= 1)
+            {
+                Console.WriteLine($"Filtering on test name contains (case sensitive) one or more of {string.Concat(args)}");
+            }
+
+            System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
+            System.GC.WaitForPendingFinalizers();
+            double startMemoryGb = Utils.AvailableMemoryGb;
+            {
+                AssemblyInit(null);
+
+                Assembly assembly = typeof(Program).Assembly;
+                var types = assembly.GetTypes()
+                    .Where(t => t.GetCustomAttributes(typeof(TestClassAttribute), false).Length > 0)
+                    .OrderBy(t => t.Name)
+                    .ToArray();
+                foreach (var testType in types)
+                {
+                    // Use the following line to only run one TestClass
+                    //if (testType != typeof(Sonnet_CbcTests)) continue;
+                    //if (testType != typeof(Sonnet_CoinNativeTests)) continue;
+                    
+                    object testInstance = null;
+                    var methods = testType.GetMethods()
+                            .Where(m => m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
+                            .OrderBy(m => m.Name)
+                            .ToArray();
+
+                    // If there are any TestMethods found, then create an instance of the TestClass
+                    if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
+                    foreach (var method in methods)
+                    {
+                        bool filterMatch = filters.Length == 0; // if no filters, then match = true. If filters, then start without match
+                        foreach (string filtername in filters)
+                        {
+                            if (method.Name.Contains(filtername))
+                            {
+                                filterMatch = true;
+                                break;
+                            }
+                        }
+                        if (filterMatch == false) continue;
+
+                        //if (method.Name != nameof(Sonnet_CoinNativeTests.SonnetCoinNativeTest2)) continue;
+
+                        var p = method.GetParameters();
+                        if (p.Length == 0)
+                        {
+                            SafeInvoke(method, testInstance, null);
+                        }
+                        else if (p.Length == 1)
+                        {
+                            Console.WriteLine($"Starting test {method.Name}");
+                            var dynamicDatas = method.GetCustomAttributes(typeof(DynamicDataAttribute), false);
+                            Assert.IsTrue(dynamicDatas.Length == 1, "Found more than one DynamicData attributes");
+                            if (dynamicDatas.Length == 1)
+                            {
+                                var dynamicData = (DynamicDataAttribute)dynamicDatas[0];
+                                var datas = dynamicData.GetData(method);
+                                // If throw System.ArgumentNullException: Value cannot be null. Parameter name: Property TestSolverTypes
+                                // then check that the [DynamicData(nameof(MyProperty), typeof(MyClass))] has the correct MyClass mentioned
+
+                                foreach (var data in datas)
+                                {
+                                    SafeInvoke(method, testInstance, data);
+                                }
+                            }
+                            Console.WriteLine($"Finished test {method.Name}: Passed");
+                        }
+
+                    }
+                }
+            }
+
+            System.GC.Collect(); // Force Gc.Collect to ensure that indeed all memory is properly freed.
+            System.GC.WaitForPendingFinalizers();
+
+            double endMemoryGb = Utils.AvailableMemoryGb;
+            Console.WriteLine("Rudimentary memory leak check:");
+            Console.WriteLine($"Available Memory at the start of testing: {startMemoryGb} (GB)");
+            Console.WriteLine($"Available Memory at the end of testing: {endMemoryGb} (GB)");
+
+            if (filters.Length >= 1)
+            {
+                Console.WriteLine($"Filtered on test name contains (case sensitive) one or more of {string.Concat(args)}");
+            }
+            
+            Console.WriteLine($"Number of tests Run: {numberOfTests}");
+            Console.WriteLine($"Number of tests Passed: {numberOfPassedTests}");
+            Console.WriteLine($"Number of tests Failed: {numberOfFailedTests}");
+
+            Assert.IsTrue(numberOfTests > 0, $"Number of test run is ZERO! This means FAILED!");
+            Assert.IsTrue(numberOfTests == numberOfFailedTests + numberOfPassedTests, $"Number of passed tests {numberOfPassedTests} and failed tests {numberOfFailedTests} does not match the total number of tests run {numberOfTests}");
+            
+            if (numberOfFailedTests == 0)
+            {
+                Console.WriteLine("All tests PASSED!");
+                Environment.Exit(0);
+            }
+            else
+            {
+                Console.WriteLine($"TESTS FAILED! There are {numberOfFailedTests} tests that failed.");
+                Environment.Exit(numberOfFailedTests);
+            }
+        }
+
+        private static object SafeInvoke(MethodInfo method, object obj, object[]parameters)
+        {
+            Ensure.NotNull(method, "Method must not be null");
+            Ensure.NotNull(obj, "Object must not be null");
+
+            numberOfTests++;
+            try
+            {
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Starting test {method.Name} ()");
+                else Console.WriteLine($"Starting test {method.Name} ({string.Join(",", parameters)})");
+
+                object ret = method.Invoke(obj, parameters);
+
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Finished test {method.Name} (): Passed");
+                else Console.WriteLine($"Finished test {method.Name} ({string.Join(",", parameters)}): Passed");
+
+                numberOfPassedTests++;
+                return ret;
+            }
+            catch
+            {
+                if (parameters == null || parameters.Length == 0) Console.WriteLine($"Finished test {method.Name} (): FAILED");
+                else Console.WriteLine($"Finished test {method.Name} ({string.Join(",", parameters)}): FAILED");
+
+                numberOfFailedTests++;
+                return null;
+            }
         }
     }
+    public static class Utils
+    {
+        public static IEnumerable<object[]> TestSolverTypes
+        {
+            get
+            {
+                //return Solver.GetOsiSolverTypes().Select(t => new object[] { t }).ToArray();
+                return new[]
+                {
+                    new object[] { typeof(COIN.OsiCbcSolverInterface) },
+                    new object[] { typeof(COIN.OsiClpSolverInterface) }
+                };
+            }
+        }
+
+        internal static System.Reflection.FieldInfo GetNumberOfVariablesOfVariableClass()
+        {
+            return typeof(Variable).GetField("numberOfVariables", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        }
+
+        internal static System.Reflection.FieldInfo GetNumberOfConstraintsOfConstraintClass()
+        {
+            return typeof(Constraint).GetField("numberOfConstraints", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        }
+
+        internal static System.Reflection.FieldInfo GetNumberOfObjectivesOfObjectiveClass()
+        {
+            return typeof(Objective).GetField("numberOfObjectives", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        }
+        public static double AvailableMemoryGb
+        {
+            get
+            {
+#if NETCOREAPP
+                double memoryGB = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1073741824.0;
+                // TotalAvailableMemoryBytes is far more than availablephysicalmemory (below), but we ignore that.
+                return memoryGB;
+#else
+                var pc = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                //double memoryGB = (pc.TotalPhysicalMemory) / 1073741824.0; // totalvirtualmemory returns faaar too much
+                double memoryGB = (pc.AvailablePhysicalMemory) / 1073741824.0;
+                return memoryGB;
+#endif
+            }
+        }
+
+        public static double ProcessMemoryGb
+        {
+            get
+            {
+                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                double totalGbMemoryUsed = currentProcess.WorkingSet64 / 1073741824.0;
+                return totalGbMemoryUsed;
+            }
+        }
+
+        public static string FindBinParent(string directory)
+        {
+            if (directory == null || directory.Length == 0) return string.Empty;
+
+            string parent = System.IO.Path.GetDirectoryName(directory);
+            if (parent == null || parent.Length == 0) return string.Empty;
+
+#if (!VS2003) // must be defined if used in VS2003
+            if (parent.EndsWith("bin", StringComparison.CurrentCultureIgnoreCase)) return parent;
+#else
+			if (parent.EndsWith("bin")) return parent;
+#endif
+            else return FindBinParent(parent);
+        }
+
+        /// <summary>
+        /// Returns true if strings are equal.
+        /// </summary>
+        /// <param name="string1"></param>
+        /// <param name="string2"></param>
+        /// <returns></returns>
+        public static bool EqualsString(string string1, string string2)
+        {
+            int n1 = string1.Length;
+            int n2 = string2.Length;
+
+            int n = Math.Min(n1, n2);
+            for (int i = 0; i < n; i++)
+            {
+                if (!string1[i].Equals(string2[i]))
+                {
+                    int j = Math.Min(n - i - 1, 20);
+                    System.Diagnostics.Debug.WriteLine("The final few characters are not the same:");
+                    System.Diagnostics.Debug.WriteLine("first : " + string1.Substring(0, i + j));
+                    System.Diagnostics.Debug.WriteLine("second: " + string2.Substring(0, i + j));
+                    return false;
+                }
+            }
+
+            if (n1 != n2) return false;
+            return true;
+        }
+
+        public static double Epsilon
+        {
+            get { return 1e-5; }
+        }
+
+        /// <summary>
+        /// Compares a and b using the given Epsilon.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>0 if a EQ b, or -1 if a LT b, or 1 if a GT b</returns>
+        public static int CompareDouble(double a, double b)
+        {
+            if (a < b - Utils.Epsilon) return -1;
+            if (a > b + Utils.Epsilon) return 1;
+
+            return 0;
+        }
+
+        public static bool EqualsDouble(double a, double b)
+        {
+            return CompareDouble(a, b) == 0;
+        }
+    }
+
 }

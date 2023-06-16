@@ -1,0 +1,132 @@
+---
+name: Windows build and test
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  release:
+    types:
+      - created
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: windows-2022
+    steps:
+      - name: Setup environment
+        run: |
+          echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_ENV
+          
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6
+
+      - name: Checkout Sonnet source
+        uses: actions/checkout@v3
+        with:
+          path: Sonnet
+
+      - name: Checkout dependenies sources
+        shell: cmd
+        run: |
+          for /f "tokens=1,2,3" %%i in (sonnet\.coin-or\Dependencies) do (
+            echo Cloning project %%i from github %%j at branch %%k
+            git clone --depth 1 %%j -b %%k
+          )
+          7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
+          erase /f Data-miplib3\*.gz
+          git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
+
+      - name: Prepare for build
+        shell: pwsh
+        run: |
+          echo Built on: ${{ env.builddate }} > Sonnet\BUILD-INFO.txt
+          echo Version: 1.4.0.${{ github.run_number }} >> Sonnet\BUILD-INFO.txt
+          echo Ref: ${{ github.ref }} >> Sonnet\BUILD-INFO.txt
+          echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
+          echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
+          Sonnet\build-third-party-license.bat
+          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.3.1.0','1.3.1.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
+          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.3.1.0','1.3.1.${{ github.run_number }}').Replace('1,3,1,0','1,3,1,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
+          7z --% a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
+          nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
+
+      - name: Build
+        shell: cmd
+        run: |
+          REM echo Build pthread-win32 as static library
+          REM msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
+          REM mkdir sonnet\lib\x64	
+          REM copy ..\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib sonnet\lib\x64\.
+          REM echo.  
+          echo Build Sonnet for x64, not ReleaseParallel
+          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=Release -p:Platform=x64 -m
+
+      - name: Run tests for net4 framework
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
+          .\SonnetTest.exe
+  
+      - name: Run tests for net60
+        shell: cmd
+        run: |
+          cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
+          .\SonnetTest.exe
+
+      - name: Create asset package
+        if: ${{ github.ref_name == 'master' }}
+        shell: cmd
+        run: |
+          mkdir package\x64\net6.0
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Sonnet.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.dll package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\SonnetWrapper.xml package\x64\net6.0\.
+          copy Sonnet\MSVisualStudio\v17\Sonnet\bin\x64\Release\net6.0\Ijwhost.dll package\x64\net6.0\.
+          mkdir package\x64\net48
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\Sonnet.xml package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
+          copy Sonnet\MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
+          copy Sonnet\AUTHORS.txt package\.
+          copy Sonnet\BUILD-INFO.txt package\.
+          copy Sonnet\CHANGELOG.txt package\.
+          copy Sonnet\LICENSE.txt package\.
+          copy Sonnet\NOTICE.txt package\.
+          copy Sonnet\README.md package\.
+          copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
+          copy Sonnet\examples\Example5.cs package\.
+          cd package
+          7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" *
+          cd ..
+      
+      - name: Update latest release
+        if: ${{ github.ref_name == 'master' }}
+        uses: IsaacShelton/update-existing-release@v1.3.2 
+        with:
+          release: Sonnet-latest
+          tag: latest
+          draft: false
+          prerelease: true
+          replace: true
+          updateTag: true
+          body: |
+            Built on: ${{ env.builddate }} (v1.3.1.${{ github.run_number }} )
+            The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
+            The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
+            The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
+            
+            Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
+            Do not use the 'Source code' assets because it only contains the sources of Sonnet.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            Sonnet-${{ github.ref_name }}-CI-src.zip
+            Sonnet-${{ github.ref_name }}-CI-bin.zip
