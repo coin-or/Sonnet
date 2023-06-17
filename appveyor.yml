@@ -124,12 +124,13 @@ before_build:
 build_script:
   - echo -- Build_script
   - cd c:\projects\sonnet
-  - REM echo Build pthread-win32 as static library for 
-  - REM msbuild c:\pthreads\windows\VS2022\pthread_lib.2022.vcxproj /p:Configuration=Release;Platform=x64 /m
-  - REM mkdir c:\projects\sonnet\lib\x64	
-  - REM copy c:\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
-  - echo Build Sonnet for x64, not ReleaseParallel
-  - msbuild MSVisualStudio\v17\Sonnet.sln /p:Configuration=Release;Platform=x64 /m
+  - echo Build pthread-win32 as static library
+  - msbuild c:\pthreads\windows\VS2022\pthread_lib.2022.vcxproj /p:Configuration=Release;Platform=x64 /m
+  - mkdir c:\projects\sonnet\lib\x64	
+  - copy c:\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
+  - echo.
+  - echo Build Sonnet
+  - msbuild MSVisualStudio\v17\Sonnet.sln /p:Configuration=ReleaseParallel;Platform=x64 /m
 
 after_build:
   - echo -- After_build
