@@ -126,7 +126,7 @@ build_script:
   - cd c:\projects\sonnet
   - echo Build pthread-win32 as static library
   - msbuild c:\pthreads\windows\VS2022\pthread_lib.2022.vcxproj /p:Configuration=Release;Platform=x64 /m
-  - mkdir c:\projects\sonnet\lib\x64	
+  - if not exist c:\projects\sonnet\lib\x64 mkdir c:\projects\sonnet\lib\x64
   - copy c:\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib c:\projects\sonnet\lib\x64\.
   - echo.
   - echo Build Sonnet
