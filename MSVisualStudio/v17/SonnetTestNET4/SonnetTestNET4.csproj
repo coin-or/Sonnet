@@ -135,9 +135,7 @@
       <Link>MIP-124725.mps</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\SonnetExamplesNET4\app.config">
-      <Link>app.config</Link>
-    </None>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

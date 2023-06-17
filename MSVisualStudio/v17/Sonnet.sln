@@ -79,6 +79,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Win32", "Win32", "{A014E79E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x64", "x64", "{A9D23D25-E8F4-4BE6-8699-C9A06FB0B582}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".coin-or", ".coin-or", "{DF264510-2EE5-4681-8FEB-3C13274A8C62}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.coin-or\Dependencies = ..\..\.coin-or\Dependencies
+		..\..\.coin-or\projDesc.xml = ..\..\.coin-or\projDesc.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -305,6 +311,7 @@ Global
 		{AF32B005-0FCD-4760-BAB6-27DDC66D2E17} = {F48F0304-01B7-4EF7-93B3-85F297B15C44}
 		{A014E79E-781F-4CB6-AD0B-27A75AF62755} = {53EB451D-0B18-4046-9038-1CDD196DDF33}
 		{A9D23D25-E8F4-4BE6-8699-C9A06FB0B582} = {53EB451D-0B18-4046-9038-1CDD196DDF33}
+		{DF264510-2EE5-4681-8FEB-3C13274A8C62} = {F48F0304-01B7-4EF7-93B3-85F297B15C44}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C418B8B-47F5-4DF0-B50B-4F5FBAEE968D}

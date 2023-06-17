@@ -36,14 +36,10 @@ jobs:
       - name: Checkout dependenies sources
         shell: cmd
         run: |
-          git clone --depth 1 https://github.com/coin-or-tools/BuildTools.git -b master 
-          git clone --depth 1 https://github.com/coin-or/Cbc.git -b master
-          git clone --depth 1 https://github.com/coin-or/Clp.git -b master
-          git clone --depth 1 https://github.com/coin-or/Cgl.git -b master
-          git clone --depth 1 https://github.com/coin-or/CoinUtils.git -b master
-          git clone --depth 1 https://github.com/coin-or/Osi.git -b master
-          git clone --depth 1 https://github.com/coin-or-tools/Data-Sample -b master
-          git clone --depth 1 https://github.com/coin-or-tools/Data-miplib3 -b master
+          for /f "tokens=1,2,3" %%i in (sonnet\.coin-or\Dependencies) do (
+            echo Cloning into folder %%i from github project %%j at branch %%k
+            git clone --depth=1 --branch=%%k %%j %%i
+          )
           7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
           erase /f Data-miplib3\*.gz
           git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
@@ -57,8 +53,8 @@ jobs:
           echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
           echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
           Sonnet\build-third-party-license.bat
-          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.4.0.99','1.4.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
-          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.4.0.99','1.4.0.${{ github.run_number }}').Replace('1,4,0,99','1,4,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
+          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
+          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}').Replace('2,0,0,9999','2,0,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
           7z --% a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
@@ -77,34 +73,13 @@ jobs:
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTestNET4\bin\x64\Release\
-          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net4-results.trx;verbosity=detailed" 
-
-      - name: Test Report for net4 framework
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Test Report for net4 framework
-          working-directory: Sonnet
-          path: "**/test-net4-results.trx"                            
-          reporter: dotnet-trx
-          fail-on-error: true
+          .\SonnetTest.exe
   
       - name: Run tests for net60
-        if: always()
         shell: cmd
         run: |
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
-          dotnet test SonnetTest.exe --logger "trx;LogFileName=test-net60-results.trx"
-
-      - name: Test Report for net60
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name:  Test Report for net60
-          working-directory: Sonnet
-          path: "**/test-net60-results.trx"                            
-          reporter: dotnet-trx
-          fail-on-error: true
+          .\SonnetTest.exe
 
       - name: Create asset package
         if: ${{ github.ref_name == 'master' }}
@@ -150,7 +125,7 @@ jobs:
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
             
             Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
-            Do not use the 'Source code' assets.
+            Do not use the 'Source code' assets because it only contains the sources of Sonnet.
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             Sonnet-${{ github.ref_name }}-CI-src.zip
