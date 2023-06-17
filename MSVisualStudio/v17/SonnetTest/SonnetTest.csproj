@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>SonnetTest</RootNamespace>
+    <Platforms>x64;x86</Platforms>
+    <StartupObject></StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\examples\Example1.cs" Link="Examples\Example1.cs" />
+    <Compile Include="..\..\..\examples\Example2.cs" Link="Examples\Example2.cs" />
+    <Compile Include="..\..\..\examples\Example3.cs" Link="Examples\Example3.cs" />
+    <Compile Include="..\..\..\examples\Example4.cs" Link="Examples\Example4.cs" />
+    <Compile Include="..\..\..\examples\Example5.cs" Link="Examples\Example5.cs" />
+    <Compile Include="..\..\..\examples\Example6.cs" Link="Examples\Example6.cs" />
+    <Compile Include="..\..\..\examples\Example6b.cs" Link="Examples\Example6b.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Program.cs" Link="Program.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_BasicTests.cs" Link="Sonnet_BasicTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CbcTests.cs" Link="Sonnet_CbcTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_CoinNativeTests.cs" Link="Sonnet_CoinNativeTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_ExampleTests.cs" Link="Sonnet_ExampleTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_QuadraticTests.cs" Link="Sonnet_QuadraticTests.cs" />
+    <Compile Include="..\..\..\test\SonnetTest\Sonnet_StressTests.cs" Link="Sonnet_StressTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\test\brandy.mps" Link="brandy.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\egout.mps" Link="egout.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\expect-feasible.mps" Link="expect-feasible.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\mas74.mps" Link="mas74.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\test\MIP-124725.mps" Link="MIP-124725.mps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SonnetWrapper\SonnetWrapper.vcxproj" />
+    <ProjectReference Include="..\Sonnet\Sonnet.csproj" />
+  </ItemGroup>
+
+</Project>

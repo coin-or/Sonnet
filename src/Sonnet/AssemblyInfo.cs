@@ -1,6 +1,6 @@
 ﻿// Copyright (C) 2011, Jan-Willem Goossens 
 // All Rights Reserved.
-// This code is licensed under the terms of the Eclipse Public License (EPL).
+// This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0).
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -16,8 +16,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SONNET")]
-[assembly: AssemblyCopyright("Copyright © 2011-2020")]
-[assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License (EPL).")]
+[assembly: AssemblyCopyright("Copyright © 2011-2023")]
+[assembly: AssemblyTrademark("This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0).")]
 [assembly: AssemblyCulture("")]
 
 // Specifies that types that are ordinarily visible only within the current
@@ -41,5 +41,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.3.0.0")]
-[assembly: AssemblyFileVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.3.1.0")]
+[assembly: AssemblyFileVersion("1.3.1.0")]
