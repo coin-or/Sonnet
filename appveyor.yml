@@ -57,16 +57,14 @@ install:
          git clone --depth 1 -b $d.k $d.j
       }
       
-      if (Test-Path -Path 'Data-miplib3') 
+      if (Test-Path -Path 'Data\miplib3') 
       {
-         Write-Host "Found Data-miplib3. Extracting and removing archives."
-         7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
-         Remove-Item -Force -Path Data-miplib3\*.gz
+         Write-Host "Found Data\miplib3. Extracting and removing archives."
+         7z x -bso0 -oData\miplib3 Data\miplib3\*.gz
+         Remove-Item -Force -Path Data\miplib3\*.gz
       }
       git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
 
-  - set SONNET_SAMPLEDIR=C:\projects\Data-Sample
-  - set SONNET_MIPLIBDIR=C:\projects\Data-miplib3
   - set RELEASE_TYPE=undefined
   - set RELEASE_NAME=undefined
   # be careful of trailing white spaces in env values!

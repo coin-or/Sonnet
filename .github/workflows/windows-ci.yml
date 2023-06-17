@@ -40,9 +40,11 @@ jobs:
             echo Cloning into folder %%i from github project %%j at branch %%k
             git clone --depth=1 --branch=%%k %%j %%i
           )
-          7z x -bso0 -oData-miplib3 Data-miplib3\*.gz
-          erase /f Data-miplib3\*.gz
-          git clone --depth 1 https://github.com/GerHobbelt/pthread-win32.git -b master ..\pthreads
+          if exist Data\miplib3 (
+            7z x -bso0 -oData\miplib3 Data\miplib3\*.gz
+            erase /f Data\miplib3\*.gz
+          )
+          git clone --depth=1 --branch=master https://github.com/GerHobbelt/pthread-win32.git ..\pthreads
 
       - name: Prepare for build
         shell: pwsh
