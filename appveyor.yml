@@ -53,8 +53,8 @@ install:
       $deps = Get-Content sonnet\.coin-or\Dependencies |  ConvertFrom-String -Delimiter "\s+" -PropertyNames i,j,k
       foreach ($d in $deps)
       { 
-         Write-Host "git clone --depth 1 -b" $d.k $d.j
-         git clone --depth 1 -b $d.k $d.j
+         Write-Host "git clone --depth 1 -b" $d.k $d.j $d.i
+         git clone --depth 1 -b $d.k $d.j $d.i
       }
       
       if (Test-Path -Path 'Data\miplib3') 
