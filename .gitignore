@@ -9,6 +9,8 @@
 app.aps
 
 **/.vs/
+**/.sonarlint/
+
 /MSVisualStudio/**/obj/
 /MSVisualStudio/**/bin/
 /MSVisualStudio/**/Release/
@@ -16,16 +18,12 @@ app.aps
 /MSVisualStudio/**/Debug/
 /MSVisualStudio/**/x64*/
 /MSVisualStudio/**/Win32*/
-/test.mps
-/testmiqp.mps
-/MSVisualStudio/v16/.sonarlint
+
 /MSVisualStudio/v16/packages/
 /MSVisualStudio/v16/TestResults/
 /MSVisualStudio/v16/UpgradeLog.htm
-
 /MSVisualStudio/v16/Sonnet/Properties/launchSettings.json
 /MSVisualStudio/v16/SonnetExamples/Properties/launchSettings.json
 /MSVisualStudio/v16/SonnetTest/Properties/launchSettings.json
 
-.idea
 /MSVisualStudio/v17/packages/

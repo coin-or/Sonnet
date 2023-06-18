@@ -16,17 +16,32 @@
     <projectLicenseURL>https://opensource.org/licenses/EPL-2.0</projectLicenseURL>
     <coinLinkedProjects>
       <coinProject>
+        <repoName>CoinUtils</repoName>
+      </coinProject>
+      <coinProject>
         <repoName>Osi</repoName>
+      </coinProject>
+      <coinProject>
+        <repoName>Clp</repoName>
+      </coinProject>
+      <coinProject>
+        <repoName>Cgl</repoName>
+      </coinProject>
+      <coinProject>
+        <repoName>Cbc</repoName>
       </coinProject>
     </coinLinkedProjects>
     <otherLinkedPackages>
+      <otherPackage>
+        <packageName>pthread-win32</packageName>
+        <packageURL>https://github.com/GerHobbelt/pthread-win32</packageURL>
+        <requiredOrOptional>Optional</requiredOrOptional>
+      </otherPackage>
     </otherLinkedPackages>
     <projectLanguage>C#</projectLanguage>
     <developmentStatus>
       <activityStatus>Active</activityStatus>
       <maturityLevel>2</maturityLevel>
-      <stableVersionNumber>1.3</stableVersionNumber>
-      <releaseNumber>1.3.0</releaseNumber>
     </developmentStatus>
     <testedPlatforms>
       <platform>

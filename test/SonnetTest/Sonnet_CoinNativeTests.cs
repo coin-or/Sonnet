@@ -42,11 +42,11 @@ namespace SonnetTest
 
 #if NETCOREAPP
             // By default, the executable will be one directory deeper in NET6 compared to NET4
-            SampleDir = SampleDir ?? "..\\..\\..\\..\\..\\..\\..\\..\\Data-sample";
-            MipLibDir = MipLibDir ?? "..\\..\\..\\..\\..\\..\\..\\..\\Data-miplib3";
+            SampleDir = SampleDir ?? "..\\..\\..\\..\\..\\..\\..\\..\\Data\\sample";
+            MipLibDir = MipLibDir ?? "..\\..\\..\\..\\..\\..\\..\\..\\Data\\miplib3";
 #else
-            SampleDir = SampleDir ?? "..\\..\\..\\..\\..\\..\\..\\Data-sample";
-            MipLibDir = MipLibDir ?? "..\\..\\..\\..\\..\\..\\..\\Data-miplib3";
+            SampleDir = SampleDir ?? "..\\..\\..\\..\\..\\..\\..\\Data\\sample";
+            MipLibDir = MipLibDir ?? "..\\..\\..\\..\\..\\..\\..\\Data\\miplib3";
 #endif
 
     }

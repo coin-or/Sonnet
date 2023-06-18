@@ -17,21 +17,21 @@ using System.Runtime.InteropServices;
 //
 #if NET6_0
 #if WIN32
-[assembly: AssemblyTitle("Sonnet (net6.0, x86)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net6.0, x86)")]
 #else
-[assembly: AssemblyTitle("Sonnet (net6.0, x64)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net6.0, x64)")]
 #endif
 #elif NET5_0
 #if WIN32
-[assembly: AssemblyTitle("Sonnet (net5.0, x86)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net5.0, x86)")]
 #else
-[assembly: AssemblyTitle("Sonnet (net5.0, x64)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net5.0, x64)")]
 #endif
 #elif NET48
 #if WIN32
-[assembly: AssemblyTitle("Sonnet (net48, x86)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net48, x86)")]
 #else
-[assembly: AssemblyTitle("Sonnet (net48, x64)")]
+[assembly: AssemblyTitle("Sonnet-latest (unstable) (net48, x64)")]
 #endif
 #else
 #error Sonnet AssemblyInfo unclear build
@@ -62,5 +62,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.4.0.0")]
-[assembly: AssemblyFileVersion("1.4.0.99")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.9999")]
