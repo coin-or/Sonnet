@@ -121,7 +121,7 @@ jobs:
           replace: true
           updateTag: true
           body: |
-            Built on: ${{ env.builddate }} (v1.4.0.${{ github.run_number }} )
+            Built on: ${{ env.builddate }} (v2.0.0.${{ github.run_number }} )
             The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
             The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
