@@ -53,8 +53,8 @@ jobs:
           echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
           echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
           Sonnet\build-third-party-license.bat
-          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.3.1.0','1.3.1.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
-          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.3.1.0','1.3.1.${{ github.run_number }}').Replace('1,3,1,0','1,3,1,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
+          (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('1.3.2.0','1.3.2.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
+          (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('1.3.2.0','1.3.2.${{ github.run_number }}').Replace('1,3,2,0','1,3,2,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
           7z --% a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
@@ -119,7 +119,7 @@ jobs:
           replace: true
           updateTag: true
           body: |
-            Built on: ${{ env.builddate }} (v1.3.1.${{ github.run_number }} )
+            Built on: ${{ env.builddate }} (v1.3.2.${{ github.run_number }} )
             The Sonnet latest builds are pre-release builds based on the latest code in the master branch. As such, these builds may or may not be stable. 
             The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
