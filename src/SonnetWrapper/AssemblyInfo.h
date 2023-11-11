@@ -4,8 +4,8 @@
 
 #pragma once
 
-#define VER_FILEVERSION			1,3,1,0
-#define VER_FILEVERSION_STR		"1.3.1.0"
+#define VER_FILEVERSION			1,3,2,0
+#define VER_FILEVERSION_STR		"1.3.2.0"
 
 // About Production & Assembly version:
 // Did the interface change? 
@@ -13,21 +13,21 @@
 //         -> No: Then change the version number
 //         -> Yes: Keep same version. 
 // -> No: Keep same version.
-#define VER_PRODUCTVERSION		1,3,1,0
-#define VER_PRODUCTVERSION_STR	"1.3.1.0"
-#define VER_ASSEMBLYVERSION_STR	"1.3.1.0" // Can use *
+#define VER_PRODUCTVERSION		1,3,2,0
+#define VER_PRODUCTVERSION_STR	"1.3.2.0"
+#define VER_ASSEMBLYVERSION_STR	"1.3.2.0" // Can use *
 
 #ifdef _DEBUG
 #ifndef WIN32
-#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (Debug), based on Cbc 2.10.10"
+#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit (Debug), based on Cbc 2.10.11"
 #else
-#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (Debug), based on Cbc 2.10.10"
+#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit (Debug), based on Cbc 2.10.11"
 #endif
 #else
 #ifndef WIN32
-#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit, based on Cbc 2.10.10"
+#define VER_FILEDESCRIPTION "SonnetWrapper 64-bit, based on Cbc 2.10.11"
 #else
-#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit, based on Cbc 2.10.10"
+#define VER_FILEDESCRIPTION "SonnetWrapper 32-bit, based on Cbc 2.10.11"
 #endif
 #endif
 
