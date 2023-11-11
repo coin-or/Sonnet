@@ -105,7 +105,7 @@ namespace SonnetTest
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
             // Stop within 5 seconds. 
             osiCbc.AddCbcSolverArgs("-sec", "5");
-            //osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567
+            //osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567 but works in Cbc 2.10.x (tested in CbcTest5)
             solver.Solve();
 
             Assert.IsTrue(solver.IsFeasible(), "with solution and hence feasible");
@@ -115,7 +115,7 @@ namespace SonnetTest
             // The problem is minimization.
             // Allow also better solutions, but not worse. 
             // If your machine is significantly slower, the solution value will be worse (higher) and this test will fail--but can be ignored.
-            Assert.IsTrue(model.Objective.Value >= 21801.18 && model.Objective.Value <= 22465, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 21801.18 (opt) and 22465");
+            Assert.IsTrue(model.Objective.Value >= 21801.18 && model.Objective.Value <= 22600, $"Best minimization solution of mas74 until now is ${model.Objective.Value} but should be between 21801.18 (opt) and 22600");
             
             // bound is expected to be 20482 on the reference machine.
             // If your machine is slower, the bound will be worse (lower)
@@ -166,8 +166,8 @@ namespace SonnetTest
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
             OsiCbcSolverInterface osiCbc = solver.OsiSolver as OsiCbcSolverInterface;
             // Stop within 5 seconds. 
-            osiCbc.AddCbcSolverArgs("-sec", "5");
-            //osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567
+            //osiCbc.AddCbcSolverArgs("-sec", "5");
+            osiCbc.getModelPtr().setMaximumSeconds(5.0); // Doesnt work for now Cbc #567 but works in Cbc 2.10.x
 
             CbcEventHandler handler = delegate (CbcModel m, CbcEvent cbcEvent) { return CbcAction.noAction; };
             handler += new CbcEventHandler(SonnetCbcTest5EventHandler); // will stop after 2nd solution

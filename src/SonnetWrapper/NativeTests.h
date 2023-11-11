@@ -9,17 +9,17 @@
 
 #undef main
 #define main mainGamsTest
-#include <Cbc\test\GamsTest.cpp>
+#include <Cbc\Cbc\test\GamsTest.cpp>
 
 #undef main
 #define main mainOsiCbcUnitTest
-#include <cbc\test\osiUnitTest.cpp>
-#include <cbc\test\OsiCbcSolverInterfaceTest.cpp>
+#include <Cbc\Cbc\test\osiUnitTest.cpp>
+#include <Cbc\Cbc\test\OsiCbcSolverInterfaceTest.cpp>
 
 #undef main
 #define main mainOsiClpUnitTest
-#include <clp\test\osiUnitTest.cpp>
-#include <Clp\test\OsiClpSolverInterfaceTest.cpp>
+#include <Clp\Clp\test\osiUnitTest.cpp>
+#include <Clp\Clp\test\OsiClpSolverInterfaceTest.cpp>
 
 #undef main
 

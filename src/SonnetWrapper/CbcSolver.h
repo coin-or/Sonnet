@@ -5,7 +5,7 @@
 
 #include <CbcSolver.hpp>
 #include <CbcModel.hpp>
-#include <CbcParamUtils.hpp>
+//#include <CbcParamUtils.hpp>
 #include <msclr\marshal.h> // for string ^ to char * via marshal_context
 #include <msclr\marshal_cppstd.h> // for string ^ to std::string via marshal_as
 
@@ -55,7 +55,7 @@ namespace COIN
 		/// </summary>
 		/// <param name="args">The arguments for the solve</param>
 		/// <param name="cbcModel">The CbcModel instance</param>
-		/// <param name="timeLimit">The time limit for the solver. Only used if lt 0.0</param>
+		/// <param name="timeLimit">The time limit for the solver. Only used if gt 0.0</param>
 		/// <returns>The return code</returns>
 		static int CbcMain(array<System::String ^> ^args, CbcModel ^ cbcModel, double timeLimit)
 		{
@@ -68,16 +68,11 @@ namespace COIN
 			{
 				argv[i] = context->marshal_as<const char*>(args[i]);
 			}
-			CbcParameters cbcData;
-			if (timeLimit != 0.0) cbcData[CbcParam::TIMELIMIT]->setDblVal(timeLimit);
 
-			// We could pass parameters using CbcParam 
-			// this is the only good way to pass timelimit etc. 
-			// How about adding like AddSolverArgs but then AddCbcParameters or something?
-			// But that would require wrapping all CbcParameters, CbcParam etc. etc.
-			// Therefore, for now use the string array.
-			// Or maybe a few dedicated parameters like timelimit via method call.
-			cbcData.enablePrinting();
+			CbcSolverUsefulData cbcData;
+			cbcData.noPrinting_ = false;
+			if (timeLimit != 0.0) cbcModel->Base->setMaximumSeconds(timeLimit);
+			
 			::CbcMain0(*(cbcModel->Base), cbcData);
 			int result = ::CbcMain1(argc, argv, *(cbcModel->Base), NativeCallBackProxy, cbcData);
 			delete context;

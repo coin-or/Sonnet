@@ -144,8 +144,14 @@ namespace SonnetTest
             model.Add(con3);
             model.Objective = obj;
             model.ObjectiveSense = ObjectiveSense.Minimise;
-            if (solver.OsiSolver is COIN.OsiCbcSolverInterface) ((COIN.OsiCbcSolverInterface)solver.OsiSolver).SetCbcSolverArgs("-branchAndBound");
+            solver.Solve();
 
+            // Test that we found the correct solution
+            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, -7.5)); // fails in Cbc 2.10 because getObjValue is wrong
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 1.0));
+            Assert.IsTrue(Utils.EqualsDouble(x2.Value, 1.0));
+           
+            //Test that exporting to mps and then importing results in the same model.
             solver.Export("testmiqp.mps");
 
             Model model2 = Model.New("testmiqp.mps");

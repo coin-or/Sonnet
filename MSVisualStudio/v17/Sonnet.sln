@@ -16,23 +16,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\THIRD-PARTY-LICENSE.txt = ..\..\THIRD-PARTY-LICENSE.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "COIN-OR v17", "COIN-OR v17", "{2969FE49-1110-4476-B8C0-F64CD5E84032}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "COIN-OR v17 Cbc 2.10", "COIN-OR v17 Cbc 2.10", "{2969FE49-1110-4476-B8C0-F64CD5E84032}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "..\..\..\Cbc\MSVisualStudio\v17\libCbc\libCbc.vcxproj", "{0B054D74-6082-452F-9744-5FBE12C7D476}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "..\..\..\Cbc\Cbc\MSVisualStudio\v17\libCbc\libCbc.vcxproj", "{0B054D74-6082-452F-9744-5FBE12C7D476}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbcSolver", "..\..\..\Cbc\MSVisualStudio\v17\libCbcSolver\libCbcSolver.vcxproj", "{5A9043A5-CB87-4E2B-807C-74830BFFAE39}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbcSolver", "..\..\..\Cbc\Cbc\MSVisualStudio\v17\libCbcSolver\libCbcSolver.vcxproj", "{5A9043A5-CB87-4E2B-807C-74830BFFAE39}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCbc", "..\..\..\Cbc\MSVisualStudio\v17\libOsiCbc\libOsiCbc.vcxproj", "{22911998-FEDD-44AC-902F-CFEFA060C36A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCbc", "..\..\..\Cbc\Cbc\MSVisualStudio\v17\libOsiCbc\libOsiCbc.vcxproj", "{22911998-FEDD-44AC-902F-CFEFA060C36A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "..\..\..\Cgl\MSVisualStudio\v17\libCgl\libCgl.vcxproj", "{1E645A44-00EF-4093-9F6A-1D082BD43BDB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "..\..\..\Cgl\Cgl\MSVisualStudio\v17\libCgl\libCgl.vcxproj", "{1E645A44-00EF-4093-9F6A-1D082BD43BDB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "..\..\..\Clp\MSVisualStudio\v17\libClp\libClp.vcxproj", "{768B67D6-E6D3-4A8F-AA61-511FDBCE7937}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "..\..\..\Clp\Clp\MSVisualStudio\v17\libClp\libClp.vcxproj", "{768B67D6-E6D3-4A8F-AA61-511FDBCE7937}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "..\..\..\Clp\MSVisualStudio\v17\libOsiClp\libOsiClp.vcxproj", "{79433425-EC16-410F-9B91-8D31D2109C90}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "..\..\..\Clp\Clp\MSVisualStudio\v17\libOsiClp\libOsiClp.vcxproj", "{79433425-EC16-410F-9B91-8D31D2109C90}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\..\..\CoinUtils\MSVisualStudio\v17\libCoinUtils\libCoinUtils.vcxproj", "{6D2EF92A-D693-47E3-A325-A686E78C5FFD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\..\..\CoinUtils\CoinUtils\MSVisualStudio\v17\libCoinUtils\libCoinUtils.vcxproj", "{6D2EF92A-D693-47E3-A325-A686E78C5FFD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\..\..\Osi\MSVisualStudio\v17\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\..\..\Osi\Osi\MSVisualStudio\v17\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sonnet", "Sonnet\Sonnet.csproj", "{F551FD31-5349-419D-92F2-EA8AC9C9E423}"
 EndProject
@@ -50,9 +50,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sonnet - NET", "Sonnet - NE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sonnet - NET4", "Sonnet - NET4", "{8181F0AF-A855-4175-AC04-8C29A8A814F1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCommonTest", "..\..\..\Osi\MSVisualStudio\v17\libOsiCommonTest\libOsiCommonTest.vcxproj", "{109D6E6F-6D91-460F-86AE-DF27400E09A9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCommonTest", "..\..\..\Osi\Osi\MSVisualStudio\v17\libOsiCommonTest\libOsiCommonTest.vcxproj", "{109D6E6F-6D91-460F-86AE-DF27400E09A9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cbc", "..\..\..\Cbc\MSVisualStudio\v17\cbc\cbc.vcxproj", "{EAF01AC1-8D19-4E37-9852-736DCFF67865}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cbc", "..\..\..\Cbc\Cbc\MSVisualStudio\v17\cbc\cbc.vcxproj", "{EAF01AC1-8D19-4E37-9852-736DCFF67865}"
 	ProjectSection(ProjectDependencies) = postProject
 		{79433425-EC16-410F-9B91-8D31D2109C90} = {79433425-EC16-410F-9B91-8D31D2109C90}
 		{6D2EF92A-D693-47E3-A325-A686E78C5FFD} = {6D2EF92A-D693-47E3-A325-A686E78C5FFD}

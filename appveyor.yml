@@ -9,7 +9,7 @@ environment:
     secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
 
 # version format
-version: 2.0.0.{build}
+version: 1.4.0.{build}
 
 # you can use {branch} name in version format too
 # version: 1.0.{build}-{branch}
@@ -83,9 +83,9 @@ install:
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "2.0.0.0"
-  assembly_file_version: "2.0.0.{build}"
-#  assembly_informational_version: "2.0.0.{build}"
+  assembly_version: "1.4.0.0"
+  assembly_file_version: "1.4.0.{build}"
+#  assembly_informational_version: "1.4.0.{build}"
 
 #---------------------------------#
 #       build configuration       #
