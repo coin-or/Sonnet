@@ -172,7 +172,9 @@ after_test:
   - copy README.txt package\.
   - copy THIRD-PARTY-LICENSE.txt package\.
   - copy examples\Example5.cs package\.
-  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" package\*
+  - cd package
+  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" *
+  - cd ..
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%" )
 
 artifacts:
