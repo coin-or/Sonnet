@@ -83,8 +83,8 @@ jobs:
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
           .\SonnetTest.exe
 
-      - name: Create asset package
-        if: ${{ github.ref_name == 'master' }}
+      - name: Create asset package for master or stable
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
         shell: cmd
         run: |
           mkdir package\x64\net6.0
