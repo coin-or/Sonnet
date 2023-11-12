@@ -100,13 +100,20 @@ jobs:
           copy Sonnet\BUILD-INFO.txt package\.
           copy Sonnet\CHANGELOG.txt package\.
           copy Sonnet\LICENSE.txt package\.
-          copy Sonnet\NOTICE.txt package\.
-          copy Sonnet\README.md package\.
+          copy Sonnet\README.txt package\.
           copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
           copy Sonnet\examples\Example5.cs package\.
           cd package
-          7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" *
+          7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" .\*
           cd ..
+
+      - name: Upload assets for master or stable to action
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            Sonnet-${{ github.ref_name }}-CI-src.zip
+            Sonnet-${{ github.ref_name }}-CI-bin.zip
       
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
