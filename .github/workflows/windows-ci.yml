@@ -83,7 +83,7 @@ jobs:
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
           .\SonnetTest.exe
 
-      - name: Create asset package for master or stable
+      - name: Create artifact package for master or stable
         if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
         shell: cmd
         run: |
@@ -102,21 +102,28 @@ jobs:
           copy Sonnet\BUILD-INFO.txt package\.
           copy Sonnet\CHANGELOG.txt package\.
           copy Sonnet\LICENSE.txt package\.
-          copy Sonnet\README.txt package\.
+          copy Sonnet\NOTICE.txt package\.
+          copy Sonnet\README.md package\.
           copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
           copy Sonnet\examples\Example5.cs package\.
           cd package
           7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" .\*
           cd ..
 
-      - name: Upload assets for master or stable to action
+      - name: Upload src artifact
         if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            Sonnet-${{ github.ref_name }}-CI-src.zip
-            Sonnet-${{ github.ref_name }}-CI-bin.zip
-      
+          name: Sonnet Sources
+          path: Sonnet-${{ github.ref_name }}-CI-src.zip
+
+      - name: Upload bin artifact
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Sonnet
+          path: Sonnet-${{ github.ref_name }}-CI-bin.zip
+    
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
         uses: IsaacShelton/update-existing-release@v1.3.2 
