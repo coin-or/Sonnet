@@ -9,7 +9,7 @@ environment:
     secure: 7rM8AX6MnUMN7F8Ad9BTvgRci9lmy4i3LWHC5l9ZdVY3xtJg7RwIXNWAg95vXFmK
 
 # version format
-version: 1.3.1.{build}
+version: 1.3.2.{build}
 
 # you can use {branch} name in version format too
 # version: 1.0.{build}-{branch}
@@ -85,8 +85,8 @@ install:
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "1.3.1.0"
-  assembly_file_version: "1.3.1.{build}"
+  assembly_version: "1.3.2.0"
+  assembly_file_version: "1.3.2.{build}"
 #  assembly_informational_version: "1.4.0.{build}"
 
 #---------------------------------#
@@ -113,11 +113,6 @@ before_build:
   - echo RELEASE_NAME "%RELEASE_NAME%"
   - echo RELEASE_TYPE "%RELEASE_TYPE%"
   - echo Creating %RELEASE_NAME%-src.zip artefact from projects folder
-  - echo Built on %date% %time% > BUILD-INFO.txt
-  - echo Version 1.3.1.%APPVEYOR_BUILD_NUMBER% >> BUILD-INFO.txt
-  - echo Repo %APPVEYOR_REPO_NAME% >> BUILD-INFO.txt
-  - echo Ref name %APPVEYOR_REPO_BRANCH% >> BUILD-INFO.txt
-  - echo Commit %APPVEYOR_REPO_COMMIT% >> BUILD-INFO.txt
   - call build-third-party-license.bat
   - 7z a -tzip -r -x!.git "c:\projects\sonnet\%RELEASE_NAME%-src.zip" c:\projects\*
   - nuget restore MSVisualStudio\v17\Sonnet.sln
@@ -165,14 +160,15 @@ after_test:
   - copy MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.dll package\x64\net48\.
   - copy MSVisualStudio\v17\SonnetNET4\bin\x64\Release\SonnetWrapper.xml package\x64\net48\.
   - copy AUTHORS.txt package\.
-  - copy BUILD-INFO.txt package\.
   - copy CHANGELOG.txt package\.
   - copy INSTALL.txt package\.
   - copy LICENSE.txt package\.
   - copy README.txt package\.
   - copy THIRD-PARTY-LICENSE.txt package\.
   - copy examples\Example5.cs package\.
-  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" package\*
+  - cd package
+  - 7z a -tzip -r "c:\projects\sonnet\%RELEASE_NAME%-bin.zip" *
+  - cd ..
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe end /d:"sonar.login=%sonar_token%" )
 
 artifacts:
