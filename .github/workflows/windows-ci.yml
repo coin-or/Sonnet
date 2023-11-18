@@ -119,7 +119,7 @@ jobs:
         with:
           name: Sonnet
           path: ${{ env.release_name }}-bin.zip
-      
+
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
         uses: IsaacShelton/update-existing-release@v1.3.2 
