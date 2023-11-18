@@ -6,10 +6,10 @@ Sonnet is a modelling API and wrapper for COIN-OR mixed integer linear programmi
 
 Sonnet uses a wrapper to make the COIN-OR C++ classes available in .NET.  
 COIN-OR projects included in the wrapper: 
-[BuildTools](https://github.com/coin-or-tools/BuildTools), 
 [Cbc](https://github.com/coin-or/Cbc),  
 [Cgl](https://github.com/coin-or/Cgl), 
 [Clp](https://github.com/coin-or/Clp), 
+[CoinUtils](https://github.com/coin-or/CoinUtils)  
 [Osi](https://github.com/coin-or/Osi).
 
 The Sonnet API allows for code like this:
@@ -64,7 +64,6 @@ See https://github.com/coin-or/Cbc#source how to get the relevant sources.
 The Sonnet solution expects the COIN-OR source code to be in the same root folder. 
 The folder structure should look like this:
 
-├─ [BuildTools](https://github.com/coin-or-tools/BuildTools)  
 ├─ [Cbc](https://github.com/coin-or/Cbc)  
 ├─ [Cgl](https://github.com/coin-or/Cgl)  
 ├─ [Clp](https://github.com/coin-or/Clp)  
@@ -102,7 +101,7 @@ Several pthread for Windows libraries are available. Sonnet was succesfully test
 To build Sonnet with pthread, all necessary project settings are available in the respective ReleaseParallel configurations of libCbc, libCbcSolver and SonnetWrapper:
 - Solution: Use the ReleaseParallel configuration.
 - Define: CBC_THREAD is defined by the projects
-- Include: "pthreads" include folder is expected at one level above the Sonnet root folder, so _not_ besides BuildTools, etc., but one level above.
+- Include: "pthreads" include folder is expected at one level above the Sonnet root folder, so _not_ besides Cbc, etc., but one level above.
 - Linker: SonnetWrapper links to pthread_static_lib.lib that is expected in the lib\Win32 or lib\x64 folder at the root of Sonnet folder. You have to build this first, below.
  
 Start by cloning the pthread repo, and opening the solution in VS2019. You can decide to build the pthread dll or the pthread static lib. 

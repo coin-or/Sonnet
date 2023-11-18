@@ -19,6 +19,7 @@ jobs:
       - name: Setup environment
         run: |
           echo "builddate=$(Get-Date -format r)" >> $env:GITHUB_ENV
+          echo "release_name=Sonnet-$("${{ github.ref_name }}".Replace("/","-"))-CI" >> $env:GITHUB_ENV
           
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
@@ -49,15 +50,10 @@ jobs:
       - name: Prepare for build
         shell: pwsh
         run: |
-          echo Built on: ${{ env.builddate }} > Sonnet\BUILD-INFO.txt
-          echo Version: 1.4.0.${{ github.run_number }} >> Sonnet\BUILD-INFO.txt
-          echo Ref: ${{ github.ref }} >> Sonnet\BUILD-INFO.txt
-          echo Ref name: ${{ github.ref_name }} >> Sonnet\BUILD-INFO.txt
-          echo Commit: ${{ github.sha }} >> Sonnet\BUILD-INFO.txt
           Sonnet\build-third-party-license.bat
           (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
           (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}').Replace('2,0,0,9999','2,0,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
-          7z --% a -tzip -r -x!.git "Sonnet-${{ github.ref_name }}-CI-src.zip" .\*
+          7z --% a -tzip -r -x!.git "${{ env.release_name }}-src.zip" .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
@@ -83,8 +79,8 @@ jobs:
           cd Sonnet\MSVisualStudio\v17\SonnetTest\bin\x64\Release\net6.0\
           .\SonnetTest.exe
 
-      - name: Create asset package
-        if: ${{ github.ref_name == 'master' }}
+      - name: Create artifact package for master or stable
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
         shell: cmd
         run: |
           mkdir package\x64\net6.0
@@ -107,8 +103,22 @@ jobs:
           copy Sonnet\THIRD-PARTY-LICENSE.txt package\.
           copy Sonnet\examples\Example5.cs package\.
           cd package
-          7z a -tzip -r "..\Sonnet-${{ github.ref_name }}-CI-bin.zip" *
+          7z a -tzip -r "..\${{ env.release_name }}-bin.zip" .\*
           cd ..
+
+      - name: Upload src artifact
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Sonnet Sources
+          path: ${{ env.release_name }}-src.zip
+
+      - name: Upload bin artifact
+        if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Sonnet
+          path: ${{ env.release_name }}-bin.zip
       
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
@@ -126,9 +136,9 @@ jobs:
             The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
             
-            Use the Sonnet-${{ github.ref_name }}-CI-src.zip to get all sources of Sonnet, Cbc and dependencies.
+            Use the S${{ env.release_name }}-src.zip to get all sources of Sonnet, Cbc and dependencies.
             Do not use the 'Source code' assets because it only contains the sources of Sonnet.
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            Sonnet-${{ github.ref_name }}-CI-src.zip
-            Sonnet-${{ github.ref_name }}-CI-bin.zip
+            ${{ env.release_name }}-src.zip
+            ${{ env.release_name }}-bin.zip
