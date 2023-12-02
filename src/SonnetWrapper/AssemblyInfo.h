@@ -5,17 +5,17 @@
 
 #pragma once
 
-#define VER_FILEVERSION			2,0,0,9999
-#define VER_FILEVERSION_STR		"2.0.0.9999"
+#define VER_FILEVERSION			1,4,0,9999
+#define VER_FILEVERSION_STR		"1.4.0.9999"
 // About Production & Assembly version:
 // Did the interface change? 
 // -> Yes: Are the changes backward compatible?
 //         -> No: Then change the version number
 //         -> Yes: Keep same version. 
 // -> No: Keep same version.
-#define VER_PRODUCTVERSION		2,0,0,0
-#define VER_PRODUCTVERSION_STR	L"2.0.0.0"
-#define VER_ASSEMBLYVERSION_STR	L"2.0.0.0" // Can use * but that's what we DONT want to do
+#define VER_PRODUCTVERSION		1,4,0,0
+#define VER_PRODUCTVERSION_STR	L"1.4.0.0"
+#define VER_ASSEMBLYVERSION_STR	L"1.4.0.0" // Can use * but that's what we DONT want to do
 
 #define VER_COPYRIGHT L"This code is licensed under the terms of the Eclipse Public License v2.0 (EPL-2.0)."
 #define VER_TRADEMARK L""
