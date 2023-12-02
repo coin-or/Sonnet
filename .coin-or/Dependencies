@@ -1,3 +1,7 @@
+# <Directory>  <Repository>  <Branch/Tag>
+# If a tag is provided, then the checkout will be with detached head.
+# Example: Cbc  https://github.com/coin-or/Cbc releases/2.10.11
+../pthreads  https://github.com/GerHobbelt/pthread-win32 master
 Data/Sample  https://github.com/coin-or-tools/Data-Sample master
 Data/miplib3  https://github.com/coin-or-tools/Data-miplib3 master
 CoinUtils  https://github.com/coin-or/CoinUtils master
