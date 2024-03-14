@@ -22,15 +22,15 @@ jobs:
           echo "release_name=Sonnet-$("${{ github.ref_name }}".Replace("/","-"))-CI" >> $env:GITHUB_ENV
           
       - name: Setup msbuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6
 
       - name: Checkout Sonnet source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: Sonnet
 
@@ -107,14 +107,14 @@ jobs:
 
       - name: Upload src artifact
         if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Sonnet Sources
           path: ${{ env.release_name }}-src.zip
 
       - name: Upload bin artifact
         if: ${{ ( github.ref_name == 'master' ) || startsWith(github.ref_name, 'stable/' ) }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Sonnet
           path: ${{ env.release_name }}-bin.zip
