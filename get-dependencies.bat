@@ -20,6 +20,12 @@ for /f "eol=# tokens=1,2,3" %%i in (%depfile%) do (
     git -C ..\%%i fetch --all
     git -C ..\%%i checkout %%k
     if errorlevel 1 pause
+    git -C ..\%%i status | find /i "HEAD detached"
+    if errorlevel 1 (
+      echo INFO: Not at detached head, so try to pull changes.
+      git -C ..\%%i pull
+      if errorlevel 1 pause
+    )
   )
   echo INFO: Finished with ..\%%i
 )

@@ -45,7 +45,7 @@ namespace SonnetTest
                 {
                     // Use the following line to only run one TestClass
                     //if (testType != typeof(Sonnet_CbcTests)) continue;
-                    if (testType != typeof(Sonnet_QuadraticTests)) continue;
+                    //if (testType != typeof(Sonnet_QuadraticTests)) continue;
                     
                     object testInstance = null;
                     var methods = testType.GetMethods()
