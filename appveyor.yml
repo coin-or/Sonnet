@@ -38,7 +38,7 @@ init:
         $env:JAVA_HOME = "C:\Program Files\Java\jdk17"
         $env:PATH += ";JAVA_HOME\bin"
       }
-  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # scripts that run after cloning repository
 install:
