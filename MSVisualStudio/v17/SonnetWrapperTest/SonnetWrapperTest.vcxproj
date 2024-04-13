@@ -95,7 +95,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <RuntimeLibrary />
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <RuntimeLibrary />
     </ClCompile>
     <Link>
@@ -124,7 +124,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <RuntimeLibrary />
     </ClCompile>
     <Link>
@@ -138,7 +138,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>..\..\..\..\BuildTools\headers;..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\CoinUtils\src;..\..\..\..\clp\src;..\..\..\..\osi\src\osi;..\..\..\..\clp\src\osiClp;..\..\..\..\osi\src\osiCpx;..\..\..\..\osi\src\osiVol;..\..\..\..\cbc\src\osiCbc;..\..\..\..\cbc\src;..\..\..\..\cgl\src;..\..\..\..\cgl\src\CglMixedIntegerRounding;..\..\..\..\cgl\src\CglMixedIntegerRounding2;..\..\..\..\cgl\src\CglFlowCover;..\..\..\..\cgl\src\CglClique;..\..\..\..\cgl\src\CglOddHole;..\..\..\..\cgl\src\CglKnapsackCover;..\..\..\..\cgl\src\CglGomory;..\..\..\..\cgl\src\CglDuplicateRow;..\..\..\..\cgl\src\CglProbing;..\..\..\..\cgl\src\CglPreProcess;..\..\..\..\cgl\src\CglTwomir;..\..\..\..\vol\src</AdditionalIncludeDirectories>
       <RuntimeLibrary />
     </ClCompile>
     <Link>
