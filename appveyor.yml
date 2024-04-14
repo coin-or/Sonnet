@@ -112,7 +112,7 @@ before_build:
   - echo Creating %RELEASE_NAME%-src.zip artefact from projects folder
   - call build-third-party-license.bat
   - 7z a -tzip -r -x!.git "c:\projects\sonnet\%RELEASE_NAME%-src.zip" c:\projects\*
-  - echo {"sdk":{"version":"6.0.0","rollForward":"latestMinor"}} > MSVisualStudio\v17\SonnetWrapper\global.json
+  - echo {"sdk":{"version":"6.0.0","rollForward":"latestMinor"}} > global.json
   - nuget restore MSVisualStudio\v17\Sonnet.sln
   - if not "%sonar_token%"=="" ( SonarScanner.MSBuild.exe begin /k:"%RELEASE_NAME%" /d:"sonar.host.url=https://sonarcloud.io" /d:"sonar.login=%sonar_token%" /o:"jhmgoossens" /d:sonar.c.file.suffixes=- /d:sonar.cpp.file.suffixes=- /d:sonar.objc.file.suffixes=- )
 
