@@ -121,7 +121,7 @@ jobs:
       
       - name: Update latest release
         if: ${{ github.ref_name == 'master' }}
-        uses: IsaacShelton/update-existing-release@v1.3.2 
+        uses: IsaacShelton/update-existing-release@v1
         with:
           release: Sonnet-latest
           tag: latest
@@ -135,7 +135,7 @@ jobs:
             The Sonnet latest builds use the latest code in the [master branch of Cbc](https://github.com/coin-or/cbc) and its dependencies. 
             The Sonnet latest builds are created automatically at every successful build following a commit to the master branch.
             
-            Use the S${{ env.release_name }}-src.zip to get all sources of Sonnet, Cbc and dependencies.
+            Use the ${{ env.release_name }}-src.zip to get all sources of Sonnet, Cbc and dependencies.
             Do not use the 'Source code' assets because it only contains the sources of Sonnet.
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
