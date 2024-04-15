@@ -52,7 +52,7 @@ jobs:
           Sonnet\build-third-party-license.bat
           (Get-Content Sonnet\src\Sonnet\AssemblyInfo.cs).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}') | Set-Content Sonnet\src\Sonnet\AssemblyInfo.cs
           (Get-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h).Replace('2.0.0.9999','2.0.0.${{ github.run_number }}').Replace('2,0,0,9999','2,0,0,${{ github.run_number }}') | Set-Content Sonnet\src\SonnetWrapper\AssemblyInfo.h
-          7z --% a -tzip -r -x!.git "${{ env.release_name }}-src.zip" .\*
+          7z --% a -tzip -r -x!.git ${{ env.release_name }}-src.zip .\*
           nuget restore Sonnet\MSVisualStudio\v17\Sonnet.sln
 
       - name: Build
