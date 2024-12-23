@@ -70,10 +70,40 @@ namespace COIN
 			return gcnew CoinPackedMatrix(Base->getMatrixByRow());
 		}
 
+		/// <summary>
+		/// Read an mps file from the given filename.
+		/// </summary>
+		/// <param name="fileName">File to be read</param>
+		/// <param name="keepNames">True to use the given row and column names</param>
+		/// <param name="ignoreErrors">True to ignore errors during reading of the file</param>
+		/// <returns>Status non-zero represents an error</returns>
+		int readMps(String^ fileName, bool keepNames, bool ignoreErrors)
+		{
+			try
+			{
+				char* charFileName = (char*)Marshal::StringToHGlobalAnsi(fileName).ToPointer();
+				int result = ((::OsiClpSolverInterface *) Base)->readMps(charFileName, keepNames, ignoreErrors);
+				Marshal::FreeHGlobal((IntPtr)charFileName);
+				return result;
+			}
+			catch (::CoinError err)
+			{
+				throw gcnew CoinError(err);
+			}
+		}
+
 		/// Get pointer to column-wise copy of matrix
 		CoinPackedMatrix^ getMatrixByCol()
 		{
 			return gcnew CoinPackedMatrix(Base->getMatrixByCol());
+		}
+
+		virtual property System::String^ Version 
+		{
+			System::String^ get() override
+			{
+				return gcnew String(CLP_VERSION);
+			}
 		}
 	};
 

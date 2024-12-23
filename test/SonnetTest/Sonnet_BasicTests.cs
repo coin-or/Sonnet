@@ -2610,6 +2610,20 @@ namespace SonnetTest
             Assert.IsNotNull(model, $"Model file {mpsfile} failed to load.");
         }
 
+        
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Version")]
+        public void SonnetTest41(Type solverType)
+        {
+            Console.WriteLine("SonnetTest41 - custom Version property of Osi");
+
+            Model m = new Model();
+            Solver solver = new Solver(m, solverType);
+            string version = solver.OsiSolver.Version;
+
+            Assert.IsFalse(string.IsNullOrEmpty(version));
+        }
     }
 }
 

@@ -57,7 +57,7 @@ namespace SonnetTest
                     if (methods.Any()) testInstance = assembly.CreateInstance(testType.FullName);
                     foreach (var method in methods)
                     {
-                        //if (method.Name != nameof(Sonnet_CoinNativeTests.SonnetCoinNativeTest2)) continue;
+                        //if (method.Name != nameof(Sonnet_QuadraticTests.SonnetTestQuad4)) continue;
 
                         var p = method.GetParameters();
                         if (p.Length == 0)
@@ -215,14 +215,32 @@ namespace SonnetTest
         {
             if (a < b - Utils.Epsilon) return -1;
             if (a > b + Utils.Epsilon) return 1;
-
             return 0;
         }
 
+        /// <summary>
+        /// Determines whether a and b have the same value with margin of Epsilon
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>true if the difference between a and b is less than Epsilon, false otherwise.</returns>
         public static bool EqualsDouble(double a, double b)
         {
             return CompareDouble(a, b) == 0;
         }
-    }
 
+        /// <summary>
+        /// Determines whether a and b have the same value with relative margin of Epsilon
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>true if the relative difference between a and b (i.e., abs(a-b)/max(abs(a), abs(b)) ) is less than Epsilon, false otherwise.</returns>
+        public static bool EqualsDoubleRel(double a, double b)
+        {
+            double rel = Math.Max(Math.Abs(a), Math.Abs(b));
+            if (rel == 0.0) return true;
+            return Math.Abs(a - b) / rel < Utils.Epsilon;
+
+        }
+    }
 }

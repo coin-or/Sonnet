@@ -71,7 +71,7 @@ namespace SonnetTest
         [TestMethod, TestCategory("Quadratic")]
         public void SonnetTestQuad2(Type solverType)
         {
-            Console.WriteLine("SonnetTestQuad2 - Linear model with quad objective");
+            Console.WriteLine("SonnetTestQuad2 - Linear model with quad objective (QP)");
 
             // See https://www.inverseproblem.co.nz/OPTI/index.php/Probs/MIQP
             //  min 0.5 x1^2 + x2^2 - x1x2 - 2x1 - 6x2
@@ -105,19 +105,41 @@ namespace SonnetTest
             Assert.IsTrue(!solver.IsProvenPrimalInfeasible);
             Assert.IsTrue(!solver.IsProvenDualInfeasible);
 
-            Assert.IsTrue(Utils.CompareDouble(obj.Value, -74 / 9.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(obj.Value, -74 / 9.0));
 
-            Assert.IsTrue(Utils.CompareDouble(x1.Value, 2.0 / 3.0) == 0 &&
-                Utils.CompareDouble(x2.Value, 4.0 / 3.0) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 2.0 / 3.0) &&
+                Utils.EqualsDouble(x2.Value, 4.0 / 3.0));
 
         }
 
-        [TestMethod, TestCategory("Cbc"), TestCategory("Quadratic")]
-        public void SonnetTestQuad3()
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Quadratic")]
+        public void SonnetTestQuad3(Type solverType)
         {
-            Console.WriteLine("SonnetTestQuad3 - Integer linear model with quad objective");
+            Console.WriteLine("SonnetTestQuad3 - Read QP from SampleDir as MPS and solve");
 
-            // MIQP doesnt work using Clp, only Cbc.
+            Sonnet_CoinNativeTests native = new Sonnet_CoinNativeTests();
+            string sampledir = native.SampleDir;
+
+            var files = new (string filename, double opt)[] { ("share2qp.mps", -415.73224074)/*, ("boyd1.mps", -61735219.57) */};
+            foreach (var file in files)
+            {
+                Model model = Model.New(native.SampleDir + "\\" + file.filename);
+                Solver solver = new Solver(model, solverType);
+                Assert.IsFalse(solver.IsMIP, "Testing {file.filename} is expected to be QP, but is MIQP.");
+
+                solver.Solve();
+
+                Assert.IsTrue(solver.IsProvenOptimal);
+                Assert.IsTrue(Utils.EqualsDoubleRel(model.Objective.Value, file.opt), "Optimal value of is {file.filename} is {model.Objective.Value} but should be {file.opt}");
+            }
+        }
+
+        [DynamicData(nameof(Utils.TestSolverTypes), typeof(Utils))]
+        [TestMethod, TestCategory("Quadratic")]
+        public void SonnetTestQuad4(Type solverType)
+        {
+            Console.WriteLine("SonnetTestQuad4 - Test MIQP export and that solving integer linear model with quad objective (MIQP) is NOT supported");
 
             // See https://www.inverseproblem.co.nz/OPTI/index.php/Probs/MIQP
             //  min 0.5 x1^2 + x2^2 - x1x2 - 2x1 - 6x2
@@ -144,13 +166,7 @@ namespace SonnetTest
             model.Add(con3);
             model.Objective = obj;
             model.ObjectiveSense = ObjectiveSense.Minimise;
-            solver.Solve();
 
-            // Test that we found the correct solution
-            Assert.IsTrue(Utils.EqualsDouble(model.Objective.Value, -7.5)); // fails in Cbc 2.10 because getObjValue is wrong
-            Assert.IsTrue(Utils.EqualsDouble(x1.Value, 1.0));
-            Assert.IsTrue(Utils.EqualsDouble(x2.Value, 1.0));
-           
             //Test that exporting to mps and then importing results in the same model.
             solver.Export("testmiqp.mps");
 
@@ -160,9 +176,18 @@ namespace SonnetTest
             // some renaming: we use the file name as model name, and use the Name (ClpDefau) as objective name.
             model2string = model2string.Replace("Model 'testmiqp'", $"Model '{model.Name}'");
             model2string = model2string.Replace("Objective OBJROW", $"Objective {model.Objective.Name}");
-
             Assert.IsTrue(Utils.EqualsString(model1string, model2string));
-        }
 
+            // Solving MIQP doesnt work using Clp nor Cbc (in Stable), and is therefore not supported (for now).
+            try
+            {
+                solver.Solve();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Correctly Not Supported:" + ex.Message);
+                Assert.IsTrue(ex is NotSupportedException, "MIQP must be not supported");
+            }
+        }
     }
 }

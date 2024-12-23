@@ -32,7 +32,7 @@ namespace Sonnet
         /// Initializes a new instance of the Solver class with the given name and model, 
         /// and using the given instance derived from OsiSolverInterface.
         /// QP is supported for OsiClp and OsiCbc only.
-        /// MIQP is supported for OsiCbcsolver only.
+        /// MIQP is not supported for any solver type.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="solver">The instance of an OsiSolver, eg, OsiClpSolverInterface to be used.</param>
@@ -49,7 +49,7 @@ namespace Sonnet
         /// Initializes a new instance of the Solver class with the given name and model,
         /// and using a to be constructed instance of the given type derived from OsiSolverInterface.
         /// QP is supported for OsiClp and OsiCbc only.
-        /// MIQP is supported for OsiCbcsolver only.
+        /// MIQP is not supported for any solver type.
         /// </summary>
         /// <param name="model">The model used in this solver.</param>
         /// <param name="osiSolverInterfaceType">The type derived from OsiSolverInterface to be used.</param>
@@ -245,7 +245,11 @@ namespace Sonnet
         /// </summary>
         public OsiSolverInterface OsiSolver
         {
-            get { return this.solver; }
+            get 
+            {
+                if (!IsGenerated && model != null && model.Constraints.Any()) log.Warn("Calling OsiSolver before generating will use an empty model. Consider calling Generate() earlier.");
+                return this.solver; 
+            }
         }
 
         /// <summary>
@@ -282,7 +286,6 @@ namespace Sonnet
 
                 this.objective.Unregister(this);
                 this.objective = objective;
-                // if the new or old objective are Quadratic, then ungenerate first
                 Generate(this.objective);
             }
             else
@@ -381,10 +384,7 @@ namespace Sonnet
             {
                 if (forceRelaxation == false && IsMIP)
                 {
-                    if (objective.IsQuadratic)
-                    {
-                        log.Warn("Only experimantal support for MIQP!");
-                    }
+                    if (objective.IsQuadratic) throw new NotSupportedException("MIQP not supported");
 
                     isSolving = true;
                     SaveBeforeMIPSolveInternal(); // save anyway, to allow manual reset
@@ -735,8 +735,7 @@ namespace Sonnet
 
             if (IsGenerated)
             {
-                // WARNING: This exception could be due to an implicit call to Generate by a Debugger Local or Watch evaluation at a breakpoint.
-                if (obj.IsQuadratic) throw new NotSupportedException("Updating the quadratic objective is not supported for already generated models.");
+                if (obj.IsQuadratic) throw new NotSupportedException("Generating the quadratic objective is not supported for already generated models.");
 
                 // now load the objective into the solver
                 int n = variables.Count;	// the NEW number of variables
@@ -905,44 +904,6 @@ namespace Sonnet
                 nz += coefs.Count;
             }
             rawconstraints.Clear();
-
-#if (SONNET_USE_SEMICONTVAR)
-		    // now that all the regular constraints and variables are registered,
-		    // register the additional constraints and helper variables for any semi-continuous variables
-            foreach (Variable var in variables.Where(v => v is SemiContiniuousVariable))
-            {
-                SemiContinuousVariable scvar = (SemiContinuousVariable)var;
-                double sclower = scvar.SemiContinuousLower;
-                double upper = scvar.Upper;
-                string name = scvar.Name + "SCHelper";
-
-                Variable scvarHelper = new Variable(name, 0.0, 1.0, VariableType.Integer);
-
-                Constraint con1 = new Constraint(name + "Con1", 1.0 * scvar, ConstraintType.LE, upper * scvarHelper);
-                try
-                {
-                    Generate(con1);
-                }
-                catch (Exception ex)
-                {
-                    string message = string.Format("Error generating constraint {0}.", con1.Name);
-                    throw new SonnetException(message, ex);
-                }
-                nz += con1.Coefficients.Count;
-
-                Constraint con2 = new Constraint(name + "Con2", sclower * scvarHelper, ConstraintType.LE, 1.0 * scvar);
-                try
-                {
-                    Generate(con2);
-                }
-                catch (Exception ex)
-                {
-                    string message = string.Format("Error generating constraint {0}.", con2.Name);
-                    throw new SonnetException(message, ex);
-                }
-                nz += con2.Coefficients.Count;
-            }
-#endif
 
             log.DebugFormat("Done generating matrix after ", (CoinUtils.CoinCpuTime() - genStart));
 
@@ -1195,17 +1156,18 @@ namespace Sonnet
                     {
                         log.Debug("Using CLP-specific quadratic objective loading.");
 
+                        if (isMip) log.Warn("Generating MIQP, but solving MIQP with OsiClp is not supported.");
+
                         ClpSimplex clpSimplex = osiClp.getModelPtr();
                         
                         clpSimplex.loadQuadraticObjectiveUnsafe(n, startObj, columnObj, elementObj);
-                        //clpSimplex.writeMps("testquad.mps", 0, 1);// for CPLEX compatibility, use formatType = 0, numberAcross = 1);
                     }
                     else if (solver is OsiCbcSolverInterface osiCbc)
                     {
                         // TODO: does QP with Cbc work? Does MIQP with Cbc work?
                         log.Debug("Using CBC-specific quadratic objective loading.");
 
-                        if (isMip) log.Warn("Only experimantal support for MIQP!"); 
+                        if (isMip) log.Warn("Generating MIQP, but solving MIQP with OsiCbc is not supported.");
 
                         OsiSolverInterface osiReal = osiCbc.getRealSolverPtr(); //usually the OsiClpSolver
                         if (osiReal is OsiClpSolverInterface osiRealClp)
@@ -1296,6 +1258,7 @@ namespace Sonnet
         /// Ungenerate the model.
         /// If you're looking to reset the solver, simply create a new instance of solver.
         /// </summary>
+
         public void UnGenerate()
         {
             if (IsGenerated)

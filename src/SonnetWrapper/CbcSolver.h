@@ -100,6 +100,14 @@ namespace COIN
 			}
 		}
 
+		static property System::String^ Version
+		{
+			System::String^ get()
+			{
+				return gcnew String(CBC_VERSION);
+			}
+		}
+
 		/// <summary>
 		/// The CallBack to delegate to be invoked.
 		/// If you add multiple delegates, all will be invoked, 

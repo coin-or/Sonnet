@@ -48,13 +48,13 @@ namespace SonnetTest
             SampleDir = SampleDir ?? "..\\..\\..\\..\\..\\..\\..\\Data\\sample";
             MipLibDir = MipLibDir ?? "..\\..\\..\\..\\..\\..\\..\\Data\\miplib3";
 #endif
+        }
 
-    }
-    /// <summary>
-    /// Runs the Cbc native gams test.
-    /// Asserts that the return value is zero
-    /// </summary>
-    [TestMethod, TestCategory("CoinNative")]
+        /// <summary>
+        /// Runs the Cbc native gams test.
+        /// Asserts that the return value is zero
+        /// </summary>
+        [TestMethod, TestCategory("CoinNative")]
         public void SonnetCoinNativeTest1()
         {
             Console.WriteLine("SonnetCoinNativeTest1: GamsTest");

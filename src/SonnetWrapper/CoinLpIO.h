@@ -91,6 +91,11 @@ namespace COIN
 			return result;
 		}
 
+		const double objectiveOffset()
+		{
+			return Base->objectiveOffset();
+		}
+
 		/// Return the problem name
 		String^ getProblemName()
 		{

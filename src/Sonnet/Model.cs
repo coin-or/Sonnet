@@ -317,28 +317,17 @@ namespace Sonnet
 
                 string fullPathWithoutExtension = Path.Combine(directoryName, fileNameWithoutExtension);
 
-                // Previously, CoinMpsIO was used but that doesnt read quad info.
-                // To read MPS with QUAD info use ClpModel or CoinModel readMps. 
-                // CoinModel we havent Wrapped yet at all, so more work.
-                // ClpModel (ClpSimplex) doesnt do row Sense needed for here, only lb / ub.
-                // ClpModel also doesnt save the Objective name.
-                // OsiClp can create row sense from lb / ub, but OsiClp uses CoinMpsIO, so cannot read Quad from OsiClp
-                // So we use ClpSimplex to read the file, but use an OsiClp of it for rowsense 
-
-                ClpSimplex m = new ClpSimplex();
-                OsiClpSolverInterface osiClp = new OsiClpSolverInterface(m);
-                log.PassToClpModel(m);
-
-                int numberErrors = m.readMps(fileName, true, false);
+                OsiClpSolverInterface osiClp = new OsiClpSolverInterface();
+                log.PassToSolver(osiClp);
+                
+                int numberErrors = osiClp.readMps(fileName, true, false);
                 if (numberErrors != 0)
                 {
                     string message = string.Format("Errors occurred when reading the mps file '{0}'.", fileName);
                     SonnetLog.Default.Error(message);
                     throw new SonnetException(message);
                 }
-
-                // set objective function offest
-                // Skip this: setDblParam(OsiObjOffset,m.objectiveOffset())
+                ClpSimplex m = osiClp.getModelPtr();                
 
                 //ClpModel  has ClpObjective which may be an implementatin of ClpQuadObjective.
                 // This can be found by obj->type() == 2 (QuadCoef)
@@ -354,7 +343,7 @@ namespace Sonnet
                 }
 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
-                    m.getColLower(), m.getColUpper(), "OBJROW", m.getObjCoefficients(),
+                    m.getColLower(), m.getColUpper(), "OBJROW", m.getObjCoefficients(), m.objectiveOffset(),
                     m.getNumCols(), m.getNumRows(), osiClp.getRowSense(), osiClp.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), fullQuadraticMatrix, quadraticObjective);
 
                 // Ensure osiClp is not disposed right after a shallow copy of getMatrixByRow was taken for NewHelper call.
@@ -377,7 +366,7 @@ namespace Sonnet
                 m.readLp(fileName);
 
                 model = NewHelper(out variables, m.isInteger, m.columnName, m.rowName,
-                    m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(),
+                    m.getColLower(), m.getColUpper(), m.getObjName(), m.getObjCoefficients(), m.objectiveOffset(),
                     m.getNumCols(), m.getNumRows(), m.getRowSense(), m.getMatrixByRow(), m.getRowLower(), m.getRowUpper(), false, null);
 
                 GC.KeepAlive(m);
@@ -413,6 +402,7 @@ namespace Sonnet
         /// <param name="colUpper"></param>
         /// <param name="objName"></param>
         /// <param name="objCoefs"></param>
+        /// <param name="objConst"></param>
         /// <param name="numberVariables"></param>
         /// <param name="numberConstraints"></param>
         /// <param name="rowSenses"></param>
@@ -424,13 +414,14 @@ namespace Sonnet
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S107:Methods should not have too many parameters", Justification = "Private member and by design")]
         private static Model NewHelper(out Variable[] variables, Func<int, bool> isIntegerFunc, Func<int, string> columnNameFunc, Func<int, string> rowNameFunc,
-            double[] colLower, double[] colUpper, string objName, double[] objCoefs, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers, bool fullQuadraticMatrix, CoinPackedMatrix quadraticObjective)
+            double[] colLower, double[] colUpper, string objName, double[] objCoefs, double objConst, int numberVariables, int numberConstraints, char[] rowSenses, CoinPackedMatrix rowMatrix, double[] rowLowers, double[] rowUppers, bool fullQuadraticMatrix, CoinPackedMatrix quadraticObjective)
         {
             Model model = new Model();
             variables = new Variable[numberVariables];
 
             Expression objExpr = new Expression();
 
+            objExpr.Subtract(objConst); // yes, subtract
             for (int i = 0; i < numberVariables; i++)
             {
                 Variable var = new Variable();

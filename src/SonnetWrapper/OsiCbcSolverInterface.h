@@ -73,6 +73,14 @@ namespace COIN
 			return Derived->getNodeCount();
 		}
 
+		virtual property System::String^ Version
+		{
+			System::String^ get() override
+			{
+				return gcnew String(CBC_VERSION);
+			}
+		}
+
 	protected:
 		property ::OsiCbcSolverInterface * Derived 
 		{

@@ -20,6 +20,7 @@ namespace SonnetTest
 
             Model model = Model.New("MIP-124725.mps"); // added file to project, "Copy Always";
             Solver solver = new Solver(model, typeof(OsiCbcSolverInterface));
+            SonnetLog.Default.PassToSolver(solver.OsiSolver);
 
             OsiCbcSolverInterface osisolver = solver.OsiSolver as OsiCbcSolverInterface;
             Assert.IsTrue(osisolver != null);

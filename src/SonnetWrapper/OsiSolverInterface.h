@@ -142,6 +142,20 @@ namespace COIN
 	    /// Get objective function sense (1 for min (default), -1 for max)
 		double getObjSense();
 	
+		const double* getObjCoefficientsUnsafe()
+		{
+			return Base->getObjCoefficients();
+		}
+
+		array<double>^ getObjCoefficients()
+		{
+			int n = Base->getNumCols();
+			double* input = (double*)Base->getObjCoefficients();
+			array<double>^ result = gcnew array<double>(n);
+			System::Runtime::InteropServices::Marshal::Copy((System::IntPtr)input, result, 0, n);
+			return result;
+		}
+	
 		const double *getColLowerUnsafe()
 		{
 			return Base->getColLower();
@@ -273,6 +287,13 @@ namespace COIN
 			      const double* obj,
 			      const double* rowlb, const double* rowub);
 
+		virtual property System::String^ Version
+		{
+			System::String^ get()
+			{
+				return gcnew String("Undefined");
+			}
+		}
 
 		static OsiSolverInterface^ CreateDerived(::OsiSolverInterface* derived);
 	};

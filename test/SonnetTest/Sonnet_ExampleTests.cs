@@ -16,7 +16,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example1();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 3288.2370400000018) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 3288.2370400000018));
 
             int index = solutionString.IndexOf("Model 'Investement_Planning'");
             Assert.IsTrue(index >= 0);
@@ -41,7 +41,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example2();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 22) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 22));
 
             int index = solutionString.IndexOf("Model 'Personel_Planning'");
             Assert.IsTrue(index >= 0);
@@ -64,7 +64,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example3();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 107842.59259259258) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 107842.59259259258));
 
             // Remove the solver name and model name since these use the default names with global numbers
             int index = solutionString.IndexOf("Model status: Optimal");
@@ -85,7 +85,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example4.Example4();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 9053.4375) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 9053.4375));
 
             int index = solutionString.IndexOf("Model 'Buy or clean'");
             Assert.IsTrue(index >= 0);
@@ -104,7 +104,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example5.Example5();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 424) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 424));
 
             string expectedSolutionString = "Solver 'MachineAssignmentMIP'\r\nModel 'MachineAssignment'\r\nModel status: Optimal\r\nObjective: 424\r\nVariables:\r\nAssign[A,senior1] : Integer : [0, Inf] = 3   ( 0 )\r\nAssign[B,senior1] : Integer : [0, Inf] = 2   ( 0 )\r\nAssign[C,senior1] : Integer : [0, Inf] = 0   ( 0 )\r\nAssign[D,senior1] : Integer : [0, Inf] = 0   ( 0 )\r\nAssign[A,senior2] : Integer : [0, Inf] = 1   ( 0 )\r\nAssign[B,senior2] : Integer : [0, Inf] = 2   ( 0 )\r\nAssign[C,senior2] : Integer : [0, Inf] = 1   ( 0 )\r\nAssign[D,senior2] : Integer : [0, Inf] = 2   ( 0 )\r\nAssign[A,senior3] : Integer : [0, Inf] = 0   ( 0 )\r\nAssign[B,senior3] : Integer : [0, Inf] = 0   ( 0 )\r\nAssign[C,senior3] : Integer : [0, Inf] = 2   ( 0 )\r\nAssign[D,senior3] : Integer : [0, Inf] = 1   ( 0 )\r\nConstraints:\r\nAvailability[senior1] : 5 <= 6  ( 0 )\r\nAvailability[senior2] : 6 <= 6  ( 0 )\r\nAvailability[senior3] : 3 <= 6  ( 0 )\r\nRequirements[A] : 950 >= 950  ( 0 )\r\nRequirements[B] : 1240 >= 1200  ( 0 )\r\nRequirements[C] : 1510 >= 1500  ( 0 )\r\nRequirements[D] : 1810 >= 1800  ( 0 )\r\nEnd\r\n";
             Assert.IsTrue(Utils.EqualsString(solutionString, expectedSolutionString));
@@ -117,7 +117,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example6.Example();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 5) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 5));
 
             int index = solutionString.IndexOf("Model status: Optimal");
             Assert.IsTrue(index >= 0);
@@ -139,7 +139,7 @@ namespace SonnetTest
             string solutionString;
             var ex = new SonnetExamples.Example6b.Example();
             ex.Run(out objValue, out solutionString);
-            Assert.IsTrue(Utils.CompareDouble(objValue, 5) == 0);
+            Assert.IsTrue(Utils.EqualsDouble(objValue, 5));
 
             int index = solutionString.IndexOf("Model status: Optimal");
             Assert.IsTrue(index >= 0);

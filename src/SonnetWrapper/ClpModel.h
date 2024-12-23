@@ -102,6 +102,11 @@ namespace COIN
 			return result;
 		}
 
+		const double objectiveOffset()
+		{
+			return Base->objectiveOffset();
+		}
+
 		bool isInteger(int columnNumber)
 		{
 			return Base->isInteger(columnNumber);
