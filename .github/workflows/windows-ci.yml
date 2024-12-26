@@ -59,12 +59,14 @@ jobs:
         shell: cmd
         run: |
           echo Build pthread-win32 as static library
-          msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -m
+          REM Hide warning C4191 for pid_t DWORD
+          msbuild ..\pthreads\windows\VS2022\pthread_lib.2022.vcxproj -p:Configuration=Release -p:Platform=x64 -p:NoWarn=C4191 -m
           mkdir sonnet\lib\x64	
           copy ..\pthreads\windows\VS2022\bin\Release-Unicode-64bit-x64\pthread_static_lib.lib sonnet\lib\x64\.
           echo.  
           echo Build Sonnet 
-          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=ReleaseParallel -p:Platform=x64 -m
+          REM Hide warning C4805 for unitTestClp.cpp
+          msbuild Sonnet\MSVisualStudio\v17\Sonnet.sln -p:Configuration=ReleaseParallel -p:Platform=x64 -p:NoWarn=C4805 -m
 
       - name: Run tests for net4 framework
         shell: cmd
